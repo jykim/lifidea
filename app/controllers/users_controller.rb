@@ -1,4 +1,5 @@
 class UsersController < ApplicationController 
+  layout "doctrack"
   
   def after_destroy 
     if User.count.zero? 
