@@ -81,17 +81,18 @@ class Searcher
     topk = o[:topk] || 50
     doc_scores = {}
     @cols.each do |col|
-      if !o[:col]
-        debug "[search] Scoring #{col.cid}"
-        col_score = score_col(col, parsed_query, :cql, :cqls => parsed_query.map{|e|col.lm.prob(e)})
-        col_score_log = if col_score == 0
-          MIN_NUM
-          #debug "[search] Skipping collection #{col.cid}"
-          #next
-        else
-          Math.log(col_score)
-        end
-      end
+      col_score_log = MIN_NUM
+      #if !o[:col]
+      #  debug "[search] Scoring #{col.cid}"
+      #  col_score = score_col(col, parsed_query, :cql, :cqls => parsed_query.map{|e|col.lm.prob(e)})
+      #  col_score_log = if col_score == 0
+      #    MIN_NUM
+      #    #debug "[search] Skipping collection #{col.cid}"
+      #    #next
+      #  else
+      #    Math.log(col_score)
+      #  end
+      #end
       doc_scores[col.cid] = []
       col.docs.each do |doc|
         #debug "[search] Scoring #{doc.did}"
