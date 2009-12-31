@@ -3,7 +3,7 @@ class DocumentsController < ApplicationController
   include AdminHelper, DocumentsHelper
   before_filter :authorize, :except => [:login, :index, :show, :search, :click]
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
-  sidebar :search, :only=>[:index, :search]
+  sidebar :pagehunt_search, :only=>[:index, :search]
   sidebar :menu, :only=>[:index]
   sidebar :pagehunt_status, :only=>[:start, :show, :start_search, :search, :request_document]
   sidebar :pagehunt_scoreboard
