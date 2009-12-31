@@ -2,8 +2,8 @@ class Searcher
   attr_accessor :cols
   include InferenceNetwork
   attr_accessor :cons, :docs
-  #RULE_DEF = 'method:jm,lambda:0.1'
-  RULE_DEF = 'method:dirichlet,mu:1500'
+  RULE_DEF = 'method:jm,lambda:0.1'
+  #RULE_DEF = 'method:dirichlet,mu:1500'
   FEATURES = ['c_title','c_content','c_uri','c_tag','time','co-oc','topic','occur']
   INDEX_FIELD_DEF = [:title, :content, :uri]
   INDEX_FIELDS = {"calendar"=>[:start_at, :location], "email"=>[:from, :to, :date], "file"=>[:filename], "news"=>[:tag_list], "webpage"=>[:tag_list]}

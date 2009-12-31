@@ -10,7 +10,7 @@ This is a collection of documents of many types (calendar, file, email, webpage 
   <tr>
     <td><%= @ranklist.to_hash[document.did] %></td>
     <td><%= document.itype %></td>
-    <td><%= link_to document.title, document, :title=>document.to_s %></td>
+    <td><%= link_to document.title, :controller=>:documents, :action=>:show, :id=>document.id, :title=>document.to_s %></td>
 <% if session[:admin_flag] %>
     <td><%= document.query_flag ? "(#{Query.valid_queries(document.id).size})" : "" %></td>
     <td><%= link_to 'Edit', edit_document_path(document) %></td>
