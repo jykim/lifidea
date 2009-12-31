@@ -164,14 +164,7 @@ class DocumentsController < ApplicationController
     src_item, tgt_item = params[:src_item_id].to_i, params[:id].to_i
     History.create(:htype=>params[:htype], :basetime=>Time.now, :src_item_id=>src_item, :item_id=>tgt_item, :user_id=>get_user_id(),
       :metadata=>{:position=>params[:position], :url=>request.url})
-    case params[:htype]
-    when 'doc_con'
-      Occurrence.find_or_create(src_item, tgt_item, 'c')
-    when 'con_con'
-      ConceptLink.find_or_create(src_item, tgt_item, 'c')
-    when /doc_doc|qry_doc/
-      DocumentLink.find_or_create(src_item, tgt_item, 'c')
-    end
+    Link.find_or_create(src_item, tgt_item, 'c', :add=>1)
     redirect_to :action=>:show
   end
 

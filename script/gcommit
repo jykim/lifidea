@@ -2,6 +2,3 @@
 msg = ARGV.join(" ")
 system("git commit -a -m '#{msg}'")
 system("git push")
-Dir.chdir("rubylib")
-system("git commit -a -m '#{msg}'")
-system("git push")
