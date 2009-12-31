@@ -1,0 +1,18 @@
+<h1>Start Search</h1>
+<h2>Your job is to find the <%= (session[:document_index]+1).to_i.ordinalize %> document.</h2>
+<h3>Use search box here to find it! <%= "You have #{@queries_per_page - session[:query_count]} trials left." %></h3><br>
+
+<% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
+<%= text_field_tag(:query, @query, :onpaste=>'return false;', :size=>60) %>
+<%= submit_tag('Search') %>
+<% end -%>
+
+<h3>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next document.</h3>
+<% debug(session)%>
+
+<table>
+  <tr>
+  </tr>
+</table>
+
+<br />

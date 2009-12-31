@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://web.resource.org/cc/">
+  <channel>
+    <title>Delicious/lifidea</title>
+    <link>http://delicious.com/lifidea</link>
+    <description>bookmarks posted by lifidea</description>
+    <atom:link rel="self" type="application/rss+xml" href="http://feeds.delicious.com/v2/rss/lifidea?count=15"/>
+    <item>
+      <title>Home - will_paginate - GitHub</title>
+      <pubDate>Thu, 20 Aug 2009 03:16:58 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/becda569bbde79ea0979a76e7354eed7#lifidea</guid>
+      <link>http://wiki.github.com/mislav/will_paginate</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/becda569bbde79ea0979a76e7354eed7</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/becda569bbde79ea0979a76e7354eed7</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">rails</category>
+      <category domain="http://delicious.com/lifidea/">plugin</category>
+      <category domain="http://delicious.com/lifidea/">ui</category>
+    </item>
+    <item>
+      <title>Simple Sidebar | AgileWebDevelopment</title>
+      <pubDate>Thu, 20 Aug 2009 03:16:40 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/ef5e8c9c51d7c7007a6d334855eb4f6d#lifidea</guid>
+      <link>http://agilewebdevelopment.com/plugins/simple_sidebar</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/ef5e8c9c51d7c7007a6d334855eb4f6d</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/ef5e8c9c51d7c7007a6d334855eb4f6d</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">rails</category>
+      <category domain="http://delicious.com/lifidea/">plugin</category>
+      <category domain="http://delicious.com/lifidea/">ui</category>
+    </item>
+    <item>
+      <title>RubyInline</title>
+      <pubDate>Sun, 16 Aug 2009 19:15:47 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/3e88096833646d236091e11b7691a790#lifidea</guid>
+      <link>http://www.zenspider.com/ZSS/Products/RubyInline/</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/3e88096833646d236091e11b7691a790</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/3e88096833646d236091e11b7691a790</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">rubyinline</category>
+    </item>
+    <item>
+      <title>InfoQ: Embedding C in Ruby for Performance</title>
+      <pubDate>Fri, 14 Aug 2009 18:15:31 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/dcd4ff553285845f85ffd151e30cb834#lifidea</guid>
+      <link>http://www.infoq.com/news/Embedding-C-in-Ruby</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/dcd4ff553285845f85ffd151e30cb834</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/dcd4ff553285845f85ffd151e30cb834</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">ruby</category>
+      <category domain="http://delicious.com/lifidea/">tuning</category>
+      <category domain="http://delicious.com/lifidea/">rubyinline</category>
+    </item>
+    <item>
+      <title>Statistical Language Modeling Toolkit</title>
+      <pubDate>Tue, 04 Aug 2009 15:28:04 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/15f3dc4509b59218baad15bbce66d8ef#lifidea</guid>
+      <link>http://mi.eng.cam.ac.uk/~prc14/toolkit.html</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/15f3dc4509b59218baad15bbce66d8ef</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/15f3dc4509b59218baad15bbce66d8ef</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">NLP</category>
+      <category domain="http://delicious.com/lifidea/">toolkit</category>
+    </item>
+    <item>
+      <title>Ski or Ride New Hampshire's Wildcat Mountain Ski Area, Jackson NH in Pinkham Notch</title>
+      <pubDate>Sun, 26 Jul 2009 20:50:49 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/6e5eb85be312005acc119afd793b6625#lifidea</guid>
+      <link>http://www.skiwildcat.com/</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/6e5eb85be312005acc119afd793b6625</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/6e5eb85be312005acc119afd793b6625</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+    </item>
+    <item>
+      <title>Cannon Mountain | Ski and Snowboard this winter in the White Mountains of New Hampshire</title>
+      <pubDate>Sun, 26 Jul 2009 20:46:21 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/cd17ec39bcfb8909133a6405d05bb24b#lifidea</guid>
+      <link>http://www.cannonmt.com/index.html</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/cd17ec39bcfb8909133a6405d05bb24b</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/cd17ec39bcfb8909133a6405d05bb24b</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">nh</category>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+    </item>
+    <item>
+      <title>Trip Planner | Visit Adirondacks - Official Travel Information for the Adirondack Region of New York</title>
+      <pubDate>Sun, 26 Jul 2009 20:39:27 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/0f45da680c1e473db2005d16aea2c62d#lifidea</guid>
+      <link>http://visitadirondacks.com/tripplanner/?category=Attractions</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/0f45da680c1e473db2005d16aea2c62d</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/0f45da680c1e473db2005d16aea2c62d</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <description>View as detailed text listings</description>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">newyork</category>
+    </item>
+    <item>
+      <title>The WILD Center | Natural History Museum of the Adirondacks</title>
+      <pubDate>Sun, 26 Jul 2009 20:35:16 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/dac252a8cc3d4eda21bbbd52a9df69ea#lifidea</guid>
+      <link>http://www.wildcenter.org/</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/dac252a8cc3d4eda21bbbd52a9df69ea</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/dac252a8cc3d4eda21bbbd52a9df69ea</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">newyork</category>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+    </item>
+    <item>
+      <title>Boston travel guide - Wikitravel</title>
+      <pubDate>Sun, 19 Jul 2009 18:05:46 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/b5e1846cf6931c372dd52fa82da08792#lifidea</guid>
+      <link>http://wikitravel.org/en/Boston</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/b5e1846cf6931c372dd52fa82da08792</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/b5e1846cf6931c372dd52fa82da08792</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">boston</category>
+    </item>
+    <item>
+      <title>The Boston Harborwalk</title>
+      <pubDate>Sun, 19 Jul 2009 18:02:03 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/4e8b2b608ccec825e710899866bff3b3#lifidea</guid>
+      <link>http://www.bostonharborwalk.com/index.php</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/4e8b2b608ccec825e710899866bff3b3</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/4e8b2b608ccec825e710899866bff3b3</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">boston</category>
+    </item>
+    <item>
+      <title>Cape Ann, Massachusetts: Gloucester, Rockport, Essex, Manchester-By-The-Sea</title>
+      <pubDate>Sat, 18 Jul 2009 16:20:23 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/d3a332e6f6ad4c2b36409d78cd66a1b4#lifidea</guid>
+      <link>http://www.cape-ann.com/</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/d3a332e6f6ad4c2b36409d78cd66a1b4</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/d3a332e6f6ad4c2b36409d78cd66a1b4</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">northboston</category>
+    </item>
+    <item>
+      <title>Halibut Point State Park</title>
+      <pubDate>Sat, 18 Jul 2009 16:16:04 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/18fec88088e4ec50a7c201a7748f6c5f#lifidea</guid>
+      <link>http://www.mass.gov/dcr/parks/northeast/halb.htm</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/18fec88088e4ec50a7c201a7748f6c5f</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/18fec88088e4ec50a7c201a7748f6c5f</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">northboston</category>
+    </item>
+    <item>
+      <title>Rockport, MA | Travel Guide for Rockport, Massachusetts</title>
+      <pubDate>Sat, 18 Jul 2009 15:13:07 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/9fcb1d1567763ac748afec3c7aebe7b2#lifidea</guid>
+      <link>http://www.rockportusa.com/</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/9fcb1d1567763ac748afec3c7aebe7b2</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/9fcb1d1567763ac748afec3c7aebe7b2</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">northboston</category>
+    </item>
+    <item>
+      <title>North of Boston Convention and Visitor Bureau: &lt;b&gt; Free Things to Do&lt;/b&gt;</title>
+      <pubDate>Sat, 18 Jul 2009 15:10:58 +0000</pubDate>
+      <guid isPermaLink="false">http://delicious.com/url/d4a0ed337cb9534c3040bb41091c0386#lifidea</guid>
+      <link>http://www.northofboston.org/tour/results.php?cat=%3Cb%3E+Free+Things+to+Do%3C%2Fb%3E&amp;cat_seqnum=66&amp;pg=1&amp;timeframe=Any+time&amp;type1=All&amp;type2=All&amp;location=All&amp;x=48&amp;y=14&amp;=ok</link>
+      <dc:creator><![CDATA[lifidea]]></dc:creator>
+      <comments>http://delicious.com/url/d4a0ed337cb9534c3040bb41091c0386</comments>
+      <wfw:commentRss>http://feeds.delicious.com/v2/rss/url/d4a0ed337cb9534c3040bb41091c0386</wfw:commentRss>
+      <source url="http://feeds.delicious.com/v2/rss/lifidea">lifidea's bookmarks</source>
+      <category domain="http://delicious.com/lifidea/">travel</category>
+      <category domain="http://delicious.com/lifidea/">northboston</category>
+    </item>
+  </channel>
+</rss>

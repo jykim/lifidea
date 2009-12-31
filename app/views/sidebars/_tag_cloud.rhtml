@@ -1,0 +1,7 @@
+<div id="tagcloud" class="sidebar">
+	<div class="title">Tags</div>
+  <% tag_cloud(Item.tag_counts,
+    %w(cloud1 cloud2 cloud3 cloud4)) do |tag, css_class| -%>
+      <%= link_to(tag.name, tag_path(tag), :class => css_class) %>
+  <% end -%>
+</div>

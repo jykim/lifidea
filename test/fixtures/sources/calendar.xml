@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?><feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/' xmlns:gml='http://www.opengis.net/gml' xmlns:georss='http://www.georss.org/georss' xmlns:batch='http://schemas.google.com/gdata/batch' xmlns:gCal='http://schemas.google.com/gCal/2005' xmlns:gd='http://schemas.google.com/g/2005'><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic</id><updated>2009-09-08T10:44:37.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='text'>Default</title><subtitle type='text'></subtitle><link rel='alternate' type='text/html' href='http://www.google.com/calendar/embed?src=myleo.jerry@gmail.com'/><link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic'/><link rel='http://schemas.google.com/g/2005#batch' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/batch'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic?max-results=25'/><link rel='next' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic?start-index=26&amp;max-results=25'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author><generator version='1.0' uri='http://www.google.com/calendar'>Google Calendar</generator><openSearch:totalResults>883</openSearch:totalResults><openSearch:startIR::Index>1</openSearch:startIR::Index><openSearch:itemsPerPage>25</openSearch:itemsPerPage><gCal:timezone value='America/New_York'/><gCal:timesCleaned value='0'/><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/aa4mlgdm8bd23fcbe1r0lhpths</id><published>2009-09-07T15:51:00.000Z</published><updated>2009-09-07T15:51:00.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Writing on Rest</title><summary type='html'>When: Mon Sep 7, 2009 11am to 12pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Mon Sep 7, 2009 11am to 12pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=YWE0bWxnZG04YmQyM2ZjYmUxcjBsaHB0aHMgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/aa4mlgdm8bd23fcbe1r0lhpths'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/9uj0qq8evv8tr4fd9sqligdong</id><published>2009-09-07T14:33:00.000Z</published><updated>2009-09-07T14:33:00.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Trip to Newport &amp;amp; Providence</title><summary type='html'>When: Sat Sep 5, 2009 9am to 5pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sat Sep 5, 2009 9am to 5pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=OXVqMHFxOGV2djh0cjRmZDlzcWxpZ2RvbmcgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/9uj0qq8evv8tr4fd9sqligdong'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/i466jupm36i36uc427a9hp4bs0</id><published>2009-09-07T14:32:43.000Z</published><updated>2009-09-07T14:32:43.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Back to Amherst</title><summary type='html'>When: Sun Sep 6, 2009 8pm to 10pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sun Sep 6, 2009 8pm to 10pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=aTQ2Nmp1cG0zNmkzNnVjNDI3YTlocDRiczAgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/i466jupm36i36uc427a9hp4bs0'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/08lrlor9qinks1v2l2941mpgr0</id><published>2009-09-06T20:27:43.000Z</published><updated>2009-09-07T01:57:07.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Reading &amp;amp; Thinking</title><summary type='html'>When: Sun Sep 6, 2009 3pm to 6pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sun Sep 6, 2009 3pm to 6pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: {score:-2}
+
+I started without a clear goal and it suddenly became very hard for me to focus on what I was doing.</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=MDhscmxvcjlxaW5rczF2MmwyOTQxbXBncjAgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/08lrlor9qinks1v2l2941mpgr0'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/n15t7b05rve0j8jblm1rl4ck6c</id><published>2009-09-06T20:27:55.000Z</published><updated>2009-09-06T20:27:55.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Reading on PIM</title><summary type='html'>When: Sun Sep 6, 2009 9am to 11:30am&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sun Sep 6, 2009 9am to 11:30am 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=bjE1dDdiMDVydmUwajhqYmxtMXJsNGNrNmMgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/n15t7b05rve0j8jblm1rl4ck6c'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/vbjnbp1sgvjlotp8i4vpt86vh8</id><published>2009-09-04T14:13:02.000Z</published><updated>2009-09-04T14:13:02.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Fri Sep 4, 2009 9am to 12pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Fri Sep 4, 2009 9am to 12pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=dmJqbmJwMXNndmpsb3RwOGk0dnB0ODZ2aDggbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/vbjnbp1sgvjlotp8i4vpt86vh8'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/v2leisbpim9hgt7kjjnad3p7e4</id><published>2009-09-03T15:02:10.000Z</published><updated>2009-09-03T15:02:10.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Daily Review</title><summary type='html'>When: Wed Sep 2, 2009 11pm to 11:30pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Wed Sep 2, 2009 11pm to 11:30pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: Finished all the groundwork regarding the blog.
+{score:2}</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=djJsZWlzYnBpbTloZ3Q3a2pqbmFkM3A3ZTQgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/v2leisbpim9hgt7kjjnad3p7e4'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/aiokdfnfb3grqkabvcclkpapqc</id><published>2009-09-03T01:57:36.000Z</published><updated>2009-09-03T04:12:33.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on Blog</title><summary type='html'>When: Wed Sep 2, 2009 9pm to 11:30pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Wed Sep 2, 2009 9pm to 11:30pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=YWlva2RmbmZiM2dycWthYnZjY2xrcGFwcWMgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/aiokdfnfb3grqkabvcclkpapqc'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/44gif74qa1o414718kfmsh4sdk</id><published>2009-09-02T21:57:31.000Z</published><updated>2009-09-02T21:57:31.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>CS791 HW#1 Due</title><summary type='html'>When: Tue Sep 15, 2009&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Tue Sep 15, 2009&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=NDRnaWY3NHFhMW80MTQ3MThrZm1zaDRzZGsgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/44gif74qa1o414718kfmsh4sdk'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/54s0t0c29ts9t9j8mkm4jiinqo</id><published>2009-09-02T21:54:08.000Z</published><updated>2009-09-02T21:54:08.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Meetin w/ David</title><summary type='html'>When: Wed Sep 9, 2009 2pm to 3pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Wed Sep 9, 2009 2pm to 3pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=NTRzMHQwYzI5dHM5dDlqOG1rbTRqaWlucW8gbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/54s0t0c29ts9t9j8mkm4jiinqo'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/h31ijf2aqn7r14cm270348hqq4</id><published>2009-09-02T19:04:32.000Z</published><updated>2009-09-02T21:48:26.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Wed Sep 2, 2009 3pm to 6pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Wed Sep 2, 2009 3pm to 6pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: {score:2} One of the most productive time I&amp;#39;ve spent!</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=aDMxaWpmMmFxbjdyMTRjbTI3MDM0OGhxcTQgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/h31ijf2aqn7r14cm270348hqq4'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/oqa3do5lb9ubi3a9u25r60865k</id><published>2009-09-02T19:04:11.000Z</published><updated>2009-09-02T19:04:11.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Writing on PIM</title><summary type='html'>When: Wed Sep 2, 2009 1:30pm to 3pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Wed Sep 2, 2009 1:30pm to 3pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=b3FhM2RvNWxiOXViaTNhOXUyNXI2MDg2NWsgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/oqa3do5lb9ubi3a9u25r60865k'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/kfjm3jhjfi1is422o3ase8elh0</id><published>2009-09-02T13:43:44.000Z</published><updated>2009-09-02T19:04:03.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Writing on PIM</title><summary type='html'>When: Wed Sep 2, 2009 9:30am to 12pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Wed Sep 2, 2009 9:30am to 12pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: {score:1} Writing a post is a very good way of directing your attention and summarize what you&amp;#39;ve learned!</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=a2ZqbTNqaGpmaTFpczQyMm8zYXNlOGVsaDAgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/kfjm3jhjfi1is422o3ase8elh0'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/3ki7dbut4qfccp2qql82ek2dns</id><published>2009-09-02T02:25:53.000Z</published><updated>2009-09-02T13:40:50.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Tue Sep 1, 2009 9pm to 11:30pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Tue Sep 1, 2009 9pm to 11:30pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: {score:1} Very productive!</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=M2tpN2RidXQ0cWZjY3AycXFsODJlazJkbnMgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/3ki7dbut4qfccp2qql82ek2dns'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/vm4r2cqnai3gbd6p50pbiuopfs</id><published>2009-09-01T17:32:47.000Z</published><updated>2009-09-01T23:52:59.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Tue Sep 1, 2009 1:30pm to 5pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Tue Sep 1, 2009 1:30pm to 5pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: v*Relevance Judgment form
+
+*Retrieval Model Implementation
+-DQL + CQL
+-</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=dm00cjJjcW5haTNnYmQ2cDUwcGJpdW9wZnMgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/vm4r2cqnai3gbd6p50pbiuopfs'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/du28n3b6ena6bu8cmk6jp59sbc</id><published>2009-09-01T14:19:08.000Z</published><updated>2009-09-01T17:32:26.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Tue Sep 1, 2009 10am to 11am&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Tue Sep 1, 2009 10am to 11am 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: *Discussion on Blog w/ Jeff
+- rss feed (?)
+- promotion
+
+*LFDA github revision</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=ZHUyOG4zYjZlbmE2YnU4Y21rNmpwNTlzYmMgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/du28n3b6ena6bu8cmk6jp59sbc'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/t9otonrj7l8khmlcjp2joqeqjg</id><published>2009-09-01T02:56:41.000Z</published><updated>2009-09-01T02:56:41.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Snacking {fun}</title><summary type='html'>When: Sun Aug 30, 2009 9pm to 10:30pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sun Aug 30, 2009 9pm to 10:30pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=dDlvdG9ucmo3bDhraG1sY2pwMmpvcWVxamcgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/t9otonrj7l8khmlcjp2joqeqjg'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/kfst5fugdahrclh2fjhoi73vr0</id><published>2009-08-31T23:48:22.000Z</published><updated>2009-09-01T02:08:51.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Daily Review</title><summary type='html'>When: Mon Aug 31, 2009 11pm to 11:30pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Mon Aug 31, 2009 11pm to 11:30pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: It is your responsibility as an adult to keep your condition to optimal level. I spent most of the time in somewhat sub-optimal condition, which got a very negative impact on my performance.
+
+---
+Tomorrow,
+- I&amp;#39;ll take exercise to llft up the condition of my body.
+- I&amp;#39;ll set the goal each moment and try to keep it.</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=a2ZzdDVmdWdkYWhyY2xoMmZqaG9pNzN2cjAgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/kfst5fugdahrclh2fjhoi73vr0'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/52u43q88lquv3o9j29m74nmhbg</id><published>2009-08-31T23:48:36.000Z</published><updated>2009-09-01T02:06:48.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Mon Aug 31, 2009 8pm to 11pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Mon Aug 31, 2009 8pm to 11pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: *Statistics Chart
+*AJAX Judgment UI
+----
+*Reading on AJAX</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=NTJ1NDNxODhscXV2M285ajI5bTc0bm1oYmcgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/52u43q88lquv3o9j29m74nmhbg'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/5qcjpd8lbekfi6tpgrlo84vihk</id><published>2009-08-31T17:27:09.000Z</published><updated>2009-09-01T02:04:41.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Mon Aug 31, 2009 9am to 11am&amp;nbsp;
+EDT&lt;br&gt;
+
+&lt;br&gt;Where: ciir
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Mon Aug 31, 2009 9am to 11am 
+EDT&lt;br /&gt;
+
+&lt;br /&gt;Where: ciir
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: {score:-2} Very distracted by conversation from people. I failed to keep myself from it. I either had to participate in the conversation or leave the room.</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=NXFjanBkOGxiZWtmaTZ0cGdybG84NHZpaGsgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/5qcjpd8lbekfi6tpgrlo84vihk'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/cgka8ogjhthupr5bhe06jqjab0</id><published>2009-08-31T20:56:15.000Z</published><updated>2009-08-31T21:24:42.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Work on LFDA</title><summary type='html'>When: Mon Aug 31, 2009 1:30pm to 5:30pm&amp;nbsp;
+EDT&lt;br&gt;
+
+&lt;br&gt;Where: dubois
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Mon Aug 31, 2009 1:30pm to 5:30pm 
+EDT&lt;br /&gt;
+
+&lt;br /&gt;Where: dubois
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: *Implementation
+-Concept
+-ConceptLink</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=Y2drYThvZ2podGh1cHI1YmhlMDZqcWphYjAgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/cgka8ogjhthupr5bhe06jqjab0'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/7kefk13hsatqe43jn54m22pbr8</id><published>2009-08-31T02:33:47.000Z</published><updated>2009-08-31T02:33:47.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Talk w/ Youngah</title><summary type='html'>When: Sun Aug 30, 2009 6pm to 7pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sun Aug 30, 2009 6pm to 7pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: {score:2} Talk to her when both of us feels alright. Time, tone and theme -- all that matters.</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=N2tlZmsxM2hzYXRxZTQzam41NG0yMnBicjggbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/7kefk13hsatqe43jn54m22pbr8'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry><entry><id>http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/u6fip1njnleaa6o8u6i6dn9r90</id><published>2009-08-29T14:58:58.000Z</published><updated>2009-08-29T15:14:03.000Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/g/2005#event'/><title type='html'>Reading: ITIR - Ch6~7 Term weighting &amp;amp; IR::Indexing</title><summary type='html'>When: Sat Aug 29, 2009 10am to 12pm&amp;nbsp;
+EDT&lt;br&gt;
+
+
+&lt;br&gt;Event Status: confirmed</summary><content type='html'>When: Sat Aug 29, 2009 10am to 12pm 
+EDT&lt;br /&gt;
+
+
+&lt;br /&gt;Event Status: confirmed
+&lt;br /&gt;Event Description: *Inverted indexing enables many optimizations based on inexact top-k rank list.</content><link rel='alternate' type='text/html' href='http://www.google.com/calendar/event?eid=dTZmaXAxbmpubGVhYTZvOHU2aTZkbjlyOTAgbXlsZW8uamVycnlAbQ' title='alternate'/><link rel='self' type='application/atom+xml' href='http://www.google.com/calendar/feeds/myleo.jerry%40gmail.com/private-f543ac9adc634f2f6e666eb561b933c5/basic/u6fip1njnleaa6o8u6i6dn9r90'/><author><name>Jin-young Kim</name><email>myleo.jerry@gmail.com</email></author></entry></feed>

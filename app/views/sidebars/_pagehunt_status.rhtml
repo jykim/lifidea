@@ -1,0 +1,14 @@
+<div class="sidebar">
+  <div class="title">Status</div>
+  <ul>
+    <li>Pages Found : <%= "#{session[:seen_doc_count]}/#{@pages_per_game}"%></li>
+    <li>Queries Issued : <%= "#{session[:query_count]}/#{@queries_per_page}"%></li>
+    <li>Current Score : <%= "#{session[:score].to_f.r2}" %></li>
+  </ul>
+	
+<% if params[:random] && controller.action_name == 'show' && session[:query_count] %>
+	<form name="cd">
+	<input id="txt" readonly="true" type="text" value="00:15" border="0" name="disp">
+	</form>
+<% end %>
+</div>

@@ -1,0 +1,33 @@
+<% content_for :left do %>
+	<% debug(params)%>
+	<% form_tag '', :method => 'GET'do %> 
+	<h3>Source:</h3>
+		<% options = options_for_select([['all',-1]].concat(Source.active.map{|e|[e.title, e.id]}),params[:source] ? params[:source].map{|e|e.to_i} : [-1]) %>
+		<%= select_tag(:source, options, :multiple=>true, :onchange => 'this.form.submit()')%>
+		<h3>Type:</h3>
+		<%= select_for_itype(params[:itype])%><br>
+		<h3>Period:</h3>
+		<%= text_field_tag(:start_at, @start_at) %> ~ 
+		<%= text_field_tag(:end_at, @end_at) %>
+		<%= submit_tag('Filter') %>
+	<% end %> 
+<% end %>
+<h1>Recent Documents</h1>
+<table  class="sortable" id="sortabletable">
+  <tr>
+  </tr>
+
+<% @items.each do |item| %>
+  <tr>
+    <td width='70'><%= item.basetime.to_date %></td>
+    <td><%= item.itype %></td>
+    <td><%= link_to ((item.title.blank?)? "Untitled" : item.title) , item_path(item), :title=>item.to_s %></td>
+    <td><%= link_to 'Edit', edit_item_path(item) %></td>
+    <td><%= link_to 'Del', del_item_path(item) %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<%= will_paginate(@items) if @items.respond_to?("total_pages")%>
+<%= link_to 'New item', new_item_path %>

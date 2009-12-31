@@ -1,0 +1,36 @@
+<% content_for :left do %>
+	<% debug(params)%>
+	<% form_tag '', :method => 'GET'do %> 
+		<h3>Sort By:</h3>
+		<% options = options_for_select(DL_TYPES.map{|e|[e.to_s,e.to_s]} << ['judgment','judgment'], params[:order]) %>
+		<%= select_tag(:order, options, :onchange => 'this.form.submit()')%>
+		<h3>Batch:</h3>
+		<%= text_field_tag(:batch, @batch) %>
+		<%= submit_tag('Filter') %>
+	<% end %> 
+<% end %>
+<% form_tag(:action=>"save_judgment", :method=>'post') do %>
+<%= submit_tag("Submit Judgment")%>
+<table class="sortable" id="sortabletable">
+<tr>
+  <th><%= "Calendar" %></th>
+	<%= DL_TYPES.map{|e|"<th>#{e}</th>"}.join("\n") %>
+  <th><%= "Email" %></th>
+  <th  class="unsortable"> Judgment </th>
+  <th  class="unsortable"> Remark </th>
+</tr>
+<% @links.each do |link| %>
+  <tr>
+    <td><%= link_to link.outdoc.title, link.outdoc, :title=>link.outdoc.to_s(true) %></td>
+		<%= DL_TYPES.map{|e|"<td>#{fp(link.m[e])}</td>"}.join("\n") %>
+    <td><%= link_to link.indoc.title,  link.indoc, :title=>link.indoc.to_s(true) %></td>
+    <td><%= text_field_tag "judgment[#{link.id}]", link.judgment ,:size=>1 %></td>
+    <td><%= text_field_tag "remark[#{link.id}]", link.remark ,:size=>5 %></td>
+  </tr>
+<% end %>
+</table>
+<%= submit_tag("Submit Judgment")%>
+<% end %>
+
+<br />
+<%= will_paginate(@links)%>

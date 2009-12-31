@@ -1,0 +1,8 @@
+<div id="tagcloud" class="sidebar">
+	<div class="title">Linked Documents</div>
+	<ul>
+	<% @item.link_docs.sort_by{|e|e[0].content}.reverse[0..10].each do |e| %>
+		<li> <%= link_to e[1].title.first(25), e[1], :title=>e[1].to_s(true) %> <%= e[0].judgment%> </li>
+	<% end %>
+	</ul>
+</div>

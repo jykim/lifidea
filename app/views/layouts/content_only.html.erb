@@ -1,0 +1,15 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+ <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+ <title>DocTrack Game</title>
+ <%= javascript_include_tag :defaults %>
+ <%= javascript_include_tag "sortable_2" %>
+ <%= image_tag "ajax-loader.gif", :id=>'spinner', :style=>"display:none; float:right;"%>
+ <%= stylesheet_link_tag '3col' %>
+ <%= stylesheet_link_tag 'plugins' %>
+</head>
+<body >
+	<%= yield %>
+</body>
+</html>

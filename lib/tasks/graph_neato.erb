@@ -1,0 +1,5 @@
+graph G {
+	overlap=false; orientation=landscape;
+  <% nodes.each do |e| %>
+    "<%=e[:from]%>" -- "<%=e[:to]%>" [len=<%=(ENV['threshold'].to_f||1) / e[:weight] %>, label="<%=e[:label]%>"];<% end %>
+}

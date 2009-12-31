@@ -1,0 +1,21 @@
+# See http://github.com/eugenebolshakov/app_config
+# parsed as ERB, apparently, not YAML?
+# accessible as Conf.whatever
+# NB must reload app after changing this file
+
+common:
+  timezone: "Eastern Time (US & Canada)"
+  # Change the secret to protect your site from DoS attack
+  secret: 8_2BGh0
+  # The array of feeds you want to aggregate. If you change this then manually delete the whole cache.
+  feeds:
+   - http://www.citeulike.org/rss/user/jykim
+  # A map between the original feed item titles in the XML, and the titles you want to show when rendered.
+  # In other words, you can change how the individual feed items are labelled.
+  title_map:
+    "CiteULike" : "CUL"
+#development:
+
+#test:
+
+#deployment:

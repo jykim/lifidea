@@ -1,0 +1,12 @@
+<div class="sidebar">
+  <div class="title">Browse by Type</div>
+  <ul>
+		<% form_tag '', :method => 'GET'do %> 
+		<%= select_for_itype(params[:itype])%><br>
+<% if session[:admin_flag]%>
+		<%= check_box_tag('query_only', params[:query_only])%>
+<% end %>
+			<%= submit_tag('Filter') %>
+		<% end %>
+  </ul>
+</div>

@@ -1,0 +1,5 @@
+digraph G<%=i%> {
+  <% nodes.each do |e| %>
+    <%=e[:from]%> -> <%=e[:to]%> [label="<%=e[:label]%>"];
+  <% end %>
+}

@@ -1,0 +1,2 @@
+module PagehuntHelper
+end

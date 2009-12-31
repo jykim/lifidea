@@ -1,0 +1,33 @@
+# http://aslakhellesoy.com/articles/2006/02/09/announcement-new-javascript-canvas-graph-library
+wilma_dino:
+  id: 1
+  from_id: 2
+  to_id: 1
+fred_wilma:
+  id: 2
+  from_id: 3
+  to_id: 2
+wilma_barney:
+  id: 3
+  from_id: 2
+  to_id: 4
+barney_patty:
+  id: 4
+  from_id: 4
+  to_id: 5
+patty_aslak:
+  id: 5
+  from_id: 5
+  to_id: 6
+aslak_dave:
+  id: 6
+  from_id: 6
+  to_id: 7
+fred_barney:
+  id: 7
+  from_id: 3
+  to_id: 4
+aslak_fred:
+  id: 8
+  from_id: 6
+  to_id: 3

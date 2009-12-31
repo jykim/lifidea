@@ -1,0 +1,23 @@
+<p>
+  <b>Gid:</b>
+  <%=h @game.gid %>
+</p>
+
+<p>
+  <b>Score:</b>
+  <%=h @game.score %>
+</p>
+
+<p>
+  <b>Query count:</b>
+  <%=h @game.query_count %>
+</p>
+
+<p>
+  <b>Start at:</b>
+  <%=h @game.start_at %>
+</p>
+
+
+<%= link_to 'Edit', edit_game_path(@game) %> |
+<%= link_to 'Back', games_path %>

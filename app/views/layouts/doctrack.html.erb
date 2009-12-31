@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+ <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+ <title>DocTrack Game</title>
+ <%= javascript_include_tag :defaults %>
+ <%= javascript_include_tag "sortable_2" %>
+ <%= javascript_include_tag "countdown" %>
+ <%= image_tag "ajax-loader.gif", :id=>'spinner', :style=>"display:none; float:right;"%>
+ <%= stylesheet_link_tag '3col' %>
+ <%= stylesheet_link_tag 'plugins' %>
+</head>
+<body >
+	<div id="header">
+		<h1>DocTrack Game</h1>
+		<% if flash[:notice] -%> 
+		<h2><%= flash[:notice] %></h2>
+		<% end -%> 
+
+		<ul>
+			<li<%= link_to 'Home', :controller => 'documents' %></li>
+			<li><%= link_to 'Start', :controller => 'documents', :action => 'start' %></li>
+			<li><%= link_to 'ScoreBoard', :controller => 'games' %></li>
+			<% if session[:admin_flag] %> 
+				<li><%= link_to 'Users', :controller => 'users' %></li>
+				<li><%= link_to 'Sources', :controller => 'sources' %></li>
+			<% end %>
+			<% if session[:user_id] %> 
+			<li><%= link_to 'Logout', :controller => 'admin', :action => 'logout' %> </li>
+			<% else %>
+			<li><%= link_to 'Login', :controller => 'admin', :action => 'logout' %> </li>
+			<% end %> 
+			<%= "&nbsp; &nbsp; &nbsp; (logged in as #{session[:user_uid]})" if session[:user_uid]%>
+		 
+		</ul>
+	</div>
+	<div class="colmask threecol">
+		<div class="colmid">
+			<div class="colleft">
+				<div class="col1">
+				  <%= yield %>
+				</div>
+				<div class="col2">
+					<%= yield :left %>
+				</div>
+				<div class="col3">
+				  <%= render_sidebars %>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<p>By Jinyoung Kim and W. Bruce Croft in CIIR, UMass Amherst.</p>
+
+	</div>
+</body>
+</html>

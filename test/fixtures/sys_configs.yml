@@ -1,0 +1,75 @@
+--- 
+sys_configs_001: 
+  updated_at: 2009-09-08 12:12:05
+  title: DATE_LAST_BATCH_JOB
+  remark: 
+  id: "1"
+  content: "2009-09-08"
+  created_at: 
+sys_configs_002: 
+  updated_at: 
+  title: FACT_ROOT
+  remark: 
+  id: "3"
+  content: /Users/lifidea/dev/data/ddl
+  created_at: 
+sys_configs_003: 
+  updated_at: 
+  title: HOUR_DAYBREAK
+  remark: 
+  id: "4"
+  content: "3"
+  created_at: 
+sys_configs_004: 
+  updated_at: 
+  title: SYNC_INTERVAL_DEFAULT
+  remark: 
+  id: "7"
+  content: "300"
+  created_at: 
+sys_configs_005: 
+  updated_at: 
+  title: PORT_SEARCHER
+  remark: 
+  id: "8"
+  content: "3101"
+  created_at: 
+sys_configs_006: 
+  updated_at: 2009-09-08 12:12:05
+  title: TIME_LAST_INDEX_JOB
+  remark: 
+  id: "9"
+  content: <%= Time.now %>
+  created_at: 
+sys_configs_007: 
+  updated_at: 2009-09-08 12:12:05
+  title: DISPLAY_TOPK_RESULT
+  remark: 
+  id: "10"
+  content: 10
+  created_at: 
+sys_configs_008: 
+  updated_at: 2009-09-08 12:12:05
+  title: PAGES_PER_GAME
+  remark: 
+  id: "11"
+  content: 5
+  created_at: 
+sys_configs_009: 
+  updated_at: 2009-09-08 12:12:05
+  title: QUERIES_PER_PAGE
+  remark: 
+  content: 5
+  created_at: 
+sys_configs_010: 
+  updated_at: 2009-09-08 12:12:05
+  title: DISPLAY_PAGE_NO
+  remark: 
+  content: 3
+  created_at: 
+sys_configs_010: 
+  updated_at: 2009-09-08 12:12:05
+  title: TIME_PER_PAGE
+  remark: 
+  content: 5
+  created_at: 

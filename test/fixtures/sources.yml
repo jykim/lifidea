@@ -1,0 +1,217 @@
+--- 
+sources_001: 
+  updated_at: 
+  sync_at: 
+  uri: 
+  sync_interval: 
+  sync_content: 
+  option: "--- {}\n"
+  title: Query
+  itype: query
+  active_flag: "1"
+  id: "1"
+  filter: 
+  created_at: 
+sources_002: 
+  updated_at: 2009-09-11 20:53:42
+  sync_at: 2009-09-11 20:53:42
+  uri: http://www.google.com/calendar/feeds/your_id@gmail.com/private-url
+  sync_interval: 
+  sync_content: c31b0f713de8f895720c4c49ce7c005e
+  option: "--- \n\
+    :password: your_passowrd\n\
+    :use_markup: true\n\
+    :id: your_id\n"
+  title: New Calendar
+  itype: calendar
+  active_flag: "1"
+  id: "2"
+  filter: 
+  created_at: 
+sources_003: 
+  updated_at: 2009-09-11 20:53:43
+  sync_at: 2009-09-11 20:53:43
+  uri: https://www.google.com/history/?output=rss
+  sync_interval: 
+  sync_content: d0410406e8febafdfc14370fab6eb554
+  option: "--- \n\
+    :password: your_passowrd\n\
+    :id: your_id\n"
+  itype: webpage
+  title: Web History
+  active_flag: "0"
+  id: "3"
+  filter: "--- \n\
+    :title: /(^http:\\/\\/mail\\.google\\.com\\/mail\\/\\?|doubleclick\\.net\\/)/\n"
+  created_at: 
+sources_004: 
+  updated_at: 2009-09-11 20:53:43
+  sync_at: 2009-09-11 20:53:43
+  uri: http://feeds.delicious.com/v2/rss/lifidea?count=100
+  sync_interval: 
+  sync_content: 9a8a0cae5d3e3718b1c65ddd7ccdb3ff
+  option: 
+  title: Bookmark
+  itype: webpage
+  active_flag: "1"
+  id: "4"
+  filter: 
+  created_at: 
+sources_005: 
+  updated_at: 2009-09-11 20:53:44
+  sync_at: 2009-09-11 20:53:44
+  uri: http://www.citeulike.org/rss/user/jykim
+  sync_interval: 
+  sync_content: 0c474bab47b777ed673a2fe6c133be2f
+  option: "--- \n\
+    :metadata: \n\
+    - :author\n\
+    - :source\n\
+    - :pub_year\n"
+  title: Publication
+  itype: pub
+  active_flag: "1"
+  id: "5"
+  filter: 
+  created_at: 
+sources_006: 
+  updated_at: 2009-09-11 03:13:22
+  sync_at: 2009-09-11 03:13:22
+  uri: imap://imap.gmail.com
+  sync_interval: 
+  sync_content: 
+  option: "--- \n\
+    :password: your_passowrd\n\
+    :folder: Inbox\n\
+    :metadata: \n\
+    - :to\n\
+    - :from\n\
+    - :date\n\
+    - :cc\n\
+    :id: your_id\n\
+    :port: 993\n"
+  title: Email
+  itype: memo
+  active_flag: "0"
+  id: "6"
+  filter: 
+  created_at: 
+sources_007: 
+  updated_at: 2009-09-11 20:53:54
+  sync_at: 2009-09-11 20:53:54
+  uri: file:///Users/lifidea/dev/data/ddl/money
+  sync_interval: 
+  sync_content: 
+  option: "--- \n\
+    :unit: :item\n"
+  title: Bank Statement
+  itype: money
+  active_flag: "0"
+  id: "7"
+  filter: 
+  created_at: 
+sources_009: 
+  updated_at: 2009-09-11 20:53:54
+  sync_at: 2009-09-11 20:53:54
+  uri: http://twitter.com/statuses/user_timeline/25219647.rss
+  sync_interval: 
+  sync_content: 282d49cb4fe0fda9e21dfd0438a22b22
+  option: 
+  title: Twitter
+  itype: memo
+  active_flag: "1"
+  id: "9"
+  filter: 
+  created_at: 
+sources_010: 
+  updated_at: 2009-09-11 20:53:55
+  sync_at: 2009-09-11 20:53:55
+  uri: http://twitter.com/statuses/user_timeline/53764303.rss
+  sync_interval: 
+  sync_content: 7a9676d8a91bd2366c61d9b947c37cd5
+  option: "--- \n\
+    :password: your_passowrd\n\
+    :id: lifidea_me\n\
+    :use_markup: true\n"
+  title: Twitter(private)
+  itype: memo
+  active_flag: "0"
+  id: "10"
+  filter: 
+  created_at: 
+sources_011: 
+  updated_at: 2009-09-11 20:53:55
+  sync_at: 2009-09-11 20:53:55
+  uri: http://www.google.com/reader/public/atom/user%2F01438087896683473898%2Fstate%2Fcom.google%2Fbroadcast
+  sync_interval: 
+  sync_content: c6dbd78dbb1f346405a7d31397ff756e
+  option: 
+  title: RSS Feed
+  itype: news
+  active_flag: "1"
+  id: "11"
+  filter: 
+  created_at: 
+sources_012: 
+  updated_at: 2009-09-11 03:13:31
+  sync_at: 2009-09-11 03:13:31
+  uri: imap://imap.gmail.com
+  sync_interval: 
+  sync_content: 
+  option: "--- \n\
+    :password: your_passowrd\n\
+    :folder: notes\n\
+    :id: your_id\n\
+    :use_markup: true\n\
+    :port: 993\n"
+  title: Email Memo
+  itype: memo
+  active_flag: "0"
+  id: "12"
+  filter: 
+  created_at:
+sources_008: 
+  updated_at: 2009-09-11 20:53:54
+  sync_at: 2009-09-11 20:53:54
+  uri: file://<%= RAILS_ROOT %>/test/fixtures/sources/app_log.txt
+  sync_interval: 
+  sync_content: 
+  option: "--- \n\
+    :unit: :item\n\
+    :copy_daily_from: <%= RAILS_ROOT %>/test/fixtures/sources_bak\n"
+  title: App Log
+  itype: app_log
+  active_flag: "0"
+  id: "8"
+  filter: 
+  created_at: 
+sources_013: 
+  updated_at: 2009-09-11 20:53:54
+  sync_at: 
+  uri: file://<%= RAILS_ROOT %>/test/fixtures/docs/trec
+  sync_interval: 
+  sync_content: 
+  option: "--- \n\
+    :recent_only: true\n\
+    :path_as_tag: true\n\
+    :trec: true\n"
+  title: TREC Docs
+  itype: file
+  active_flag: "0"
+  id: "13"
+  filter: 
+  created_at: 
+sources_015: 
+  updated_at: 2009-09-11 20:53:54
+  sync_at: 2009-09-11 20:53:54
+  uri: file://<%= RAILS_ROOT %>/test/fixtures/docs/others
+  sync_interval: 
+  sync_content: 
+  option: "--- \n\
+    :path_as_tag: true\n"
+  title: Other Docs
+  itype: file
+  active_flag: "1"
+  id: "15"
+  filter: 
+  created_at: 

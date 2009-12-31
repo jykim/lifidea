@@ -1,0 +1,14 @@
+<h1>Game Statistics </h1>
+<h2>Score : <%= session[:score] %></h2>
+<h2>Queries Issued : <%= session[:total_query_count] %></h2>
+<h2>Time Spent : <%= (@game.finish_at - @game.start_at).round %> seconds</h2>
+
+
+<h3>Do you have any feedback or problem on DocTrack? </h3>
+
+<% form_tag({:controller=>'documents',:action => 'finish'}, :method => :post) do -%>
+<%= text_area_tag(:comment, @comment, :cols=>80, :rows=>10) %><br>
+<%= submit_tag('Submit Feedback') %> (you'll be redirected to the scoreboard after submission)
+<% end -%>
+
+<h3>Click <%= link_to "here", :controller=>:games %> just to see the scoreboard!</h3>

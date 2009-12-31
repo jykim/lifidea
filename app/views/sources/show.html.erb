@@ -1,0 +1,28 @@
+<p>
+  <b>Title:</b>
+  <%=h @source.title %>
+</p>
+
+<p>
+  <b>Dtype:</b>
+  <%=h @source.itype %>
+</p>
+
+<p>
+  <b>Uri:</b>
+  <%=h @source.uri %>
+</p>
+
+<p>
+  <b>Option:</b>
+  <%=h @source.option %>
+</p>
+
+<p>
+  <b>Active:</b>
+  <%=h @source.active_flag %>
+</p>
+
+
+<%= link_to 'Edit', edit_source_path(@source) %> |
+<%= link_to 'Back', sources_path %>

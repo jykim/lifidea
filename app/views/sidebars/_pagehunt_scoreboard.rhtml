@@ -1,0 +1,8 @@
+<div id="tagcloud" class="sidebar">
+	<div class="title">Top Scores</div>
+	<ul>
+	<% Game.valid.find_all(&:score).sort_by(&:score).reverse[0..20].each do |e| %>
+		<li> <%=  "#{e.user.uid} : #{e.score} (#{e.start_at.to_date})" %> </li>
+	<% end %>
+	</ul>
+</div>

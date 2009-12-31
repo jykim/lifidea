@@ -1,0 +1,23 @@
+<h1>Start a New Game</h1>
+
+<h2>Goal</h2>
+Your goal is to find the documents you're shown using the search engine provided. Since finding the document you've just seen is too easy, we show <%= @display_page_total %> documents in a row and tell you which document to find in the end. <br><br>
+
+Your score is determined by where in the Top <%= @display_topk_result %> rank list you can locate the target document. For instance, if the target document was found at the first rank, you can get 10 points.<br><br>
+
+Up to this point, you have found <%=  @query_docs_found.size %> out of <%= @query_docs_total.size %> target documents provided by the system. Since there's no limit in playing this game, you're free to play as much as possible until you find all the target documents.
+
+<h2>Rules</h2>
+- You'll be finding <%= @pages_per_game %> documents per game, each of which will be provided with <%= @display_page_total-1 %> other documents. <br>
+
+- You'll be given <%= @time_per_page %> seconds to skim each document after it's loaded.<br>
+
+- Please do not copy and paste document text. (pasting to search box is disabled) <br>
+
+- The search engine used for this game indexes everything (type, title, uri, metadata and content) shown in the document page yet handles only simple keyword queries without fancy features. (e.g. phrase, spell correction, etc.)
+
+<% if @query_docs_total.size - @query_docs_found.size <= @pages_per_game %>
+	<h3>You have found all the documents available!</h3>
+<% else %>
+	<h3><%= link_to("Click here", :action=>:request_document)%> if you want to start now!</h3>
+<% end %>

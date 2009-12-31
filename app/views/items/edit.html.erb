@@ -1,0 +1,35 @@
+<h1>Editing item</h1>
+
+<% form_for(@item, :url=>{:action=>:update, :id=>@item}) do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <%= f.label :title %> : 
+    <%= f.text_field :title %>
+  </p>
+  <p>
+    <%= f.label :did %> : 
+    <%= f.text_field :did %>
+  </p>
+  <p>
+    <%= f.label :uri %> : 
+    <%= f.text_field :uri %>
+  </p>
+  <p>
+    <%= f.label :itype %> : 
+    <%= f.text_field :itype %>
+  </p>
+  <p>
+    <%= f.label :remark %><br />
+    <%= f.text_area :remark %>
+  </p>
+	<p>
+	  <b>Content:</b> <br>
+	  <%= @item.content.gsub("\n","<br/>") if @item.content %>
+	</p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', item_path(@item) %> |
+<%= link_to 'Back', items_path %>

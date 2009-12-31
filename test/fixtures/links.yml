@@ -1,0 +1,29 @@
+---
+L1:
+  lid: 1_2_o
+  out_id: 1
+  in_id: 2
+  ltype: o
+  weight: 1
+  
+L2:
+  lid: 1_3_o
+  out_id: 1
+  in_id: 3
+  ltype: o
+  weight: 2
+  
+L3:
+  lid: 2_3_o
+  out_id: 2
+  in_id: 3
+  ltype: o
+  weight: 3
+
+L4:
+  lid: 3_1_o
+  out_id: 3
+  in_id: 1
+  ltype: o
+  weight: 4
+

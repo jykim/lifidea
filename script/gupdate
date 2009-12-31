@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+system("git pull")
+Dir.chdir("rubylib")
+system("git pull")

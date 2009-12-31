@@ -1,0 +1,9 @@
+<div class="sidebar">
+  <div class="title">Search</div>
+  <ul>
+		<% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
+    <li><%= text_field_tag(:query, @query, :onpaste=>((during_game?)? 'return false;' : '')) %></li>
+    <li><%= submit_tag('Search') %></li>
+		<% end -%>
+  </ul>
+</div>

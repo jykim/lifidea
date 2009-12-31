@@ -1,0 +1,27 @@
+<h1>Creating a New User</h1> 
+<% form_for(@user) do |f| %> 
+	<%= f.error_messages %> 
+	<fieldset> 
+		<legend>Enter User Details</legend> 
+		<div> 
+			<%= f.label :uid %>: 
+			<%= f.text_field :uid, :size => 40 %> (your ID)
+		</div> 
+		<div> 
+			<%= f.label :email %>: 
+			<%= f.text_field :email, :size => 40 %> (required for a brief survey)
+		</div> 
+		<div> 
+			<%= f.label :user_password, 'Password' %>: 
+			<%= f.password_field :password, :size => 40 %> (optional)
+		</div> 
+		<div> 
+			<%= f.label :user_password_confirmation, 'Confirm' %>: 
+			<%= f.password_field :password_confirmation, :size => 40 %> 
+		</div> 
+		<div> 
+			<%= f.submit "Add User", :class => "submit" %> 
+		</div> 
+	</fieldset> 
+<% end %> 
+<h3>By submitting this form, you are agreeing to share the data collected by your activities during this game with research community. Thanks for your contribution!</h3>

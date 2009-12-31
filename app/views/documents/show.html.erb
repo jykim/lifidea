@@ -1,0 +1,42 @@
+<% if params[:random] %>
+	<h2>Here's the <%= session[:display_page_cur].to_i.ordinalize %> document (
+	<% if @display_page_total <= session[:display_page_cur] %>
+		 <%= link_to("skip to search", :action=>:start_search)%> 
+	<% else %>
+	 <%= link_to("skip to next", :action=>:show, :random=>true)%> 
+	<% end%>
+	)</h2>
+<% end %>
+<p>
+  <b>Type:</b>
+  <%=h @document.itype %>
+</p>
+
+<p>
+  <b>Title:</b>
+  <%=h @document.title %> <%=h @document.query_flag ? "(query)" : "" %>
+</p>
+
+<% if @document.uri =~ /^http:/ %>
+<p>
+  <b>URL:</b>
+  <%= link_to @document.uri, @document.uri %>
+</p>
+<% end %>
+<p>
+  <b>Metadata:</b> <br>
+	<table border='1' cellspacing=0 cellpadding=2>
+  <%= @document.metadata.find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
+	</table>
+</p>
+
+<b>Content:</b> <br>
+<% if @document.uri =~ /^http/ %>
+	(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
+	<iframe name='iframe_doc' src="<%= display_url(@document.uri) %>" width="750" height="780" style="border: none;"></iframe>
+<% else %>
+	<%= @document.content.gsub("\n","<br/>") if @document.content %>
+<% end %>
+
+<%= link_to 'Edit', edit_document_path(@document) %> |
+<%= link_to 'Back', documents_path %>

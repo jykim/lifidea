@@ -1,0 +1,23 @@
+<h1>Search Result ( <% @query %>)</h1>
+<% debug(request.url)%>
+
+<% form_tag :action => 'create_concept', :method => 'POST' do %> 
+<table>
+  <tr>
+  </tr>
+	<% @rank_list.sort_by{|e|e[1]}.reverse.each do |e| %>
+	  <tr>
+	    <td><%= check_box_tag("checked_docs[]", e[0]) %><% e[1].round_at(3) %></td>
+	    <td><%= @docs[e[0]].itype %></td>
+	    <td><%= link_to @docs[e[0]].title, {:controller=>'items', :action=>'click', :htype=>'qry_doc', :id=>@docs[e[0]].id, :src_item_id=>@query_doc.id} %></td>
+	    <td><%= link_to 'Edit', edit_item_path(@docs[e[0]]) %></td>
+	    <td><%= link_to 'Destroy', @docs[e[0]], :confirm => 'Are you sure?', :method => :delete %></td>
+	  </tr>
+	<% end %>
+</table>
+<%= hidden_field_tag "query", @query %>
+<%= hidden_field_tag "source_type", 'Query' %>
+<div align='right'><%= submit_tag 'Add as New Concept' %></div>
+<% end %>
+
+<br />

@@ -1,0 +1,8 @@
+<div id="concept_cloud" class="sidebar">
+	<div class="title">Concepts</div>
+	<% concept_counts = Tag.find_by_source(params[:source]).group_by{|c|c}.map{|k,v|[k,v.size]} %>
+  <% concept_counts.sort_by{|e|e[1]}.reverse.each_with_index do |e,i| %>
+		<% tag_size = (5-4*(i+1).to_f/concept_counts.size).to_i %>
+    <%= link_to(e[0].title, e[0], :class=>"cloud#{tag_size}")  %>
+  <% end %>
+</div>

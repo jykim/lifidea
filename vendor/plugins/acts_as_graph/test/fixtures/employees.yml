@@ -1,0 +1,22 @@
+dino:
+  id: 1
+  name: dino
+wilma:
+  id: 2
+  name: wilma
+fred:
+  id: 3
+  name: fred
+barney:
+  id: 4
+  name: barney
+patty:
+  id: 5
+  name: patty
+aslak:
+  id: 6
+  name: aslak
+dave:
+  id: 7
+  name: dave
+  

@@ -1,0 +1,30 @@
+<h1>Listing tags</h1>
+<% content_for :left do %>
+	<h3>By Source:</h3>
+	<% debug(params)%>
+	<% form_tag '', :method => 'GET'do %> 
+		<% options = options_for_select([['all',-1]].concat(Source.active.map{|e|[e.title, e.id]}),params[:source] ? params[:source].map{|e|e.to_i} : [-1]) %>
+		<%= select_tag(:source, options, :onchange => 'this.form.submit()')%>
+	<% end %> 
+<% end %>
+<table class="sortable" id="sortabletable">
+  <tr>
+    <th>Title</th>
+    <th class="sorttable_numeric">Occurrences</th>
+  </tr>
+
+<% @tags.each do |tag| %>
+  <tr>
+    <td><%= link_to tag.title, tag %></td>
+    <td><%=h tag.occurrence_count %></td>
+    <td><%= link_to 'Show', tag %></td>
+    <td><%= link_to 'Edit', edit_tag_path(tag) %></td>
+    <td><%= link_to 'Del', tag, :method => :delete %></td>
+		<td><%= link_to 'ToConcept', :controller=>:items, :action=>:create_concept, :source_id=>tag, :source_type=>'Tag' %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<%= will_paginate(@documents) if @tags.respond_to?("total_pages")%>
+<%= link_to 'New tag', new_tag_path %>

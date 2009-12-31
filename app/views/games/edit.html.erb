@@ -1,0 +1,28 @@
+<h1>Editing game</h1>
+
+<% form_for(@game) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :gid %><br />
+    <%= f.text_field :gid %>
+  </p>
+  <p>
+    <%= f.label :score %><br />
+    <%= f.text_field :score %>
+  </p>
+  <p>
+    <%= f.label :query_count %><br />
+    <%= f.text_field :query_count %>
+  </p>
+  <p>
+    <%= f.label :start_at %><br />
+    <%= f.datetime_select :start_at %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @game %> |
+<%= link_to 'Back', games_path %>

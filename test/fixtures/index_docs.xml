@@ -1,0 +1,23 @@
+<parameters>
+<corpus>
+<path>/Users/lifidea/dev/rails/ddl/test/fixtures/docs</path>
+<class>trectext</class>
+</corpus>
+<stemmer>
+<name>potter</name>
+</stemmer>
+<index>/Users/lifidea/dev/rails/ddl/test/fixtures/index</index>
+<field>
+  <name>a</name>
+  <ordinal>true</ordinal>
+</field>
+<field>
+  <name>b</name>
+  <ordinal>true</ordinal>
+</field>
+<field>
+  <name>c</name>
+  <ordinal>true</ordinal>
+</field>
+</parameters>
+

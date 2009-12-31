@@ -1,0 +1,81 @@
+---
+T1:
+  rid: T1
+  itype: all
+  condition: "--- \n\
+    :type: :hourly\n"
+  rtype: tag
+  value: tag1,tag2
+
+T2:
+  rid: T2
+  itype: all
+  condition: "--- \n\
+    :type: :hourly\n"
+  rtype: tag
+  value: tag2,tag3
+ 
+T2_2:
+  rid: T2_2
+  itype: all
+  condition: "--- \n\
+    :tag: /tag2/\n"
+  rtype: tag
+  value: tag4
+
+T3:
+  rid: T3
+  itype: all
+  condition: "--- \n\
+    :score: \n"
+  rtype: tag
+  value: scored
+
+T3_1:
+  rid: T3_1
+  itype: all
+  condition: "--- \n\
+    :score: (1..2)\n"
+  rtype: tag
+  value: high_scored
+
+T3_2:
+  rid: T4
+  itype: all
+  condition: "--- \n\
+    :tag: /scored/\n"
+  rtype: tag
+  value: tag_scored
+
+S1:
+  rid: cal_score_avg
+  itype: calendar
+  unit: day|week|month
+  condition: "--- \n\
+    :type: :hourly\n"
+  rtype: avg
+  target: score
+
+S1_1:
+  rid: cal_high_scored_avg
+  itype: calendar
+  unit: day|week|month
+  condition: "--- \n\
+    :tag: /high_scored/\n\
+    :type: :hourly\n"
+  rtype: avg
+  target: score
+
+S2:
+  rid: hour_start
+  itype: app_log
+  unit: day
+  rtype: min
+  target: start_time
+
+S3:
+  rid: hour_end
+  itype: app_log
+  unit: day
+  rtype: max
+  target: end_time

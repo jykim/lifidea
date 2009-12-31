@@ -1,0 +1,32 @@
+<h1>Editing source</h1>
+
+<% form_for(@source) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </p>
+  <p>
+    <%= f.label :itype %><br />
+    <%= f.text_field :itype %>
+  </p>
+  <p>
+    <%= f.label :uri %><br />
+    <%= f.text_field :uri %>
+  </p>
+  <p>
+    <%= f.label :option %><br />
+    <%= f.text_area :option %>
+  </p>
+  <p>
+    <%= f.label :active_flag %><br />
+    <%= f.check_box :active_flag %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @source %> |
+<%= link_to 'Back', sources_path %>

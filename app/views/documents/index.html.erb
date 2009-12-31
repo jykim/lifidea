@@ -1,0 +1,24 @@
+
+<h1>Welcome to DocTrack game!</h1>
+This is a collection of documents of many types (calendar, file, email, webpage and news) that may be found in a desktop of a typical UMass CS grad student. Please imagine that this is your new desktop and try browsing or searching it for a while. Use the sidebar to filter the documents by type.
+<h3>Click <%= link_to "here", :action=>:start %>  to start a new game when you're ready.</h3>
+<table  class="sortable" id="sortabletable">
+  <tr>
+  </tr>
+
+<% @documents.each do |document| %>
+  <tr>
+    <td><%= @ranklist.to_hash[document.did] %></td>
+    <td><%= document.itype %></td>
+    <td><%= link_to document.title, document, :title=>document.to_s %></td>
+<% if session[:admin_flag] %>
+    <td><%= document.query_flag ? "(#{Query.valid_queries(document.id).size})" : "" %></td>
+    <td><%= link_to 'Edit', edit_document_path(document) %></td>
+    <td><%= link_to 'Del', document, :confirm => 'Are you sure?', :method => :delete %></td>
+<% end %>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<%= will_paginate(@documents) if @documents.respond_to?("total_pages")%>

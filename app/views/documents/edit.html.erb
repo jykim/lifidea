@@ -1,0 +1,38 @@
+<h1>Editing document</h1>
+
+<% form_for(@document) do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <strong><%= f.label :title %></strong><br />
+    <%= f.text_field :title %>
+  </p>
+  <p>
+    <a href='<%= @document.uri  %>'><%= @document.uri  %></a><br />
+  </p>
+  <p>
+   <strong> <%= f.label :content %></strong><br />
+    <% if @document.uri =~ /^http/ %>
+			(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the text if the content is invisible)
+			<iframe name='iframe_doc' src="<%= display_url(@document.uri) %>" width="750" height="780" style="border: none;"></iframe>
+		<% else %>
+			<%= @document.content.gsub("\n","<br/>") if @document.content %>
+		<% end %>
+  </p>
+	<p>
+	  <b>Queries:</b> <br>
+		<table border='1' cellspacing=0 cellpadding=2>
+		<tr><td><strong>User</strong></td><td><strong>Query</strong></td><td><strong>Rank(order)</strong></td></tr>
+	  <%= Query.find_all_by_item_id(@document.id).map{|e|"<tr><td>#{e.user.uid}</td><td>#{e.query_text}</td><td>#{e.position}(#{e.query_count})</td></tr>"}.join("\n") %>
+		</table>
+	</p>
+  <p>
+    <strong><%= f.label :query_flag %></strong><br />
+    <%= f.check_box :query_flag %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @document %> |
+<%= link_to 'Back', documents_path %>

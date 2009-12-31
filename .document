@@ -1,0 +1,4 @@
+lib/**/*.rb
+app/**/*.rb
+rubylib/**/*.rb
+test/**/*.rb

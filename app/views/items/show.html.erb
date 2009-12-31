@@ -1,0 +1,43 @@
+<p>
+  <b>Title:</b>
+  <%=h @item.title %>
+</p>
+
+<p>
+  <b>Type:</b>
+  <%=h @item.itype %>
+</p>
+
+<p>
+  <b>URL:</b>
+  <%= link_to @item.uri, @item.uri %>
+</p>
+
+<p>
+  <b>PubTime:</b>
+  <%= @item.basetime %>
+</p>
+
+<p>
+  <b>Metadata:</b> <br>
+  <%= @item.metadata.map{|k,v|"#{k} : #{v}"}.join("<br/>") if @item.metadata %>
+</p>
+
+<p>
+  <b>Content:</b> <br>
+  <%= @item.content.gsub("\n","<br/>") if @item.content %>
+</p>
+<%= link_to 'Edit', edit_item_path(@item) %> |
+<%= link_to 'Back', items_path %>
+
+<table>
+<% @link_docs.each do |item| %>
+  <tr>
+    <td width='80'><%= item.basetime.to_date %></td>
+    <td><%= item.itype %></td>
+    <td><%= link_to item.title, item_path(item), :title=>item.to_s %></td>
+    <td><%= link_to 'Edit', edit_item_path(item) %></td>
+    <td><%= link_to 'Del', del_item_path(item) %></td>
+  </tr>
+<% end %>
+</table>

@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns="http://purl.org/rss/1.0/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/"
+   xmlns:dcterms="http://purl.org/dc/terms/"
+
+>
+<channel rdf:about="http://www.citeulike.org/about">
+
+
+
+	<title>CiteULike: jykim's library [22 articles]</title>
+	<description>CiteULike: jykim's library [22 articles]</description>
+
+
+	<link>http://www.citeulike.org/user/jykim</link>
+	<dc:publisher>CiteULike.org</dc:publisher>
+	<dc:language>en-gb</dc:language>
+	<dc:rights>Copyright &#169; 2004-2008 citeulike.org</dc:rights>
+	<items>
+    <rdf:Seq>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/5372136"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/376720"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/3458263"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/3046254"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4518067"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4387877"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/3032037"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4910686"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4195137"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4410261"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4710320"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4026609"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/3169341"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/2931483"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4695410"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/1842549"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/2262223"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/4128895"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/1815232"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/2227409"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/2744046"/>
+        <rdf:li rdf:resource="http://www.citeulike.org/user/jykim/article/2478063"/>
+
+	</rdf:Seq>
+	</items>
+	</channel>
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/5372136">
+    <title>Query side evaluation: an empirical analysis of effectiveness and effort</title>
+    <link>http://www.citeulike.org/user/jykim/article/5372136</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;09: Proceedings of the 32nd international ACM SIGIR conference on Research and development in information retrieval (2009), pp. 556-563.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;Typically, Information Retrieval evaluation focuses on measuring the performance of the system&#39;s ability at retrieving relevant information, and not the query&#39;s ability. However, the effectiveness of a retrieval system is strongly influenced by the quality of the query submitted. In this paper, the effectiveness and effort of querying is empirically examined in the context of the Principle of Least Effort, Zipf&#39;s Law and the Law of Diminishing Returns. This query focused investigation leads to a number of novel findings which should prove useful in the development of future retrieval methods and evaluation techniques. While, also motivating further research into query side evaluation.&lt;br /&gt;&lt;i&gt;Leif Azzopardi&lt;/i&gt;</description>
+    <dc:title>Query side evaluation: an empirical analysis of effectiveness and effort</dc:title>
+
+    <dc:creator>Leif Azzopardi</dc:creator>
+    <dc:identifier>doi:10.1145/1571941.1572037</dc:identifier>
+    <dc:source>In SIGIR &#39;09: Proceedings of the 32nd international ACM SIGIR conference on Research and development in information retrieval (2009), pp. 556-563.</dc:source>
+    <dc:date>2009-08-05T13:04:36-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:startingPage>556</prism:startingPage>
+    <prism:endingPage>563</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>querygeneration</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/376720">
+    <title>Personalizing search via automated analysis of interests and activities</title>
+    <link>http://www.citeulike.org/user/jykim/article/376720</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;05: Proceedings of the 28th annual international ACM SIGIR conference on Research and development in information retrieval (2005), pp. 449-456.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Jaime Teevan, Susan Dumais, Eric Horvitz&lt;/i&gt;</description>
+    <dc:title>Personalizing search via automated analysis of interests and activities</dc:title>
+
+    <dc:creator>Jaime Teevan</dc:creator>
+    <dc:creator>Susan Dumais</dc:creator>
+    <dc:creator>Eric Horvitz</dc:creator>
+    <dc:identifier>doi:10.1145/1076034.1076111</dc:identifier>
+    <dc:source>In SIGIR &#39;05: Proceedings of the 28th annual international ACM SIGIR conference on Research and development in information retrieval (2005), pp. 449-456.</dc:source>
+    <dc:date>2009-06-24T15:06:33-00:00</dc:date>
+    <prism:publicationYear>2005</prism:publicationYear>
+    <prism:startingPage>449</prism:startingPage>
+    <prism:endingPage>456</prism:endingPage>
+    <prism:publisher>ACM Press</prism:publisher>
+    <prism:category>personalization</prism:category>
+    <prism:category>websearch</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/3458263">
+    <title>How people recall, recognize, and reuse search results</title>
+    <link>http://www.citeulike.org/user/jykim/article/3458263</link>
+    <description>&lt;i&gt;ACM Trans. Inf. Syst., Vol. 26, No. 4. (2008), pp. 1-27.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;When a person issues a query, that person has expectations about the search results that will be returned. These expectations can be based on the current information need, but are also influenced by how the searcher believes the search engine works, where relevant results are expected to be ranked, and any previous searches the individual has run on the topic. This paper looks in depth at how the expectations people develop about search result lists during an initial query affect their perceptions of and interactions with future repeat search result lists. Three studies are presented that give insight into how people recall, recognize, and reuse results. The first study (a study of recall ) explores what people recall about previously viewed search result lists. The second study (a study of recognition ) builds on the first to reveal that people often recognize a result list as one they have seen before even when it is quite different. As long as those aspects that the searcher remembers about the initial list remain the same, other aspects can change significantly. This is advantageous because, as the third study (a study of reuse ) shows, when a result list appears to have changed, people have trouble re-using the previously viewed content in the list. They are less likely to find what they are looking for, less happy with the result quality, more likely to find the task hard, and more likely to take a long time searching. Although apparent consistency is important for reuse, people&#39;s inability to recognize change makes consistency without stagnation possible. New relevant results can be presented where old results have been forgotten, making both old and new content easy to find.&lt;br /&gt;&lt;i&gt;Jaime Teevan&lt;/i&gt;</description>
+    <dc:title>How people recall, recognize, and reuse search results</dc:title>
+
+    <dc:creator>Jaime Teevan</dc:creator>
+    <dc:identifier>doi:10.1145/1402256.1402258</dc:identifier>
+    <dc:source>ACM Trans. Inf. Syst., Vol. 26, No. 4. (2008), pp. 1-27.</dc:source>
+    <dc:date>2009-06-24T15:02:44-00:00</dc:date>
+    <prism:publicationYear>2008</prism:publicationYear>
+    <prism:publicationName>ACM Trans. Inf. Syst.</prism:publicationName>
+    <prism:issn>1046-8188</prism:issn>
+    <prism:volume>26</prism:volume>
+    <prism:number>4</prism:number>
+    <prism:startingPage>1</prism:startingPage>
+    <prism:endingPage>27</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>refinding</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/3046254">
+    <title>Task-aware search personalization</title>
+    <link>http://www.citeulike.org/user/jykim/article/3046254</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;08: Proceedings of the 31st annual international ACM SIGIR conference on Research and development in information retrieval (2008), pp. 721-722.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Julia Luxenburger, Shady Elbassuoni, Gerhard Weikum&lt;/i&gt;</description>
+    <dc:title>Task-aware search personalization</dc:title>
+
+    <dc:creator>Julia Luxenburger</dc:creator>
+    <dc:creator>Shady Elbassuoni</dc:creator>
+    <dc:creator>Gerhard Weikum</dc:creator>
+    <dc:identifier>doi:10.1145/1390334.1390469</dc:identifier>
+    <dc:source>In SIGIR &#39;08: Proceedings of the 31st annual international ACM SIGIR conference on Research and development in information retrieval (2008), pp. 721-722.</dc:source>
+    <dc:date>2009-06-24T15:02:20-00:00</dc:date>
+    <prism:publicationYear>2008</prism:publicationYear>
+    <prism:startingPage>721</prism:startingPage>
+    <prism:endingPage>722</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>desktopsearch</prism:category>
+    <prism:category>personalization</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4518067">
+    <title>HTM: A Topic Model for Hypertexts</title>
+    <link>http://www.citeulike.org/user/jykim/article/4518067</link>
+    <description>&lt;i&gt;In Proceedings of EMNLP (2009)&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Congkai Sun, Bin Gao, Zhenfu Cao, Hang Li&lt;/i&gt;</description>
+    <dc:title>HTM: A Topic Model for Hypertexts</dc:title>
+
+    <dc:creator>Congkai Sun</dc:creator>
+    <dc:creator>Bin Gao</dc:creator>
+    <dc:creator>Zhenfu Cao</dc:creator>
+    <dc:creator>Hang Li</dc:creator>
+    <dc:source>In Proceedings of EMNLP (2009)</dc:source>
+    <dc:date>2009-06-19T18:25:44-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:category>lda</prism:category>
+    <prism:category>tompicmodel</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4387877">
+    <title>Towards context-aware search by learning a very large variable length hidden markov model from search logs</title>
+    <link>http://www.citeulike.org/user/jykim/article/4387877</link>
+    <description>&lt;i&gt;In WWW &amp;#39;09: Proceedings of the 18th international conference on World wide web (2009), pp. 191-200.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;Capturing the context of a user&#39;s query from the previous queries and clicks in the same session may help understand the user&#39;s information need. A context-aware approach to document re-ranking, query suggestion, and URL recommendation may improve users&#39; search experience substantially. In this paper, we propose a general approach to context-aware search. To capture contexts of queries, we learn a variable length Hidden Markov Model (vlHMM) from search sessions extracted from log data. Although the mathematical model is intuitive, how to learn a large vlHMM with millions of states from hundreds of millions of search sessions poses a grand challenge. We develop a strategy for parameter initialization in vlHMM learning which can greatly reduce the number of parameters to be estimated in practice. We also devise a method for distributed vlHMM learning under the map-reduce model. We test our approach on a real data set consisting of 1.8 billion queries, 2.6 billion clicks, and 840 million search sessions, and evaluate the effectiveness of the vlHMM learned from the real data on three search applications: document re-ranking, query suggestion, and URL recommendation. The experimental results show that our approach is both effective and efficient.&lt;br /&gt;&lt;i&gt;Huanhuan Cao, Daxin Jiang, Jian Pei, Enhong Chen, Hang Li&lt;/i&gt;</description>
+    <dc:title>Towards context-aware search by learning a very large variable length hidden markov model from search logs</dc:title>
+
+    <dc:creator>Huanhuan Cao</dc:creator>
+    <dc:creator>Daxin Jiang</dc:creator>
+    <dc:creator>Jian Pei</dc:creator>
+    <dc:creator>Enhong Chen</dc:creator>
+    <dc:creator>Hang Li</dc:creator>
+    <dc:identifier>doi:10.1145/1526709.1526736</dc:identifier>
+    <dc:source>In WWW &#39;09: Proceedings of the 18th international conference on World wide web (2009), pp. 191-200.</dc:source>
+    <dc:date>2009-06-19T18:22:45-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:startingPage>191</prism:startingPage>
+    <prism:endingPage>200</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>hmm</prism:category>
+    <prism:category>personalization</prism:category>
+    <prism:category>querylog</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/3032037">
+    <title>BrowseRank: letting web users vote for page importance</title>
+    <link>http://www.citeulike.org/user/jykim/article/3032037</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;08: Proceedings of the 31st annual international ACM SIGIR conference on Research and development in information retrieval (2008), pp. 451-458.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Yuting Liu, Bin Gao, Tie-Yan Liu, Ying Zhang, Zhiming Ma, Shuyuan He, Hang Li&lt;/i&gt;</description>
+    <dc:title>BrowseRank: letting web users vote for page importance</dc:title>
+
+    <dc:creator>Yuting Liu</dc:creator>
+    <dc:creator>Bin Gao</dc:creator>
+    <dc:creator>Tie-Yan Liu</dc:creator>
+    <dc:creator>Ying Zhang</dc:creator>
+    <dc:creator>Zhiming Ma</dc:creator>
+    <dc:creator>Shuyuan He</dc:creator>
+    <dc:creator>Hang Li</dc:creator>
+    <dc:identifier>doi:10.1145/1390334.1390412</dc:identifier>
+    <dc:source>In SIGIR &#39;08: Proceedings of the 31st annual international ACM SIGIR conference on Research and development in information retrieval (2008), pp. 451-458.</dc:source>
+    <dc:date>2009-06-19T18:20:01-00:00</dc:date>
+    <prism:publicationYear>2008</prism:publicationYear>
+    <prism:startingPage>451</prism:startingPage>
+    <prism:endingPage>458</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>relevancefeedback</prism:category>
+    <prism:category>websearch</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4910686">
+    <title>Global Ranking Using Continuous Conditional Random Fields</title>
+    <link>http://www.citeulike.org/user/jykim/article/4910686</link>
+    <description>&lt;i&gt;In NIPS (2008), pp. 1281-1288.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Tao Qin, Tie Liu, Xu Zhang, De Wang, Hang Li&lt;/i&gt;</description>
+    <dc:title>Global Ranking Using Continuous Conditional Random Fields</dc:title>
+
+    <dc:creator>Tao Qin</dc:creator>
+    <dc:creator>Tie Liu</dc:creator>
+    <dc:creator>Xu Zhang</dc:creator>
+    <dc:creator>De Wang</dc:creator>
+    <dc:creator>Hang Li</dc:creator>
+    <dc:source>In NIPS (2008), pp. 1281-1288.</dc:source>
+    <dc:date>2009-06-19T18:18:12-00:00</dc:date>
+    <prism:publicationYear>2008</prism:publicationYear>
+    <prism:startingPage>1281</prism:startingPage>
+    <prism:endingPage>1288</prism:endingPage>
+    <prism:publisher>MIT Press</prism:publisher>
+    <prism:category>crf</prism:category>
+    <prism:category>learningtorank</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4195137">
+    <title>Integration of news content into web results</title>
+    <link>http://www.citeulike.org/user/jykim/article/4195137</link>
+    <description>&lt;i&gt;In WSDM &amp;#39;09: Proceedings of the Second ACM International Conference on Web Search and Data Mining (2009), pp. 182-191.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;Aggregated search refers to the integration of content from specialized corpora or verticals into web search results. Aggregation improves search when the user has vertical intent but may not be aware of or desire vertical search. In this paper, we address the issue of integrating search results from a news vertical into web search results. News is particularly challenging because, given a query, the appropriate decision---to integrate news content or not---changes with time. Our system adapts to news intent in two ways. First, by inspecting the dynamics of the news collection and query volume, we can track development of and interest in topics. Second, by using click feedback, we can quickly recover from system errors. We define several click-based metrics which allow a system to be monitored and tuned without annotator effort.&lt;br /&gt;&lt;i&gt;Fernando Diaz&lt;/i&gt;</description>
+    <dc:title>Integration of news content into web results</dc:title>
+
+    <dc:creator>Fernando Diaz</dc:creator>
+    <dc:identifier>doi:10.1145/1498759.1498825</dc:identifier>
+    <dc:source>In WSDM &#39;09: Proceedings of the Second ACM International Conference on Web Search and Data Mining (2009), pp. 182-191.</dc:source>
+    <dc:date>2009-06-03T14:34:24-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:startingPage>182</prism:startingPage>
+    <prism:endingPage>191</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>verticalsearch</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4410261">
+    <title>A probabilistic model based approach for blended search</title>
+    <link>http://www.citeulike.org/user/jykim/article/4410261</link>
+    <description>&lt;i&gt;In WWW &amp;#39;09: Proceedings of the 18th international conference on World wide web (2009), pp. 1075-1076.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;In this paper, we propose to model the blended search problem by assuming conditional dependencies among queries, VSEs and search results. The probability distributions of this model are learned from search engine query log through unigram language model. Our experimental exploration shows that, (1) a large number of queries in generic Web search have vertical search intentions; and (2) our proposed algorithm can effectively blend vertical search results into generic Web search, which can improve the Mean Average Precision (MAP) by as much as 16% compared to traditional Web search without blending.&lt;br /&gt;&lt;i&gt;Ning Liu, Jun Yan, Zheng Chen&lt;/i&gt;</description>
+    <dc:title>A probabilistic model based approach for blended search</dc:title>
+
+    <dc:creator>Ning Liu</dc:creator>
+    <dc:creator>Jun Yan</dc:creator>
+    <dc:creator>Zheng Chen</dc:creator>
+    <dc:identifier>doi:10.1145/1526709.1526863</dc:identifier>
+    <dc:source>In WWW &#39;09: Proceedings of the 18th international conference on World wide web (2009), pp. 1075-1076.</dc:source>
+    <dc:date>2009-06-03T04:41:33-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:startingPage>1075</prism:startingPage>
+    <prism:endingPage>1076</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>verticalsearch</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4710320">
+    <title>Theory-driven design strategies for technologies that support behavior change in everyday life</title>
+    <link>http://www.citeulike.org/user/jykim/article/4710320</link>
+    <description>&lt;i&gt;In CHI &amp;#39;09: Proceedings of the 27th international conference on Human factors in computing systems (2009), pp. 405-414.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;In this paper, we propose design strategies for persuasive technologies that help people who want to change their everyday behaviors. Our strategies use theory and prior work to substantially extend a set of existing design goals. Our extensions specifically account for social characteristics and other tactics that should be supported by persuasive technologies that target long-term discretionary use throughout everyday life. We used these strategies to design and build a system that encourages people to lead a physically active lifestyle. Results from two field studies of the system - a three-week trial and a three-month experiment - have shown that the system was successful at helping people maintain a more physically active lifestyle and validate the usefulness of the strategies.&lt;br /&gt;&lt;i&gt;Sunny Consolvo, David Mcdonald, James Landay&lt;/i&gt;</description>
+    <dc:title>Theory-driven design strategies for technologies that support behavior change in everyday life</dc:title>
+
+    <dc:creator>Sunny Consolvo</dc:creator>
+    <dc:creator>David Mcdonald</dc:creator>
+    <dc:creator>James Landay</dc:creator>
+    <dc:identifier>doi:10.1145/1518701.1518766</dc:identifier>
+    <dc:source>In CHI &#39;09: Proceedings of the 27th international conference on Human factors in computing systems (2009), pp. 405-414.</dc:source>
+    <dc:date>2009-06-01T18:21:46-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:startingPage>405</prism:startingPage>
+    <prism:endingPage>414</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>behaviroalchange</prism:category>
+    <prism:category>hci</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4026609">
+    <title>In search of how people change. Applications to addictive behaviors.</title>
+    <link>http://www.citeulike.org/user/jykim/article/4026609</link>
+    <description>&lt;i&gt;The American psychologist, Vol. 47, No. 9. (September 1992), pp. 1102-1114.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;How people intentionally change addictive behaviors with and without treatment is not well understood by behavioral scientists. This article summarizes research on self-initiated and professionally facilitated change of addictive behaviors using the key trans-theoretical constructs of stages and processes of change. Modification of addictive behaviors involves progression through five stages--pre-contemplation, contemplation, preparation, action, and maintenance--and individuals typically recycle through these stages several times before termination of the addiction. Multiple studies provide strong support for these stages as well as for a finite and common set of change processes used to progress through the stages. Research to date supports a trans-theoretical model of change that systematically integrates the stages with processes of change from diverse theories of psychotherapy.&lt;br /&gt;&lt;i&gt;JO Prochaska, CC DiClemente, JC Norcross&lt;/i&gt;</description>
+    <dc:title>In search of how people change. Applications to addictive behaviors.</dc:title>
+
+    <dc:creator>JO Prochaska</dc:creator>
+    <dc:creator>CC DiClemente</dc:creator>
+    <dc:creator>JC Norcross</dc:creator>
+    <dc:source>The American psychologist, Vol. 47, No. 9. (September 1992), pp. 1102-1114.</dc:source>
+    <dc:date>2009-06-01T13:14:45-00:00</dc:date>
+    <prism:publicationYear>1992</prism:publicationYear>
+    <prism:publicationName>The American psychologist</prism:publicationName>
+    <prism:issn>0003-066X</prism:issn>
+    <prism:volume>47</prism:volume>
+    <prism:number>9</prism:number>
+    <prism:startingPage>1102</prism:startingPage>
+    <prism:endingPage>1114</prism:endingPage>
+    <prism:category>behaviroalchange</prism:category>
+    <prism:category>psychology</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/3169341">
+    <title>Building a practically useful theory of goal setting and task motivation. A 35-year odyssey.</title>
+    <link>http://www.citeulike.org/user/jykim/article/3169341</link>
+    <description>&lt;i&gt;The American psychologist, Vol. 57, No. 9. (September 2002), pp. 705-717.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;The authors summarize 35 years of empirical research on goal-setting theory. They describe the core findings of the theory, the mechanisms by which goals operate, moderators of goal effects, the relation of goals and satisfaction, and the role of goals as mediators of incentives. The external validity and practical significance of goal-setting theory are explained, and new directions in goal-setting research are discussed. The relationships of goal setting to other theories are described as are the theory&#39;s limitations.&lt;br /&gt;&lt;i&gt;EA Locke, GP Latham&lt;/i&gt;</description>
+    <dc:title>Building a practically useful theory of goal setting and task motivation. A 35-year odyssey.</dc:title>
+
+    <dc:creator>EA Locke</dc:creator>
+    <dc:creator>GP Latham</dc:creator>
+    <dc:source>The American psychologist, Vol. 57, No. 9. (September 2002), pp. 705-717.</dc:source>
+    <dc:date>2009-06-01T13:03:51-00:00</dc:date>
+    <prism:publicationYear>2002</prism:publicationYear>
+    <prism:publicationName>The American psychologist</prism:publicationName>
+    <prism:issn>0003-066X</prism:issn>
+    <prism:volume>57</prism:volume>
+    <prism:number>9</prism:number>
+    <prism:startingPage>705</prism:startingPage>
+    <prism:endingPage>717</prism:endingPage>
+    <prism:category>behaviroalchange</prism:category>
+    <prism:category>psychology</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/2931483">
+    <title>SearchBar: a search-centric web history for task resumption and information re-finding</title>
+    <link>http://www.citeulike.org/user/jykim/article/2931483</link>
+    <description>&lt;i&gt;In CHI &amp;#39;08: Proceeding of the twenty-sixth annual SIGCHI conference on Human factors in computing systems (2008), pp. 1207-1216.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Dan Morris, Meredith Morris, Gina Venolia&lt;/i&gt;</description>
+    <dc:title>SearchBar: a search-centric web history for task resumption and information re-finding</dc:title>
+
+    <dc:creator>Dan Morris</dc:creator>
+    <dc:creator>Meredith Morris</dc:creator>
+    <dc:creator>Gina Venolia</dc:creator>
+    <dc:identifier>doi:10.1145/1357054.1357242</dc:identifier>
+    <dc:source>In CHI &#39;08: Proceeding of the twenty-sixth annual SIGCHI conference on Human factors in computing systems (2008), pp. 1207-1216.</dc:source>
+    <dc:date>2009-05-31T23:59:44-00:00</dc:date>
+    <prism:publicationYear>2008</prism:publicationYear>
+    <prism:startingPage>1207</prism:startingPage>
+    <prism:endingPage>1216</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>hci</prism:category>
+    <prism:category>known-item</prism:category>
+    <prism:category>refinding</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4695410">
+    <title>Lightweight tagging expands information and activity management practices</title>
+    <link>http://www.citeulike.org/user/jykim/article/4695410</link>
+    <description>&lt;i&gt;In CHI &amp;#39;09: Proceedings of the 27th international conference on Human factors in computing systems (2009), pp. 279-288.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;Could people use tagging to manage day-to-day work in their personal computing environment? Could tagging be sufficiently generic and lightweight to support diverse ways of working and, perhaps, support new and efficient practices for managing applications and accessing documents? We investigate these issues by implementing the TAGtivity system that enables users to tag resources in the context of their ongoing work. We deployed TAGtivity and studied users&#39; tagging practices in their actual work places over a three week period. Our analysis of interviews and logs reveals that affordances of the TAGtivity system supported users in a variety of information and activity management tasks. These include new practices for managing emerging activities and ephemeral information and accessing documents across application data silos.&lt;br /&gt;&lt;i&gt;Gerard Oleksik, Max Wilson, Craig Tashman, Eduarda Rodrigues, Gabriella Kazai, Gavin Smyth, Natasa Frayling, Rachel Jones&lt;/i&gt;</description>
+    <dc:title>Lightweight tagging expands information and activity management practices</dc:title>
+
+    <dc:creator>Gerard Oleksik</dc:creator>
+    <dc:creator>Max Wilson</dc:creator>
+    <dc:creator>Craig Tashman</dc:creator>
+    <dc:creator>Eduarda Rodrigues</dc:creator>
+    <dc:creator>Gabriella Kazai</dc:creator>
+    <dc:creator>Gavin Smyth</dc:creator>
+    <dc:creator>Natasa Frayling</dc:creator>
+    <dc:creator>Rachel Jones</dc:creator>
+    <dc:identifier>doi:10.1145/1518701.1518746</dc:identifier>
+    <dc:source>In CHI &#39;09: Proceedings of the 27th international conference on Human factors in computing systems (2009), pp. 279-288.</dc:source>
+    <dc:date>2009-05-31T23:55:11-00:00</dc:date>
+    <prism:publicationYear>2009</prism:publicationYear>
+    <prism:startingPage>279</prism:startingPage>
+    <prism:endingPage>288</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>hci</prism:category>
+    <prism:category>pim</prism:category>
+    <prism:category>tagging</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/1842549">
+    <title>Towards task-based personal information management evaluations</title>
+    <link>http://www.citeulike.org/user/jykim/article/1842549</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;07: Proceedings of the 30th annual international ACM SIGIR conference on Research and development in information retrieval (2007), pp. 23-30.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;David Elsweiler, Ian Ruthven&lt;/i&gt;</description>
+    <dc:title>Towards task-based personal information management evaluations</dc:title>
+
+    <dc:creator>David Elsweiler</dc:creator>
+    <dc:creator>Ian Ruthven</dc:creator>
+    <dc:identifier>doi:10.1145/1277741.1277748</dc:identifier>
+    <dc:source>In SIGIR &#39;07: Proceedings of the 30th annual international ACM SIGIR conference on Research and development in information retrieval (2007), pp. 23-30.</dc:source>
+    <dc:date>2009-05-25T14:44:11-00:00</dc:date>
+    <prism:publicationYear>2007</prism:publicationYear>
+    <prism:startingPage>23</prism:startingPage>
+    <prism:endingPage>30</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>pimevaluation</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/2262223">
+    <title>Simple BM25 extension to multiple weighted fields</title>
+    <link>http://www.citeulike.org/user/jykim/article/2262223</link>
+    <description>&lt;i&gt;In CIKM &amp;#39;04: Proceedings of the thirteenth ACM international conference on Information and knowledge management (2004), pp. 42-49.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Stephen Robertson, Hugo Zaragoza, Michael Taylor&lt;/i&gt;</description>
+    <dc:title>Simple BM25 extension to multiple weighted fields</dc:title>
+
+    <dc:creator>Stephen Robertson</dc:creator>
+    <dc:creator>Hugo Zaragoza</dc:creator>
+    <dc:creator>Michael Taylor</dc:creator>
+    <dc:identifier>doi:10.1145/1031171.1031181</dc:identifier>
+    <dc:source>In CIKM &#39;04: Proceedings of the thirteenth ACM international conference on Information and knowledge management (2004), pp. 42-49.</dc:source>
+    <dc:date>2009-04-02T14:57:11-00:00</dc:date>
+    <prism:publicationYear>2004</prism:publicationYear>
+    <prism:startingPage>42</prism:startingPage>
+    <prism:endingPage>49</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>structureddocument</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/4128895">
+    <title>Comparing the performance of collection selection algorithms</title>
+    <link>http://www.citeulike.org/user/jykim/article/4128895</link>
+    <description>&lt;i&gt;ACM Trans. Inf. Syst., Vol. 21, No. 4. (2003), pp. 412-456.&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;The proliferation of online information resources increases the importance of effective and efficient information retrieval in a multicollection environment. Multicollection searching is cast in three parts: collection selection (also referred to as database selection), query processing and results merging. In this work, we focus our attention on the evaluation of the first step, collection selection.In this article, we present a detailed discussion of the methodology that we used to evaluate and compare collection selection approaches, covering both test environments and evaluation measures. We compare the CORI , CVV and gGLOSS collection selection approaches using six test environments utilizing three document testbeds. We note similar trends in performance among the collection selection approaches, but the CORI approach consistently outperforms the other approaches, suggesting that effective collection selection can be achieved using limited information about each collection.The contributions of this work are both the assembled evaluation methodology as well as the application of that methodology to compare collection selection approaches in a standardized environment.&lt;br /&gt;&lt;i&gt;Allison Powell, James French&lt;/i&gt;</description>
+    <dc:title>Comparing the performance of collection selection algorithms</dc:title>
+
+    <dc:creator>Allison Powell</dc:creator>
+    <dc:creator>James French</dc:creator>
+    <dc:identifier>doi:10.1145/944012.944016</dc:identifier>
+    <dc:source>ACM Trans. Inf. Syst., Vol. 21, No. 4. (2003), pp. 412-456.</dc:source>
+    <dc:date>2009-04-02T14:54:25-00:00</dc:date>
+    <prism:publicationYear>2003</prism:publicationYear>
+    <prism:publicationName>ACM Trans. Inf. Syst.</prism:publicationName>
+    <prism:issn>1046-8188</prism:issn>
+    <prism:volume>21</prism:volume>
+    <prism:number>4</prism:number>
+    <prism:startingPage>412</prism:startingPage>
+    <prism:endingPage>456</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>collectionselection</prism:category>
+    <prism:category>distributedir</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/1815232">
+    <title>Combining document representations for known-item search</title>
+    <link>http://www.citeulike.org/user/jykim/article/1815232</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;03: Proceedings of the 26th annual international ACM SIGIR conference on Research and development in informaion retrieval (2003), pp. 143-150.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Paul Ogilvie, Jamie Callan&lt;/i&gt;</description>
+    <dc:title>Combining document representations for known-item search</dc:title>
+
+    <dc:creator>Paul Ogilvie</dc:creator>
+    <dc:creator>Jamie Callan</dc:creator>
+    <dc:identifier>doi:10.1145/860435.860463</dc:identifier>
+    <dc:source>In SIGIR &#39;03: Proceedings of the 26th annual international ACM SIGIR conference on Research and development in informaion retrieval (2003), pp. 143-150.</dc:source>
+    <dc:date>2009-04-02T14:28:47-00:00</dc:date>
+    <prism:publicationYear>2003</prism:publicationYear>
+    <prism:startingPage>143</prism:startingPage>
+    <prism:endingPage>150</prism:endingPage>
+    <prism:publisher>ACM Press</prism:publisher>
+    <prism:category>known-item</prism:category>
+    <prism:category>metasearch</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/2227409">
+    <title>Models for metasearch</title>
+    <link>http://www.citeulike.org/user/jykim/article/2227409</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;01: Proceedings of the 24th annual international ACM SIGIR conference on Research and development in information retrieval (2001), pp. 276-284.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Javed Aslam, Mark Montague&lt;/i&gt;</description>
+    <dc:title>Models for metasearch</dc:title>
+
+    <dc:creator>Javed Aslam</dc:creator>
+    <dc:creator>Mark Montague</dc:creator>
+    <dc:identifier>doi:10.1145/383952.384007</dc:identifier>
+    <dc:source>In SIGIR &#39;01: Proceedings of the 24th annual international ACM SIGIR conference on Research and development in information retrieval (2001), pp. 276-284.</dc:source>
+    <dc:date>2009-04-02T14:26:34-00:00</dc:date>
+    <prism:publicationYear>2001</prism:publicationYear>
+    <prism:startingPage>276</prism:startingPage>
+    <prism:endingPage>284</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>metasearch</prism:category>
+    <prism:category>rankfusion</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/2744046">
+    <title>Hybrid results merging</title>
+    <link>http://www.citeulike.org/user/jykim/article/2744046</link>
+    <description>&lt;i&gt;In CIKM &amp;#39;07: Proceedings of the sixteenth ACM conference on Conference on information and knowledge management (2007), pp. 321-330.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;Georgios Paltoglou, Michail Salampasis, Maria Satratzemi&lt;/i&gt;</description>
+    <dc:title>Hybrid results merging</dc:title>
+
+    <dc:creator>Georgios Paltoglou</dc:creator>
+    <dc:creator>Michail Salampasis</dc:creator>
+    <dc:creator>Maria Satratzemi</dc:creator>
+    <dc:identifier>doi:10.1145/1321440.1321487</dc:identifier>
+    <dc:source>In CIKM &#39;07: Proceedings of the sixteenth ACM conference on Conference on information and knowledge management (2007), pp. 321-330.</dc:source>
+    <dc:date>2009-04-02T13:46:36-00:00</dc:date>
+    <prism:publicationYear>2007</prism:publicationYear>
+    <prism:startingPage>321</prism:startingPage>
+    <prism:endingPage>330</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>distributedir</prism:category>
+    <prism:category>rankfusion</prism:category>
+</item>
+
+
+
+<item rdf:about="http://www.citeulike.org/user/jykim/article/2478063">
+    <title>ProbFuse: a probabilistic approach to data fusion</title>
+    <link>http://www.citeulike.org/user/jykim/article/2478063</link>
+    <description>&lt;i&gt;In SIGIR &amp;#39;06: Proceedings of the 29th annual international ACM SIGIR conference on Research and development in information retrieval (2006), pp. 139-146.&lt;/i&gt;&lt;br /&gt;&lt;i&gt;David Lillis, Fergus Toolan, Rem Collier, John Dunnion&lt;/i&gt;</description>
+    <dc:title>ProbFuse: a probabilistic approach to data fusion</dc:title>
+
+    <dc:creator>David Lillis</dc:creator>
+    <dc:creator>Fergus Toolan</dc:creator>
+    <dc:creator>Rem Collier</dc:creator>
+    <dc:creator>John Dunnion</dc:creator>
+    <dc:identifier>doi:10.1145/1148170.1148197</dc:identifier>
+    <dc:source>In SIGIR &#39;06: Proceedings of the 29th annual international ACM SIGIR conference on Research and development in information retrieval (2006), pp. 139-146.</dc:source>
+    <dc:date>2009-04-02T13:43:30-00:00</dc:date>
+    <prism:publicationYear>2006</prism:publicationYear>
+    <prism:startingPage>139</prism:startingPage>
+    <prism:endingPage>146</prism:endingPage>
+    <prism:publisher>ACM</prism:publisher>
+    <prism:category>metasearch</prism:category>
+    <prism:category>rankfusion</prism:category>
+</item>
+
+
+
+</rdf:RDF>
+

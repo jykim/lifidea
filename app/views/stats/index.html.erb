@@ -1,0 +1,31 @@
+<script type="text/javascript" src="/javascripts/swfobject.js"></script>
+<% content_for :left do %>
+	<h3>Type:</h3>
+	<% debug(params)%>
+	<%= %>
+	<% form_tag '', :method => 'GET'do %> 
+		<% options = options_for_select(Rule.stat_rules.map{|e|[e.rid, e.rid]}, params[:rid]) %>
+		<%= select_tag(:rid, options)%>
+		<h3>Period:</h3>
+		<%= text_field_tag(:start_at, @start_at) %> ~ 
+		<%= text_field_tag(:end_at, @end_at) %>
+		<%= submit_tag('Filter') %>
+	<% end %> 
+<% end %>
+
+
+<% debug(@stats)%>
+<table  class="sortable" id="sortabletable">
+<tr>
+	<td>RID</td><td>Unit</td><td>basedate</td><td>value</td><td>doc_count</td>
+</tr>
+<% @stats.each do |stat| %>
+  <tr>
+    <td><%= stat.rid %></td>
+    <td><%= stat.unit %></td>
+    <td><%= stat.basedate %></td>
+    <td><%= stat.content %></td>
+    <td><%= stat.doc_count %></td>
+  </tr>
+<% end %>
+</table>

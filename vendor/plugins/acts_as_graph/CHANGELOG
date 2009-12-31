@@ -1,0 +1,10 @@
+= CHANGELOG
+
+== Subversion
+
+* Imported initial sources
+* Added basic methods: incoming_edges, incoming_nodes, outgoing_edges and outgoing_nodes
+* Dynamically define the edge class
+* Create RGL graphs
+* Refoactored from habtm to has_many :through
+* Added patch for has_many :through from Marshall Roch

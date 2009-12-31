@@ -1,0 +1,28 @@
+<p>
+  <b>Title:</b>
+  <%=h @tag.title %>
+</p>
+
+<p>
+  <b>Metadata:</b>
+  <%=h @tag.metadata %>
+</p>
+
+<table  class="sortable" id="sortabletable">
+  <tr>
+  </tr>
+
+<% @items.each do |item| %>
+  <tr>
+    <td width='80'><%= item.basetime.to_date %></td>
+    <td><%= item.itype %></td>
+    <td><%= link_to item.title, item_path(item), :title=>item.to_s %></td>
+    <td><%= link_to 'Edit', edit_item_path(item) %></td>
+    <td><%= link_to 'Del', del_item_path(item) %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to 'Edit', edit_tag_path(@tag) %> |
+<%= link_to 'To Concept', :controller=>:items, :action=>:create_concept, :source_id=>@tag, :source_type=>'Tag' %> |
+<%= link_to 'Back', tags_path %>
