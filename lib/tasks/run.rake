@@ -140,7 +140,7 @@ namespace :run do
   #end
 
   task(:searcher_client => :environment) do
-    puts search_remote((ENV['qtype']||'k'), ENV['query'], :port=>(ENV['port']||get_searcher_port()))
+    puts search_remote((ENV['qtype']||'k'), ENV['query'], :port=>(ENV['port']||Conf.searcher_port))
   end  
   
   task(:batch => :environment) do

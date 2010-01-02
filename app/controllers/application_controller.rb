@@ -16,9 +16,9 @@ class ApplicationController < ActionController::Base
   # from your application log (in this case, all fields with names like "password"). 
   filter_parameter_logging :password 
   
-  ActiveScaffold.set_defaults do |config| 
-    config.ignore_columns.add [:created_at, :updated_at]
-  end
+  #ActiveScaffold.set_defaults do |config| 
+  #  config.ignore_columns.add [:created_at, :updated_at]
+  #end
   
   # Process & log user click
   # - Add to history

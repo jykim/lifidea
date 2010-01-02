@@ -17,7 +17,7 @@ end
 # Send request to remote(local) search server
 # @param[String] qtype : type of query
 def search_remote(qtype, query, o={})
-  port = o[:port] || $searcher_port || get_searcher_port()
+  port = o[:port] || $searcher_port || Conf.searcher_port
   jtype = o[:jtype] || 'search'
   puts "port = #{port}"
   host = "localhost" || o[:host]

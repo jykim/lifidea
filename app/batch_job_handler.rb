@@ -36,7 +36,7 @@ end
 def enque_daily_job()
   today = Time.now.to_date ; jid = "DJ_#{today}"
   date_last_job = SysConfig.find_by_title("DATE_LAST_BATCH_JOB")
-  if Time.now.hour >= get_config("HOUR_DAYBREAK").to_i && Time.now.at_beginning_of_day > date_last_job.content.to_utc #!DelayedJobs.find_by_jid(jid)
+  if Time.now.hour >= Conf.hour_daybreak && Time.now.at_beginning_of_day > date_last_job.content.to_utc #!DelayedJobs.find_by_jid(jid)
     Delayed::Job.enqueue DailyJob.new(jid, today)
     DelayedJobs.last.update_attributes(:jid=>jid)
     date_last_job.update_attributes(:content=>today.to_s(:db))

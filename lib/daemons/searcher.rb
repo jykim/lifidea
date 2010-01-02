@@ -27,11 +27,11 @@ if $profile
 end
 
 begin
-  server = TCPServer.open(get_searcher_port())  
+  server = TCPServer.open(Conf.searcher_port)  
 rescue Exception => e
   errror "Failed to open socket!", e
 end
-puts "Ready to accept client at #{$searcher_port}"
+puts "Ready to accept client at #{Conf.searcher_port}"
 while($running) do
   #Thread.start(server.accept) do |client|
     client = server.accept

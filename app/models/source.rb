@@ -17,7 +17,7 @@ class Source < ActiveRecord::Base
   
   
   def self.sync_interval_default()
-    @sync_interval_default ||= get_config("SYNC_INTERVAL_DEFAULT").to_i
+    @sync_interval_default ||= Conf.collector_sync_interval
   end
   
   def sync_now?()
