@@ -11,4 +11,8 @@ class Query < ActiveRecord::Base
   def self.valid_queries(item_id)
     Query.valid.find_all_by_item_id(item_id)
   end
+  
+  def self.get_qlm_with(queries)
+    queries.group_by{|q|q.item.itype}.map_hash{|k,v|[k , LanguageModel.new(v.map{|q|q.query_text}.join(" "))]}
+  end
 end

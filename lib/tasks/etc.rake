@@ -33,79 +33,71 @@ namespace :etc do
         result_test << e
       end
     end
-    File.open(filename+'.train','w'){|f|f.puts result_train.join}
-    File.open(filename+'.test','w'){|f|f.puts result_test.join}
+    File.open(filename+'.train','w'){|f|f.puts o[:header] ;f.puts result_train.join}
+    File.open(filename+'.test' ,'w'){|f|f.puts o[:header] ;f.puts result_test.join}
   end
   
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
-    filename = ENV['input'] || get_learner_input_file()
-    data = IO.read(filename).split(/^(?=2)/)
+    filename = ENV['input'] || get_feature_file()
+    puts "Splitting #{filename}..."
+    header = nil
+    data = case ENV['method']
+    when 'svmrank' : IO.read(filename).split(/^(?=2)/)
+    when 'grid'
+      content = IO.read(filename).split(/^/)
+      header = content[0]
+      content[1..-1]
+    else
+      error "[split_file] No parameter specified!"
+    end
+    error "[split_file] Data is blank!" if data.blank?
     if ENV['train_ratio'] 
       train_ratio = ENV['train_ratio'].to_f
       split_file(filename, data, :train_ratio=>train_ratio)
     elsif ENV['folds']
       test_sets=(0..data.size).to_a.shuffle.in_groups_of((data.size.to_f / ENV['folds'].to_f).ceil)
-      p test_sets
+      #p test_sets
       1.upto(ENV['folds'].to_i) do |i|
         puts "#{test_sets[i-1].size} / #{data.size}"
-        split_file(get_learner_input_file(i), data, :test_set=>test_sets[i-1])
+        $fold = "-k#{ENV['folds']}-#{i}"
+        split_file(get_learner_input_file(), data, :header=>header, :test_set=>test_sets[i-1])
       end
     else
       error "[split_file] No parameter specified!"
     end
   end
   
-  task(:evaluate => :environment) do
-    set_type = ENV['set_type'] || 'test'
-    input = ENV['input'] || get_learner_input_file(ENV['fold'])+".#{set_type}"
-    output = ENV['output'] || "data/evaluation_#{$renv}_#{$today}.csv"
-    $searcher = Searcher.new
-    $searcher.load_concepts() ; index = $searcher.cons
-    methods = [Searcher::FEATURES, 'uniform','grid','svm'].flatten
-    weights = methods.map{|e|Searcher::load_weights(e)}
-    weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
-    result_all = []
-    qrels = IO.read(input).split("\n").find_all{|l|l =~ /^2/}
-    qrels.map{|l|l.scan(/\# (\d+) \-\> (\d+)/)[0]}.each do |ids|
-      result = [] ; query, rel = ids[0].to_i, ids[1].to_i
-      #puts "Query : #{query} -> Rel : #{rel}"
-      #debugger
-      weights.each_with_index do |weight,i|
-        rank_list = index.find_similar(query, :weights=>weight)
-        recip_rank = 0 ; rank_list.each_with_index{|e,i|recip_rank = 1.0 / (i+1) if e[0] == rel}
-        result << recip_rank
-      end
-      result_all << [query, result].flatten
-    end
-    result_all << ["summary(#{set_type})", (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}].flatten
-    write_csv(output, result_all, :mode=>'a', :header=>["query", methods].flatten)
-  end
-  
   task(:evaluate_cval) do
+    case $type
+    when 'col' : Rake::Task['export:col_features'].execute
+    when 'con' : Rake::Task['export:concept_features'].execute
+    end
+    Rake::Task['etc:split_file'].execute
     1.upto(ENV['folds'].to_i) do |i|
       puts "====== Starting #{i}th fold ======="
       ENV['fold'] = i.to_s
-      $remark = '_' + ENV['remark'] if ENV['remark']
-      ENV['output'] = "data/evaluation_#{$renv}_#{$today}#{$remark}_k#{ENV['folds']}-#{ENV['fold']}.csv"
+      ENV['output'] = get_evaluation_file()
       Rake::Task['etc:learn_and_evaluate'].execute
     end
   end
   
   desc "Run Learner to Train Weights"
   task(:learn_and_evaluate => :environment) do
-    #input = ENV['input'] || "data/learner_input_#{$renv}.txt"
-    #weights = ENV['weights'] || "data/learner_output_#{$renv}_#{$today}.txt"
-    Rake::Task['export:learner_input'].execute if !ENV['fold'] || ENV['fold'].to_i == 1
-    ['svm','grid'].each do |method|
-      next if ENV['svm_only'] && method != 'svm'
-      ENV['method'] = method
+    $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
+    ['svmrank','grid'].each do |method|
+      next if ENV['method'] && ENV['method'] != method
+      $method = method
       Rake::Task['run:learner'].execute
     end
-    ENV['set_type'] = 'train'
-    Rake::Task['etc:evaluate'].execute
-    ENV['set_type'] = 'test'
-    Rake::Task['etc:evaluate'].execute # evaluate at test set
+    case $type
+    when 'con'
+    when 'col'
+      ENV['set_type'] = 'train'
+      Rake::Task['evaluate:col_select_combs'].execute
+      ENV['set_type'] = 'test'
+      Rake::Task['evaluate:col_select_combs'].execute # evaluate at test set
+    end
   end
   
   task(:monitor => :environment) do
@@ -150,49 +142,6 @@ namespace :etc do
       end
     end
     puts "#{process_count} docs were processed..."
-  end
-  
-  namespace :csel do
-    desc "Calculate Single-feature Result"
-    task :evaluate_features => :environment do
-      in_filename = ENV['filename'] || "data/csel_#$renv-#$min_prob-#$mp_smt.csv"
-      out_filename = ENV['out_filename'] || "data/csel_evaluate_features_#$renv-#$min_prob-#$mp_smt.csv"
-      result_all = []
-      read_csv(in_filename).each do |l|
-        result = [l[:qid], l[:query], l[:user], l[:date], l[:position], l[:did], l[:itype]]
-        values_cs_type = l.find_all{|k,v|k.to_s=~/_/}.group_by{|e|e[0].to_s.split("_")[0]}
-        #debugger
-        Searcher::CS_TYPES.each do |cs_type|
-          #p values_cs_type[cs_type.to_s]
-          col_scores = values_cs_type[cs_type.to_s].sort_by{|e|e[1].to_f}
-          if col_scores[-1][1] == col_scores[-2][1]
-            #warn "[]"
-            result << "x"
-          else
-            itype = col_scores[-1][0].to_s.split("_")[1] 
-            result << ((itype == l[:itype])? 1 : itype)
-          end
-        end
-        result_all << result
-      end
-      #puts result_all.map{|e|e.join(" ")}.join("\n")
-      write_csv out_filename, result_all, :summary=>["summary", [nil]*6, [:sum]*Searcher::CS_TYPES.size].flatten, 
-        :header=>["qid","query","user","date","position", "did", "itype",Searcher::CS_TYPES].flatten
-    end
-
-    desc "Get Features"
-    task :evaluate_batch => :environment do
-      [0.00000001, 0.000000001].each do |min_prob|
-        $min_prob = min_prob
-        Rake::Task['export:csel_features'].execute
-        Rake::Task['etc:csel:evaluate_features'].execute
-      end      
-      [0.1,0.3,0.5,0.7,0.9].each do |mp_smt|
-        $mp_smt = mp_smt
-        Rake::Task['export:csel_features'].execute
-        Rake::Task['etc:csel:evaluate_features'].execute
-      end
-    end
   end
   
   desc "PD Index Create"

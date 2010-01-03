@@ -73,10 +73,22 @@ namespace :export do
     write_csv filename, result_total, 
       :header=>['query','target'].concat(Searcher::FEATURES)
   end
+    
+  desc "Export Stat table into CSV"
+  task(:stats => :environment) do
+    ["day","week","month"].each{|unit|export_stat_for(unit, $start_at, $end_at)}
+  end
+  
+  desc "Export Concept table into CSV"
+  task :concepts => :environment do
+    filename = ENV['filename'] || "data/concepts_#$renv.csv"
+    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.ctype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
+      :header=>['id','title','ctype','synonym_id','hidden_flag','modified_flag']
+  end
   
   desc "Export Learner Input from Click Histories"
-  task :learner_input => :environment do
-    filename = ENV['input'] || get_learner_input_file()
+  task :concept_features => :environment do
+    filename = ENV['input'] || get_feature_file()
     File.unlink(filename) if File.exists?(filename)
     $f_li = File.open(filename, 'a')
     $last_query_no = 0
@@ -91,25 +103,12 @@ namespace :export do
       end
       index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
-    puts "Splitting #{filename}..."
-    Rake::Task['etc:split_file'].execute
-  end
-    
-  desc "Export Stat table into CSV"
-  task(:stats => :environment) do
-    ["day","week","month"].each{|unit|export_stat_for(unit, $start_at, $end_at)}
-  end
-  
-  desc "Export Concept table into CSV"
-  task :concepts => :environment do
-    filename = ENV['filename'] || "data/concepts_#$renv.csv"
-    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.ctype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
-      :header=>['id','title','ctype','synonym_id','hidden_flag','modified_flag']
   end
   
   desc "Export Training Data for Collection Selection"
-  task :csel_features => :environment do
-    filename = ENV['filename'] || "data/csel_#$renv-#$min_prob-#$mp_smt.csv"
+  task :col_features => :environment do
+    #$remark = "#$min_prob-#$mp_smt"
+    filename = ENV['filename'] || get_feature_file()
     if !$searcher
       $searcher = Searcher.new(nil, :debug=>ENV['debug'])
       $searcher.load_documents()
@@ -117,8 +116,8 @@ namespace :export do
     result_all = []
     queries_all = Query.between($start_at, $end_at).all.find_all{|q|q.item}
     queries_valid = Query.valid.between($start_at, $end_at).all
-    col_qlm = queries_all.group_by{|q|q.item.itype}.map_hash{|k,v|[k , LanguageModel.new(v.map{|q|q.query_text}.join(" "))]}
-    debug col_qlm.inspect.round
+    col_qlm = Query.get_qlm_with(queries_all)
+    #debug col_qlm.inspect.round
     queries_all.each do |q|
       result = [q.id, q.query_text, q.user.uid, q.created_at, q.position, q.item.did, q.item.itype]
       parsed_query = InferenceNetwork.parse_query(q.query_text)

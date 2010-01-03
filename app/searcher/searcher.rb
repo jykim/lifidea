@@ -19,20 +19,20 @@ class Searcher
     parse_rule(o[:rule] || RULE_DEF)
   end
   
-  def self.load_weights(rank = nil)
-    result = [0] * Searcher::FEATURES.size
+  def self.load_weights(features, rank = nil)
+    result = [0] * features.size
     rank ||= ENV['rank']
-    if FEATURES.include?(rank)
-      FEATURES.each_with_index{|e,i|result[i] = 1 if e == rank}
+    if features.include?(rank)
+      features.each_with_index{|e,i|result[i] = 1 if e == rank}
       return result
     elsif rank == 'uniform'
-      return [1] * Searcher::FEATURES.size 
+      return [1] * features.size 
     end
     
     begin
-      weight_hash = IO.read(read_recent_file_in(RAILS_ROOT+"/data/learner_output", :filter=>/#{ENV['RAILS_ENV']}.*#{rank}/)).
+      weight_hash = IO.read(read_recent_file_in(RAILS_ROOT+"/data/learner_output", :filter=>/#{ENV['RAILS_ENV']}.*#{$type}.*#{rank}/)).
         split("\n")[0].split(" ")[1..-1].map_hash{|e|r = e.split(":") ; [r[0].to_i, r[1].to_f]}
-      result = [] ; 1.upto(Searcher::FEATURES.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0)}
+      result = [] ; 1.upto(features.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0)}
     rescue Exception => e
       puts "[Searcher.load_weights] error:", e
     end
@@ -115,7 +115,8 @@ class Searcher
     doc_scores.values.collapse.sort_by{|e|e[1]}.reverse[0..topk]
   end
   
-  CS_TYPES = [:cql, :mpmax, :mpmean, :smpmean, :mphmean, :mpgmean, :clarity, :qlm, :gmap, :redde, :dict]
+  CS_TYPES = [:cql, :mpmax, :mpmean, :smpmean, :mphmean, :mpgmean, :clarity, :gmap, :redde, :dict]#, :qlm
+  CS_COMB_TYPES = ['uniform', 'grid', 'logreg', 'ranksvm']
   DICT_COLS = {
     "calendar"=>[:calendar, :schedule, :start_at, :location], "email"=>[:email, :from, :to, :date], 
     "file"=>[:file, :filename, :pdf, :html, :dvi, :ppt, :doc], "news"=>[:news, :tag_list, :blog, :tag], 

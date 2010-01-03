@@ -64,80 +64,21 @@ namespace :run do
   
   desc "Run Learner to Train Weights"
   task(:learner => :environment) do
-    input = ENV['input'] || get_learner_input_file(ENV['fold'])
+    input = ENV['input'] || get_learner_input_file($method)
     #puts input
-    weights = ENV['weights'] || get_learner_output_file(ENV['method'], ENV['fold'])
+    weights = ENV['weights'] || get_learner_output_file($method)
     learner = WeightLearner.new
-    case ENV['method']
-    when 'svm' : learner.learn_by_svm(input, weights)
-    when 'grid' : learner.learn_by_grid_search(input, weights)
+    case ($method || ENV['method'])
+    when 'svmrank' : learner.learn_by_svmrank(input, weights)
+    when 'grid' : learner.learn_by_grid_search(input, weights, $type, :grid_type=>ENV['grid_type'])
     end
   end
-  
-  desc "PageHunt Indexer"
-  task :ph_indexer do
-    while(true) do
-      $idx ||= Indexer.new
-      all_docs = $idx.find_target_documents
-      if all_docs.size == 0
-        debug "[indexer.rb] No target document!"
-        exit
-      end
-      warn "[indexer.rb] Started indexing #{all_docs.size} docs"
-      # @TODO substitute with batch finder
-      all_docs.in_groups_of(FileCollector::FILES_IN_BATCH) do |batch|
-        docs = batch.find_all{|d|d}
-        #debugger
-        #read contents
-        $idx.read_files(docs.find_all{|d|d.itype =~ /file/})
-        docs.each{|d| $idx.read_webpage(d) if d.itype =~ /webpage|calendar/}
-
-        #run indexing
-        docs.each{|d|$idx.index_document(d)}
-
-        #notify Searcher on the change
-      end
-      sleep 0.1
-    end
-  end
-  
-  #desc "Run Searcher"
-  #task(:searcher => :environment) do
-  #  col = file_load("col_test.dmp")
-  #  #col = IR::Index.create_from_yaml(IO.read("col_test.yaml"))
-  #
-  #  searcher = Searcher.new(col, Searcher::RULE_DEF)
-  #  queries = IO.read(PATH_COL+"c0002_lists_manual_PRM-S.qry").find_tag("query").map{|e|e.gsub("combine ","combine").gsub(/\s\s+/,"").gsub("\n"," ")}
-  #  results = []
-  #  queries.each_with_index do |query,i|
-  #    next if ENV['query'] && ENV['query'] != i.to_s
-  #    puts "Query[#{i}] : [#{query}]"
-  #    results[i] = searcher.search(query, :doc=>ENV['doc'])
-  #    puts results[i].map{|e|e.join("\t")}.join("\n")
-  #  end
-  #end
   
   desc "Run Searcher"
   task(:searcher => :environment) do
     $profile = true if ENV['profile']
     require 'lib/daemons/searcher'
   end
-  
-  #desc "Run Searcher"
-  #task(:searcher => :environment) do
-  #  col = file_load("col_test.dmp")
-  #  #col = IR::Index.create_from_yaml(IO.read("col_test.yaml"))
-  #
-  #  searcher = Searcher.new(col, Searcher::RULE_DEF)
-  #  queries = IO.read(PATH_COL+"c0002_lists_manual_PRM-S.qry").find_tag("query").map{|e|e.gsub("combine ","combine").gsub(/\s\s+/,"").gsub("\n"," ")}
-  #  results = []
-  #  queries.each_with_index do |query,i|
-  #    next if ENV['query'] && ENV['query'] != i.to_s
-  #    puts "Query[#{i}] : [#{query}]"
-  #    results[i] = searcher.search(query, :doc=>ENV['doc'])
-  #    puts results[i].map{|e|e.join("\t")}.join("\n")
-  #  end
-  #end
 
   task(:searcher_client => :environment) do
     puts search_remote((ENV['qtype']||'k'), ENV['query'], :port=>(ENV['port']||Conf.searcher_port))
