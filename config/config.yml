@@ -6,7 +6,7 @@
 common:
   collector_sync_interval: 5
   hour_daybreak: 4
-  rule_searcher: "method:dirichlet,mu:50"
+  rule_searcher: "method:dirichlet,mu:100"
   
 development:
   searcher_port: 3100
