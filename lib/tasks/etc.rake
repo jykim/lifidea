@@ -77,7 +77,6 @@ namespace :etc do
     1.upto(ENV['folds'].to_i) do |i|
       puts "====== Starting #{i}th fold ======="
       ENV['fold'] = i.to_s
-      ENV['output'] = get_evaluation_file()
       Rake::Task['etc:learn_and_evaluate'].execute
     end
   end
@@ -94,9 +93,9 @@ namespace :etc do
     when 'con'
     when 'col'
       ENV['set_type'] = 'train'
-      Rake::Task['evaluate:col_select_combs'].execute
+      Rake::Task['evaluate:csel_combs'].execute
       ENV['set_type'] = 'test'
-      Rake::Task['evaluate:col_select_combs'].execute # evaluate at test set
+      Rake::Task['evaluate:csel_combs'].execute # evaluate at test set
     end
   end
   

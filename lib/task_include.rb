@@ -27,8 +27,8 @@ def get_learner_output_file(method = nil)
   "data/learner_output/learner_output_#$renv-#$today-#$type-#{method}-#$remark#$fold.csv"
 end
 
-def get_evaluation_file()
-  "data/evaluation_#$renv-#$today-#$type-#$remark#$fold.csv"
+def get_evaluation_file(eval_type)
+  "data/evaluation_#$renv-#$today-#$type-#{eval_type}-#$remark#$fold.csv"
 end
 
 #LEARNER_INPUT = 

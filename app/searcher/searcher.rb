@@ -44,6 +44,12 @@ class Searcher
     $clf.load Link.all.map{|l|[l.ltype, l.out_id.to_i, l.in_id.to_i, l.weight]}
   end
   
+  def self.recip_rank(rank_list, rel)
+    result = 0
+    rank_list.each_with_index{|e,i| result = 1.0 / (i+1) if e[0] == rel}
+    result
+  end
+  
   def load_items()
     Searcher.load_features() if !$clf
     @items = Item.valid.indexed
@@ -74,25 +80,17 @@ class Searcher
   # - merging 1) and 2) into final score
   def search_by_keyword(query, o={})
     parsed_query = InferenceNetwork.parse_query(query)
+    parse_rule(o[:rule]) if o[:rule]
     o[:indri_query] ||= "#combine(#{parsed_query.map{|w|w+'.(document)'}.join(' ')})"
     #info "[searcher_daemon] indri_query = [#{o[:indri_query]}]"
     #qws = query.scan(LanguageModel::PTN_TERM)
     InferenceNetwork.eval_indri_query(o[:indri_query])
     topk = o[:topk] || 50
+    col_weight = o[:col_weight] || 0.4
     doc_scores = {}
     @cols.each do |col|
-      col_score_log = MIN_NUM
-      #if !o[:col]
-      #  debug "[search] Scoring #{col.cid}"
-      #  col_score = score_col(col, parsed_query, :cql, :cqls => parsed_query.map{|e|col.lm.prob(e)})
-      #  col_score_log = if col_score == 0
-      #    MIN_NUM
-      #    #debug "[search] Skipping collection #{col.cid}"
-      #    #next
-      #  else
-      #    Math.log(col_score)
-      #  end
-      #end
+      col_score = (o[:col_scores])? o[:col_scores][col.cid] : MIN_PROB
+      #debug "col_scores : #{o[:col_scores]}"
       doc_scores[col.cid] = []
       col.docs.each do |doc|
         #debug "[search] Scoring #{doc.did}"
@@ -101,7 +99,13 @@ class Searcher
           @debug = true if o[:id]
           @match_found = false
           if( doc_score = score_doc(doc,col))
-            doc_scores[col.cid] << [doc.did, (col_score_log||0) + doc_score] if doc_score > MIN_NUM
+            next if doc_score <= MIN_NUM
+            final_score = if o[:col_scores]
+              col_score * Math.exp(doc_score) * col_weight + Math.exp(doc_score)
+            else
+              doc_score
+            end
+            doc_scores[col.cid] << [doc.did, final_score] 
           end
         rescue Exception => e
           @debug = true

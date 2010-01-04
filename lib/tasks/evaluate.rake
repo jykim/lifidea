@@ -28,11 +28,11 @@ namespace :evaluate do
   end
   
   desc "Calculate Single-feature Result"
-  task :col_select_features => :environment do
-    in_filename = ENV['filename'] || get_feature_file()
-    out_filename = ENV['out_filename'] || get_evaluation_file()
+  task :csel_features => :environment do
+    input = ENV['filename'] || get_feature_file()
+    output = ENV['output'] || get_evaluation_file('col_features')
     result_all = []
-    read_csv(in_filename).each do |l|
+    read_csv(input).each do |l|
       result = [l[:qid], l[:query], l[:user], l[:date], l[:position], l[:did], l[:itype]]
       values_cs_type = l.find_all{|k,v|k.to_s=~/_/}.group_by{|e|e[0].to_s.split("_")[0]}
       #debugger
@@ -50,31 +50,53 @@ namespace :evaluate do
       result_all << result
     end
     #puts result_all.map{|e|e.join(" ")}.join("\n")
-    write_csv out_filename, result_all, :summary=>["summary", [nil]*6, [:sum]*Searcher::CS_TYPES.size].flatten, 
+    write_csv output, result_all, :summary=>["summary", [nil]*6, [:sum]*Searcher::CS_TYPES.size].flatten, 
       :mode=>'a', :header=>["qid","query","user","date","position", "did", "itype",Searcher::CS_TYPES].flatten
   end
   
   desc "Calculate Combination Result"
-  task :col_select_combs => :environment do
-    in_filename = ENV['filename'] || get_learner_input_file()+'.'+ENV['set_type']
-    out_filename = ENV['out_filename'] || get_evaluation_file()
+  task :csel_combs => :environment do
+    input = ENV['input'] || get_learner_input_file()+'.'+ENV['set_type']
+    output = ENV['output'] || get_evaluation_file('col_combs')
     methods = [Searcher::CS_TYPES, Searcher::CS_COMB_TYPES].flatten
-    input_data = read_csv(in_filename)
-    result = methods.map{|e|WeightLearner.evaluate_col_select_with(input_data, Searcher.load_weights(Searcher::CS_TYPES, e))[0]}
-    write_csv out_filename, [result], :mode=>'a', :header=>methods
+    input_data = read_csv(input)
+    result_csel, result_ret = [], []
+    methods.each do |e|
+      weights = Searcher.load_weights(Searcher::CS_TYPES, e)
+      result_csel << WeightLearner.evaluate_csel_with(input_data, weights)[0]
+      #result_ret  << WeightLearner.evaluate_keyword_search_with(input_data, weights)[0]
+    end
+    write_csv output, [result_csel, result_ret] ,:mode=>'a', :header=>methods
   end
-
-  desc "Get Features"
-  task :csel_features_batch => :environment do
-    [0.00000001, 0.000000001].each do |min_prob|
-      $min_prob = min_prob
-      Rake::Task['export:csel_features'].execute
-      Rake::Task['etc:csel:evaluate_features'].execute
-    end      
-    [0.1,0.3,0.5,0.7,0.9].each do |mp_smt|
-      $mp_smt = mp_smt
-      Rake::Task['export:csel_features'].execute
-      Rake::Task['etc:csel:evaluate_features'].execute
+  
+  namespace :batch do
+    desc "Csel Features"
+    task :csel_features => :environment do
+      [0.00000001, 0.000000001].each do |min_prob|
+        $min_prob = min_prob
+        Rake::Task['export:csel_features'].execute
+        Rake::Task['etc:csel:evaluate_features'].execute
+      end      
+      [0.1,0.3,0.5,0.7,0.9].each do |mp_smt|
+        $mp_smt = mp_smt
+        Rake::Task['export:csel_features'].execute
+        Rake::Task['etc:csel:evaluate_features'].execute
+      end
+    end
+    
+    desc "Keyword Search"
+    task :keyword_search do
+      input_data = read_csv(ENV['input'] || get_feature_file())
+      output = ENV['output'] || get_evaluation_file('keywrod_search')
+      result = []
+      params_jm, params_dir = [0.1,0.3,0.5,0.7,0.9], [50,100,500,1500,3000]
+      params_jm.each do |lambda|
+        result << WeightLearner.evaluate_keyword_search_with(input_data, nil, :rule=>"method:jm,lambda:#{lambda}")[0]
+      end
+      params_dir.each do |mu|
+        result << WeightLearner.evaluate_keyword_search_with(input_data, nil, :rule=>"method:dirichlet,mu:#{mu}")[0]
+      end
+      write_csv output, [result], :header=>[params_jm, params_dir].flatten
     end
   end
 end
