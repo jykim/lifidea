@@ -108,7 +108,7 @@ namespace :export do
   desc "Export Training Data for Collection Selection"
   task :csel_features => :environment do
     #$remark = "#$min_prob-#$mp_smt"
-    filename = ENV['filename'] || get_feature_file()
+    #filename = ENV['filename'] || 
     if !$searcher
       $searcher = Searcher.new(:debug=>ENV['debug'])
       $searcher.load_documents()
@@ -140,7 +140,7 @@ namespace :export do
       result_all << result
     end
     header_features = $searcher.cols.map{|e|Searcher::CS_TYPES.map{|e2|[e2.to_s,e.cid].join("_")}}
-    write_csv filename, result_all, :normalize=>[[nil]*7, [:minmax]*Searcher::CS_TYPES.size*$searcher.cols.size].flatten, 
+    write_csv get_feature_file('grid'), result_all, :normalize=>[[nil]*7, [:minmax]*Searcher::CS_TYPES.size*$searcher.cols.size].flatten, 
       :header=>["qid","query","user","date","position", "did", "itype", header_features].flatten
   end
   

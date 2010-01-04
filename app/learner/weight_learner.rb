@@ -65,7 +65,7 @@ class WeightLearner
   def learn_by_grid_search(input, output, type, o = {})
     no_params = case $type
     when 'con' : Searcher::FEATURES.size
-    when 'col' : Searcher::CS_TYPES.size
+    when 'csel': Searcher::CS_TYPES.size
     else
       error("[learn_by_grid_search] no type parameter!")
       return nil
@@ -75,7 +75,7 @@ class WeightLearner
     results = []
     input_data = case $type
     when 'con' : self.parse_svmrank_input(input+'.train')
-    when 'col' : read_csv(input+'.train')
+    when 'csel': read_csv(input+'.train')
     end
     
     search_method = GoldenSectionSearchMethod.new(xvals , yvals)
@@ -83,7 +83,7 @@ class WeightLearner
       #do_retrieval_at(xvals , yvals.map{|e|(e.to_s.scan(/e/).size>0)? 0.0 : e} , $o.merge(:remote_query=>remote))[$opt_for]
       results << case $type
       when 'con' : WeightLearner.evaluate_sim_search_with(input_data, yvals)
-      when 'col' : WeightLearner.evaluate_csel_with(input_data, yvals)
+      when 'csel': WeightLearner.evaluate_csel_with(input_data, yvals)
       end
       #puts results.inspect
       puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"

@@ -13,8 +13,9 @@ $cols = Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'col'
 $remark = ENV['remark'] if ENV['remark']
 
-def get_feature_file()
-  "data/feature-#$renv-#$today-#$type-#$remark.csv"
+def get_feature_file(method = nil)
+  method ||= ENV['method']
+  "data/feature-#$renv-#$today-#$type-#{method}-#$remark.csv"
 end
 
 def get_learner_input_file(method = nil)

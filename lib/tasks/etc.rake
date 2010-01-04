@@ -68,9 +68,23 @@ namespace :etc do
     end
   end
   
+  desc "Convert feature file"
+  task :conv_file => :environment do
+    $method ||= ENV['method']
+    col_hash = $cols.map_hash_with_index{|e,i|[e, i+1]}
+    result = []
+    IO.read(get_feature_file('grid')).split("\n")[1..-1].map{|e|e.split(",")}.each do |l|
+      case $method
+      when 'svmmulti'
+        result << [col_hash[l[6]]].concat(l[7..-1].map_with_index{|e,i|[i+1,e].join(":")})
+      end
+    end
+    File.open(get_feature_file($method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
+  end
+  
   task(:evaluate_cval) do
     case $type
-    when 'col' : Rake::Task['export:col_features'].execute
+    when 'csel': Rake::Task['export:csel_features'].execute
     #when 'con' : Rake::Task['export:concept_features'].execute
     end
     Rake::Task['etc:split_file'].execute
