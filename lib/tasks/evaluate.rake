@@ -72,15 +72,15 @@ namespace :evaluate do
   namespace :batch do
     desc "Csel Features"
     task :csel_features => :environment do
-      [0.00000001, 0.000000001].each do |min_prob|
-        $min_prob = min_prob
+      [10,25,50,100].each do |topk|
+        $topk = topk ; $remark = "topk_#{topk}"
         Rake::Task['export:csel_features'].execute
-        Rake::Task['etc:csel:evaluate_features'].execute
-      end      
-      [0.1,0.3,0.5,0.7,0.9].each do |mp_smt|
-        $mp_smt = mp_smt
+        Rake::Task['evaluate:csel_features'].execute
+      end
+      [3,5,10,15].each do |gavg_m|
+        $gavg_m = gavg_m ; $remark = "gavg_m_#{gavg_m}"
         Rake::Task['export:csel_features'].execute
-        Rake::Task['etc:csel:evaluate_features'].execute
+        Rake::Task['evaluate:csel_features'].execute
       end
     end
     

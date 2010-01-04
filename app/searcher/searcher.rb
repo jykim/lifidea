@@ -117,7 +117,7 @@ class Searcher
     doc_scores.values.collapse.sort_by{|e|e[1]}.reverse[0..topk]
   end
   
-  CS_TYPES = [:cql, :mpmean, :dict, :clarity, :gmap, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
+  CS_TYPES = [:cql, :mpmean, :dict, :clarity, :gavg, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
   CS_COMB_TYPES = ['uniform', 'grid', 'logreg', 'ranksvm']
   DICT_COLS = {
     "calendar"=>[:calendar, :schedule, :start_at, :location], "email"=>[:email, :from, :to, :date], 
@@ -139,7 +139,7 @@ class Searcher
       when :mpgmean : o[:mps].map{|e|(e.values).gmean}.multiply_log
       when :clarity : col.dhid[o[:rank_list][0][0]].lm.kld(col.lm)
       when :qlm     : o[:qqls].multiply_log
-      when :gmap    : o[:rank_list].map{|e|Math.exp(e[1])}.gmean
+      when :gavg    : o[:rank_list].map{|e|Math.exp(e[1])}.pad(o[:gavg_m], o[:gavg_minql]).gmean
       when :redde   : o[:rank_list].map{|e|Math.exp(e[1])}.sum
       when :dict    : (DICT_COLS[col.cid].map{|e|e.to_s.stem} & parsed_query).size
       end
