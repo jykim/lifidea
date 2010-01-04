@@ -74,7 +74,7 @@ namespace :etc do
     $method ||= ENV['method']
     col_hash = $cols.map_hash_with_index{|e,i|[e, i+1]}
     result = []
-    IO.read(get_feature_file('grid')).split("\n")[1..-1].map{|e|e.split(",")}.each do |l|
+    read_csv(get_feature_file('grid'),:output=>:array).each do |l|
       case $method
       when 'svmmulti'
         result << [col_hash[l[6]]].concat(l[7..-1].map_with_index{|e,i|[i+1,e].join(":")})
