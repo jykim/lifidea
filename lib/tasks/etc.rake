@@ -23,7 +23,7 @@ namespace :etc do
   end
   
   def split_file(filename, data, o={})
-    result_train, result_test = [], []
+    result_train, result_test = [o[:header]], [o[:header]]
     data.each_with_index do |e,i|
       #puts rand(), train_ratio
       if (o[:train_ratio] && rand() < o[:train_ratio]) ||
@@ -33,17 +33,18 @@ namespace :etc do
         result_test << e
       end
     end
-    File.open(filename+'.train','w'){|f|f.puts o[:header] ;f.puts result_train.join}
-    File.open(filename+'.test' ,'w'){|f|f.puts o[:header] ;f.puts result_test.join}
+    File.open(filename+'.train','w'){|f|f.puts result_train.find_valid.join}
+    File.open(filename+'.test' ,'w'){|f|f.puts result_test.find_valid.join}
   end
   
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
     filename = ENV['input'] || get_feature_file()
-    puts "Splitting #{filename}..."
+    puts "Splitting #{filename}... (#{ENV['method']})"
     header = nil
     data = case ENV['method']
     when 'svmrank' : IO.read(filename).split(/^(?=2)/)
+    when 'svmmulti' : IO.read(filename).split(/^/)
     when 'grid'
       content = IO.read(filename).split(/^/)
       header = content[0]
