@@ -71,7 +71,7 @@ namespace :etc do
   task(:evaluate_cval) do
     case $type
     when 'col' : Rake::Task['export:col_features'].execute
-    when 'con' : Rake::Task['export:concept_features'].execute
+    #when 'con' : Rake::Task['export:concept_features'].execute
     end
     Rake::Task['etc:split_file'].execute
     1.upto(ENV['folds'].to_i) do |i|
