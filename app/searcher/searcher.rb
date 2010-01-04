@@ -3,7 +3,7 @@ class Searcher
   include InferenceNetwork
   attr_accessor :cons, :docs
   RULE_DEF = 'method:jm,lambda:0.1'
-  #RULE_DEF = 'method:dirichlet,mu:1500'
+  #RULE_DEF = 'method:dirichlet,mu:50'
   FEATURES = ['c_title','c_content','c_uri','c_tag','time','co-oc','topic','occur']
   INDEX_FIELD_DEF = [:title, :content, :uri]
   INDEX_FIELDS = {"calendar"=>[:start_at, :location], "email"=>[:from, :to, :date], "file"=>[:filename], "news"=>[:tag_list], "webpage"=>[:tag_list]}
@@ -16,7 +16,7 @@ class Searcher
     @debug = o[:debug] || false
     @lambda = nil
     $clf = LinkFeatures.new
-    parse_rule(o[:rule] || RULE_DEF)
+    parse_rule(o[:rule] || Conf.rule_searcher ||RULE_DEF)
   end
   
   def self.load_weights(features, rank = nil)
@@ -117,7 +117,7 @@ class Searcher
     doc_scores.values.collapse.sort_by{|e|e[1]}.reverse[0..topk]
   end
   
-  CS_TYPES = [:cql, :mpmean, :dict]#,:clarity, :gmap, :redde,  :mpmax, :qlm, :smpmean, :mphmean, :mpgmean
+  CS_TYPES = [:cql, :mpmean, :dict, :clarity, :gmap, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
   CS_COMB_TYPES = ['uniform', 'grid', 'logreg', 'ranksvm']
   DICT_COLS = {
     "calendar"=>[:calendar, :schedule, :start_at, :location], "email"=>[:email, :from, :to, :date], 

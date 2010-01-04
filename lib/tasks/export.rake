@@ -106,7 +106,7 @@ namespace :export do
   end
   
   desc "Export Training Data for Collection Selection"
-  task :col_features => :environment do
+  task :csel_features => :environment do
     #$remark = "#$min_prob-#$mp_smt"
     filename = ENV['filename'] || get_feature_file()
     if !$searcher
@@ -116,7 +116,7 @@ namespace :export do
     result_all = []
     queries_all = Query.between($start_at, $end_at).all.find_all{|q|q.item}
     queries_valid = Query.valid.between($start_at, $end_at).all
-    col_qlm = Query.get_qlm_with(queries_all)
+    col_qlm = Query.get_qlm_with(Query.between('20090101', '20091231').all)
     #debug col_qlm.inspect.round
     queries_all.each do |q|
       result = [q.id, q.query_text, q.user.uid, q.created_at, q.position, q.item.did, q.item.itype]
