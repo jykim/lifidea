@@ -110,7 +110,7 @@ namespace :export do
     #$remark = "#$min_prob-#$mp_smt"
     filename = ENV['filename'] || get_feature_file()
     if !$searcher
-      $searcher = Searcher.new(nil, :debug=>ENV['debug'])
+      $searcher = Searcher.new(:debug=>ENV['debug'])
       $searcher.load_documents()
     end
     result_all = []

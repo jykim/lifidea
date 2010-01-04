@@ -11,7 +11,7 @@ class Searcher
   #RULE_DEF = 'method:dirichlet,mu:100'
   
   # @param [Array<IR::Index>] cols : target collections
-  def initialize(cols = nil, o = {})
+  def initialize(o = {})
     @cols = cols
     @debug = o[:debug] || false
     @lambda = nil
@@ -45,7 +45,8 @@ class Searcher
   end
   
   def self.recip_rank(rank_list, rel)
-    result = 0
+    #p rank_list,rel
+    result = 0.0
     rank_list.each_with_index{|e,i| result = 1.0 / (i+1) if e[0] == rel}
     result
   end
@@ -75,16 +76,13 @@ class Searcher
   end
   
   # Search given keyword query
-  # - 1) collection scoring
   # - 2) document scoring
   # - merging 1) and 2) into final score
   def search_by_keyword(query, o={})
-    parsed_query = InferenceNetwork.parse_query(query)
-    parse_rule(o[:rule]) if o[:rule]
-    o[:indri_query] ||= "#combine(#{parsed_query.map{|w|w+'.(document)'}.join(' ')})"
+    #debugger
+    indri_query = o[:indri_query] || "#combine(#{InferenceNetwork.parse_query(query).map{|w|w+'.(document)'}.join(' ')})"
     #info "[searcher_daemon] indri_query = [#{o[:indri_query]}]"
-    #qws = query.scan(LanguageModel::PTN_TERM)
-    InferenceNetwork.eval_indri_query(o[:indri_query])
+    InferenceNetwork.eval_indri_query(indri_query)
     topk = o[:topk] || 50
     col_weight = o[:col_weight] || 0.4
     doc_scores = {}

@@ -35,6 +35,7 @@ END
     when 'jm' : rule_parsed['lambda']
     when 'dirichlet' : rule_parsed['mu']
     end
+    debug "[parse_rule] #{rule} parsed!"
     @rule_name, @rule_value = rule_name, rule_value.to_f
   end
   

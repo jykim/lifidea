@@ -108,7 +108,7 @@ namespace :etc do
     require 'ruby-prof'
     RubyProf.start
     #====
-    $searcher = Searcher.new(nil, :debug=>ENV['debug'])
+    $searcher = Searcher.new(:debug=>ENV['debug'])
     $searcher.load_documents()
     #====
     result = RubyProf.stop

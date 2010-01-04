@@ -87,7 +87,7 @@ namespace :evaluate do
     desc "Keyword Search"
     task :keyword_search do
       input_data = read_csv(ENV['input'] || get_feature_file())
-      output = ENV['output'] || get_evaluation_file('keywrod_search')
+      output = ENV['output'] || get_evaluation_file('keyword_search')
       result = []
       params_jm, params_dir = [0.1,0.3,0.5,0.7,0.9], [50,100,500,1500,3000]
       params_jm.each do |lambda|

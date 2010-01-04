@@ -23,14 +23,15 @@ class WeightLearner
   def self.evaluate_keyword_search_with(input_data, weights = nil, o={})
     result = {}
     if !$searcher
-      $searcher = Searcher.new
+      $searcher = Searcher.new(o)
       $searcher.load_documents()
     end
+    $searcher.parse_rule(o[:rule]) if o[:rule]
     input_data.each do |l|
-      #puts "Query : #{l[:query]}"
       o.merge!(:col_scores=>WeightLearner.get_col_scores(l, weights)) if weights
       rank_list = $searcher.search_by_keyword(l[:query], o)
       result[l[:qid]] = Searcher.recip_rank(rank_list, l[:did])
+      debug "Q[#{l[:qid]}] #{result[l[:qid]]} (#{o[:rule]} / #{l[:query]} )"
     end
     [result.values.mean, weights].flatten
   end

@@ -13,7 +13,8 @@ class SearcherTest < ActiveSupport::TestCase
     0.upto(10){|i|@docs[i] = create_doc(i, "d"+i.to_s)}
     @col = IR::Index.new(@docs, :cid=>'test', :fields=>@fields)
     debug @col.flm.map{|k,v|[k,v.size]}.inspect
-    @searcher = Searcher.new([@col], Searcher::RULE_DEF)
+    @searcher = Searcher.new(:rule=>Searcher::RULE_DEF)
+    @searcher.cols = [@col]
   end
   
   def create_doc(dno, did)
