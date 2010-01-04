@@ -88,10 +88,10 @@ class WeightLearner
       puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
       results[-1][0]
     end
-    results_str = case (o[:grid_type] || :single)
-    when :single
+    results_str = case (o[:grid_type] || 'single')
+    when 'single'
       results.sort_by{|e|e[0]}.reverse.map{|l|l.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
-    when :avg
+    when 'avg'
       max_perf = results.sort_by{|l|l[0]}[-1][0]
       results_str = results.find_all{|l|l[0] == max_perf}.merge_array_by_avg().map_with_index{|e,i|[i,e].join(":")}.join(" ")
     end
