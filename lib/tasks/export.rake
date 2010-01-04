@@ -121,10 +121,12 @@ namespace :export do
     queries_all.each do |q|
       result = [q.id, q.query_text, q.user.uid, q.created_at, q.position, q.item.did, q.item.itype]
       parsed_query = InferenceNetwork.parse_query(q.query_text)
+      rank_list = $searcher.search_by_keyword(q.query_text, :topk=>($topk||50))
       $searcher.cols.each do |col|
         #debugger
         col_score_opt = {
-        :rank_list => $searcher.search_by_keyword(q.query_text, :col=>col.cid, :topk=>100).find_all{|e|col.dhid[e[0]]},
+        :rank_list => rank_list.find_all{|e|col.dhid[e[0]]}, 
+        :gavg_m => ($gavg_m||5), :gavg_minql => Math.exp(rank_list[-1][1]), 
         :qqls=> parsed_query.map{|e|col_qlm[col.cid].prob(e)},
         :cps => parsed_query.map{|e|col.lm.prob(e)},
         :mps => parsed_query.map{|e|col.flm.map_hash{|k,v|[k,v.prob(e)]}},
