@@ -60,7 +60,7 @@ END
   def op_wsum(*args)
     debug "#wsum(#{args.map{|e|e.join('*')}.join(' ')})" if @debug
     sum_weights = args.map{|e|e[0]}.sum
-    args.find_all{|e|e>0}.map{|e|e[0] * e[1] / sum_weights}.sum
+    args.find_all{|e|e[0]>0}.map{|e|e[0] * e[1] / sum_weights}.sum
   end
   
   # args = [score1, score2, ...]

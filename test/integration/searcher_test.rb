@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class SearcherTest < ActiveSupport::TestCase
-  INDRI_ROOT = "/Users/lifidea/app/indri-2.10/bin/"
+  INDRI_ROOT = "/Users/lifidea/pkg/indri-2.10/bin/"
   DOC_ROOT = "test/fixtures/docs/trec/"
 
   def setup()
@@ -41,8 +41,8 @@ class SearcherTest < ActiveSupport::TestCase
       #debugger
       queries[i] = '#combine(#wsum(0.6 t1.(a) 0.4 t1.(b)) #wsum(0.3 t2.(a) 0.7 t2.(b)))'#@docs[i].lm.p.sample(2).join(" ")
       puts "Query : #{queries[i]}"
-      #run_indri(queries[i])
-      results[i] = @searcher.search("t1 t2", :indri_query=>queries[i])
+      run_indri(queries[i])
+      results[i] = @searcher.search_by_keyword("t1 t2", :indri_query=>queries[i])
       puts results[i].map{|e|e.join("\t")}.join("\n")
     end
   end

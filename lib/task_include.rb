@@ -9,7 +9,7 @@ else
 end
 $end_at = ENV['end_at']   || (Date.tomorrow+1).to_s
 $today = Time.now.to_ymd
-$cols = Item.itype_lists - ['query','concept']
+$cols = ['calendar','webpage','news','file','email'] #Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'col'
 $remark = ENV['remark'] if ENV['remark']
 

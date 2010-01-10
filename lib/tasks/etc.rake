@@ -74,10 +74,17 @@ namespace :etc do
     $method ||= ENV['method']
     col_hash = $cols.map_hash_with_index{|e,i|[e, i+1]}
     result = []
-    read_csv(get_feature_file('grid'),:output=>:array).each do |l|
+    read_csv(get_feature_file('grid'),:output=>:array).each_with_index do |l,i|
+      rel_col = l[6]
       case $method
       when 'svmmulti'
-        result << [col_hash[l[6]]].concat(l[7..-1].map_with_index{|e,i|[i+1,e].join(":")})
+        result << [col_hash[rel_col]].concat(l[7..-1].map_with_index{|e,j|[j+1,e].join(":")})
+      when 'svmrank'
+        raise DataError, "Col size not consistent! #{l[7..-1].size}!=#{$cols.size * Searcher::CS_TYPES.size}" if l[7..-1].size != $cols.size * Searcher::CS_TYPES.size
+        values_col = l[7..-1].map_with_index{|e,j|[e,j]}.group_by{|e|e[1]/Searcher::CS_TYPES.size}
+        result.concat values_col.map{|col,features|
+          [((col+1 == col_hash[rel_col])? 2 : 1), i+1, features.map_with_index{|e,j|[j+1,e[0]].join(":")}].flatten
+          }.sort_by{|e|e[0]}.reverse
       end
     end
     File.open(get_feature_file($method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}

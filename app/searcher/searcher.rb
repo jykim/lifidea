@@ -117,7 +117,7 @@ class Searcher
     doc_scores.values.collapse.sort_by{|e|e[1]}.reverse[0..topk]
   end
   
-  CS_TYPES = [:cql, :mpmean, :dict, :clarity, :gavg, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
+  CS_TYPES = [:cql, :mpmean, :dict, :qlm, :clarity, :gavg, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
   CS_COMB_TYPES = ['uniform', 'grid', 'logreg', 'ranksvm']
   DICT_COLS = {
     "calendar"=>[:calendar, :schedule, :start_at, :location], "email"=>[:email, :from, :to, :date], 
