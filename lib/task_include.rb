@@ -8,7 +8,7 @@ else
   ENV['start_at'] || Date.today.at_beginning_of_month.to_s
 end
 $end_at = ENV['end_at']   || (Date.tomorrow+1).to_s
-$today = Time.now.to_ymd
+$today = ENV['today'] || Time.now.to_ymd
 $cols = Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'csel'
 $remark = ENV['remark'] if ENV['remark']

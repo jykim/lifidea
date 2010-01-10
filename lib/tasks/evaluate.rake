@@ -49,7 +49,7 @@ namespace :evaluate do
       end
       result_all << result
     end
-    puts result_all.map{|e|e.join(" ")}.join("\n")
+    #puts result_all.map{|e|e.join(" ")}.join("\n")
     debugger
     write_csv output, result_all, :summary=>["summary", [nil]*6, [:sum]*Searcher::CS_TYPES.size].flatten, 
       :mode=>'a', :header=>["qid","query","user","date","position", "did", "itype",Searcher::CS_TYPES].flatten
@@ -59,6 +59,7 @@ namespace :evaluate do
   task :csel_combs => :environment do
     input = ENV['input'] || get_learner_input_file()+'.'+ENV['set_type']
     output = ENV['output'] || get_evaluation_file('col_combs')
+    #puts output
     methods = [Searcher::CS_TYPES, Searcher::CS_COMB_TYPES].flatten
     input_data = read_csv(input)
     result_csel, result_ret = [], []

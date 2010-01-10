@@ -84,10 +84,10 @@ namespace :etc do
   end
   
   task(:evaluate_cval) do
-    #case $type
+    case $type
     #when 'csel': Rake::Task['export:csel_features'].execute
-    #when 'con' : Rake::Task['export:concept_features'].execute
-    #end
+    when 'con' : Rake::Task['export:concept_features'].execute
+    end
     Rake::Task['etc:split_file'].execute
     1.upto(ENV['folds'].to_i) do |i|
       puts "====== Starting #{i}th fold ======="
@@ -106,7 +106,7 @@ namespace :etc do
     end
     case $type
     when 'con'
-    when 'col'
+    when 'csel'
       ENV['set_type'] = 'train'
       Rake::Task['evaluate:csel_combs'].execute
       ENV['set_type'] = 'test'
