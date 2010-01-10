@@ -84,10 +84,10 @@ namespace :etc do
   end
   
   task(:evaluate_cval) do
-    case $type
-    when 'csel': Rake::Task['export:csel_features'].execute
+    #case $type
+    #when 'csel': Rake::Task['export:csel_features'].execute
     #when 'con' : Rake::Task['export:concept_features'].execute
-    end
+    #end
     Rake::Task['etc:split_file'].execute
     1.upto(ENV['folds'].to_i) do |i|
       puts "====== Starting #{i}th fold ======="

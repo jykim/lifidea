@@ -19,7 +19,7 @@ end
 
 namespace :export do
   desc "Export Documents into Text File"
-  task(:docs => :environment) do
+  task(:doc_contents => :environment) do
     path = ENV['dirname'] || "data/docs"
     annotation = ENV['annotation'] || true
     ch = Indexer.init_concept_hash() if annotation
@@ -150,6 +150,7 @@ namespace :export do
     header_features = $searcher.cols.map{|e|Searcher::CS_TYPES.map{|e2|[e2.to_s,e.cid].join("_")}}
     write_csv get_feature_file('grid'), result_all, :normalize=>[[nil]*7, [:minmax]*Searcher::CS_TYPES.size*$searcher.cols.size].flatten, 
       :header=>["qid","query","user","date","position", "did", "itype", header_features].flatten
+    debugger
   end
   
   desc "Export Items along with Tags into Text File"

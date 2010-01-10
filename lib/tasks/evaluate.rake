@@ -35,7 +35,7 @@ namespace :evaluate do
     read_csv(input).each do |l|
       result = [l[:qid], l[:query], l[:user], l[:date], l[:position], l[:did], l[:itype]]
       values_cs_type = l.find_all{|k,v|k.to_s=~/_/}.group_by{|e|e[0].to_s.split("_")[0]}
-      #debugger
+
       Searcher::CS_TYPES.each do |cs_type|
         #p values_cs_type[cs_type.to_s]
         col_scores = values_cs_type[cs_type.to_s].sort_by{|e|e[1].to_f}
@@ -49,7 +49,8 @@ namespace :evaluate do
       end
       result_all << result
     end
-    #puts result_all.map{|e|e.join(" ")}.join("\n")
+    puts result_all.map{|e|e.join(" ")}.join("\n")
+    debugger
     write_csv output, result_all, :summary=>["summary", [nil]*6, [:sum]*Searcher::CS_TYPES.size].flatten, 
       :mode=>'a', :header=>["qid","query","user","date","position", "did", "itype",Searcher::CS_TYPES].flatten
   end
