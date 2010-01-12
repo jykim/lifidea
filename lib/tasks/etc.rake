@@ -37,14 +37,33 @@ namespace :etc do
     File.open(filename+'.test' ,'w'){|f|f.puts result_test.find_valid.join}
   end
   
+  def conv_file(filename, method)
+    col_hash = $cols.map_hash_with_index{|e,i|[e, i+1]}
+    result = []
+    read_csv(filename,:output=>:array).each_with_index do |l,i|
+      rel_col = l[6]
+      case method
+      when 'liblinear'
+        result << [col_hash[rel_col]].concat(l[7..-1].map_with_index{|e,j|[j+1,e].join(":")})
+      when 'ranksvm'
+        raise DataError, "Col size not consistent! #{l[7..-1].size}!=#{$cols.size * Searcher::CS_TYPES.size}" if l[7..-1].size != $cols.size * Searcher::CS_TYPES.size
+        values_col = l[7..-1].map_with_index{|e,j|[e,j]}.group_by{|e|e[1]/Searcher::CS_TYPES.size}
+        result.concat values_col.map{|col,features|
+          [((col+1 == col_hash[rel_col])? 2 : 1), "qid:#{i+1}", features.map_with_index{|e,j|[j+1,e[0]].join(":")}].flatten
+          }.sort_by{|e|e[0]}.reverse
+      end
+    end
+    File.open(filename.gsub(/grid/,method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
+  end
+  
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
     filename = ENV['input'] || get_feature_file()
     puts "Splitting #{filename}... (#{ENV['method']})"
     header = nil
-    data = case ENV['method']
-    when 'svmrank' : IO.read(filename).split(/^(?=2)/)
-    when 'svmmulti' : IO.read(filename).split(/^/)
+    data = case ($method ||= ENV['method'])
+    when 'ranksvm' : IO.read(filename).split(/^(?=2)/)
+    when 'liblinear' : IO.read(filename).split(/^/)
     when 'grid'
       content = IO.read(filename).split(/^/)
       header = content[0]
@@ -63,62 +82,22 @@ namespace :etc do
         puts "#{test_sets[i-1].size} / #{data.size}"
         $fold = "-k#{ENV['folds']}-#{i}"
         split_file(get_learner_input_file(), data, :header=>header, :test_set=>test_sets[i-1])
+        if $type == 'csel' && $method == 'grid'
+          conv_file(get_learner_input_file()+'.train', 'ranksvm')
+          conv_file(get_learner_input_file()+'.test', 'ranksvm')
+          conv_file(get_learner_input_file()+'.train', 'liblinear')
+          conv_file(get_learner_input_file()+'.test', 'liblinear')
+        end
       end
     else
       error "[split_file] No parameter specified!"
     end
   end
   
-  desc "Convert feature file"
+  desc "Convert grid feature file"
   task :conv_file => :environment do
     $method ||= ENV['method']
-    col_hash = $cols.map_hash_with_index{|e,i|[e, i+1]}
-    result = []
-    read_csv(get_feature_file('grid'),:output=>:array).each_with_index do |l,i|
-      rel_col = l[6]
-      case $method
-      when 'svmmulti'
-        result << [col_hash[rel_col]].concat(l[7..-1].map_with_index{|e,j|[j+1,e].join(":")})
-      when 'svmrank'
-        raise DataError, "Col size not consistent! #{l[7..-1].size}!=#{$cols.size * Searcher::CS_TYPES.size}" if l[7..-1].size != $cols.size * Searcher::CS_TYPES.size
-        values_col = l[7..-1].map_with_index{|e,j|[e,j]}.group_by{|e|e[1]/Searcher::CS_TYPES.size}
-        result.concat values_col.map{|col,features|
-          [((col+1 == col_hash[rel_col])? 2 : 1), i+1, features.map_with_index{|e,j|[j+1,e[0]].join(":")}].flatten
-          }.sort_by{|e|e[0]}.reverse
-      end
-    end
-    File.open(get_feature_file($method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
-  end
-  
-  task(:evaluate_cval) do
-    case $type
-    when 'csel': Rake::Task['export:csel_features'].execute
-    #when 'con' : Rake::Task['export:concept_features'].execute
-    end
-    Rake::Task['etc:split_file'].execute
-    1.upto(ENV['folds'].to_i) do |i|
-      puts "====== Starting #{i}th fold ======="
-      ENV['fold'] = i.to_s
-      Rake::Task['etc:learn_and_evaluate'].execute
-    end
-  end
-  
-  desc "Run Learner to Train Weights"
-  task(:learn_and_evaluate => :environment) do
-    $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
-    ['svmrank','grid'].each do |method|
-      next if ENV['method'] && ENV['method'] != method
-      $method = method
-      Rake::Task['run:learner'].execute
-    end
-    case $type
-    when 'con'
-    when 'col'
-      ENV['set_type'] = 'train'
-      Rake::Task['evaluate:csel_combs'].execute
-      ENV['set_type'] = 'test'
-      Rake::Task['evaluate:csel_combs'].execute # evaluate at test set
-    end
+    conv_file(get_feature_file('grid'), $method)
   end
   
   task(:monitor => :environment) do

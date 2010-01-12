@@ -1,4 +1,6 @@
 class WeightLearner
+  LL_TYPE_DEF = 5
+  
   def initialize()
     
   end
@@ -38,7 +40,7 @@ class WeightLearner
   
   def self.get_col_scores(input_line, weights)
     $cols.map_hash{|col|
-      [col, Searcher::CS_TYPES.map_with_index{|cs_type,i|input_line[[cs_type, col].join('_').to_sym].to_f * weights[i] }.sum]}
+      [col, ($cs_types || Searcher::CS_TYPES).map_with_index{|cs_type,i|input_line[[cs_type, col].join('_').to_sym].to_f * weights[i] }.sum]}
   end
   
   # @param [Array] input_data : parsed csv of input_learner_col*
@@ -52,20 +54,27 @@ class WeightLearner
     [result.values.mean, weights].flatten
   end
   
-  def self.parse_svmrank_input(filename)
+  def self.parse_ranksvm_input(filename)
     IO.read(input+'.train').split("\n").find_all{|l|l =~ /^2/}.map{|l|a = l.scan(/\# (\d+) \-\> (\d+)/)[0]}
   end
   
-  def learn_by_svmrank(input, output)
+  def learn_by_ranksvm(input, output)
     cmd = "python anton/SVMWrapper.py -d anton/ -t #{input}.train -a #{input}.test -w #{output} -e 1"
     puts "[learner] running: #{cmd}"
+    system(cmd)
+  end
+  
+  def learn_by_liblinear(input, output, o={})
+    cmd = "#{ENV['PG']}/liblinear/train -s #{o[:ll_type] || LL_TYPE_DEF} #{input}.train #{output}.model"
+    puts "[learner] running: #{cmd}" ; system(cmd)
+    cmd = "#{ENV['PG']}/liblinear/predict #{input}.test  #{output}.model #{output}.output 1> #{output}.result"
     system(cmd)
   end
   
   def learn_by_grid_search(input, output, type, o = {})
     no_params = case $type
     when 'con' : Searcher::FEATURES.size
-    when 'csel': Searcher::CS_TYPES.size
+    when 'csel': ($cs_types || Searcher::CS_TYPES).size
     else
       error("[learn_by_grid_search] no type parameter!")
       return nil
@@ -74,8 +83,8 @@ class WeightLearner
     yvals = [] ; yvals << [0.5] * xvals.size
     results = []
     input_data = case $type
-    when 'con' : self.parse_svmrank_input(input+'.train')
-    when 'csel': read_csv(input+'.train')
+    when 'con' : self.parse_ranksvm_input(input)
+    when 'csel': read_csv(input)
     end
     
     search_method = GoldenSectionSearchMethod.new(xvals , yvals)
@@ -86,7 +95,7 @@ class WeightLearner
       when 'csel': WeightLearner.evaluate_csel_with(input_data, yvals)
       end
       #puts results.inspect
-      puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
+      #puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
       results[-1][0]
     end
     results_str = case (o[:grid_type] || 'single')

@@ -118,7 +118,7 @@ class Searcher
   end
   
   CS_TYPES = [:cql, :mpmean, :dict, :qlm, :clarity, :gavg, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
-  CS_COMB_TYPES = ['uniform', 'grid', 'logreg', 'ranksvm']
+  CS_COMB_TYPES = ['uniform', 'grid', 'ranksvm']
   DICT_COLS = {
     "calendar"=>[:calendar, :schedule, :start_at, :location], "email"=>[:email, :from, :to, :date], 
     "file"=>[:file, :filename, :pdf, :html, :dvi, :ppt, :doc], "news"=>[:news, :tag_list, :blog, :tag], 

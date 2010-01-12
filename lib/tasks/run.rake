@@ -64,13 +64,17 @@ namespace :run do
   
   desc "Run Learner to Train Weights"
   task(:learner => :environment) do
+    #puts "run:learner!"
     input = ENV['input'] || get_learner_input_file($method)
     #puts input
     weights = ENV['weights'] || get_learner_output_file($method)
     learner = WeightLearner.new
     case ($method || ENV['method'])
-    when 'svmrank' : learner.learn_by_svmrank(input, weights)
-    when 'grid' : learner.learn_by_grid_search(input, weights, $type, :grid_type=>ENV['grid_type'])
+    when 'ranksvm' : learner.learn_by_ranksvm(input, weights)
+    when 'liblinear' : learner.learn_by_liblinear(input, weights, :ll_type=>ENV['ll_type'])
+    when 'grid' : learner.learn_by_grid_search(input+'.train', weights, $type, :grid_type=>ENV['grid_type'])
+    else
+      puts "[run:learner] No method selected!"
     end
   end
   

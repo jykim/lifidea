@@ -12,7 +12,7 @@ namespace :evaluate do
     weights = methods.map{|e|Searcher::load_weights(Searcher::FEATURES, e)}
     weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
     result_all = []
-    WrightLearner.parse_svmrank_input(input).each do |ids|
+    WrightLearner.parse_ranksvm_input(input).each do |ids|
       result = [] ; query, rel = ids[0].to_i, ids[1].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
@@ -70,6 +70,53 @@ namespace :evaluate do
   end
   
   namespace :batch do
+    task(:cval) do
+      case $type
+      #when 'csel': Rake::Task['export:csel_features'].execute
+      when 'con' : Rake::Task['export:concept_features'].execute
+      end
+      Rake::Task['etc:split_file'].execute
+      1.upto(ENV['folds'].to_i) do |i|
+        puts "====== Starting #{i}th fold ======="
+        ENV['fold'] = i.to_s
+        $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
+        ['ranksvm','grid','liblinear'].each do |method|
+          $method = method
+          Rake::Task['run:learner'].execute
+        end
+        case $type
+        when 'con'
+        when 'csel'
+          ENV['set_type'] = 'train'
+          Rake::Task['evaluate:csel_combs'].execute
+          ENV['set_type'] = 'test'
+          Rake::Task['evaluate:csel_combs'].execute # evaluate at test set
+        end
+      end
+    end
+    
+    def learn_with_weights(input, weights)
+      input_data = read_csv(input)
+      learner = WeightLearner.new
+      learner.learn_by_grid_search(input, weights, $type, :grid_type=>ENV['grid_type'])
+      weight_values = Searcher.load_weights(Searcher::CS_TYPES || $cs_types, 'grid')
+      WeightLearner.evaluate_csel_with(input_data, weight_values)[0]
+    end
+    
+    desc "Leave one feature out"
+    task :leave_one_out => :environment do
+      ENV['method'] = 'grid'
+      input = ENV['input'] || get_feature_file()
+      weights = ENV['weights'] || get_learner_output_file($method)
+      output = ENV['output'] || get_evaluation_file('leave_one_out')
+      result_csel = [learn_with_weights(input, weights)]
+      Searcher::CS_TYPES.each_with_index do |e,i|
+        $cs_types = Searcher::CS_TYPES.dup ; $cs_types.delete_at(i)
+        result_csel << learn_with_weights(input, weights)
+      end
+      write_csv output, [result_csel], :header=>['all', Searcher::CS_TYPES].flatten
+    end
+    
     desc "Csel Features"
     task :csel_features => :environment do
       [10,25,50,100].each do |topk|
@@ -81,6 +128,24 @@ namespace :evaluate do
         $gavg_m = gavg_m ; $remark = "gavg_m_#{gavg_m}"
         Rake::Task['export:csel_features'].execute
         Rake::Task['evaluate:csel_features'].execute
+      end
+    end
+    
+    desc "Learner parameter of liblinear"
+    task :learner_params => :environment do
+      [0,1,2,3,4,5,6].each do |ll_type|
+        puts "=============== TYPE #{ll_type} ==============="
+        ENV['ll_type'] = ll_type.to_s
+        $method = 'liblinear'
+        1.upto(ENV['folds'].to_i) do |i|
+          puts "====== Starting #{i}th fold ======="
+          ENV['fold'] = i.to_s
+          $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
+          ENV['input'] = get_learner_input_file($method)
+          $remark = "lltype#{ll_type}"
+          Rake::Task['run:learner'].execute
+          $remark = ""
+        end
       end
     end
     

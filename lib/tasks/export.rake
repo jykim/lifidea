@@ -104,14 +104,6 @@ namespace :export do
       index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
   end
-
-  def set_def(val, def_val = 0)
-    begin
-      val
-    rescue Exception => e
-      def_val
-    end
-  end
   
   desc "Export Training Data for Collection Selection"
   task :csel_features => :environment do
@@ -124,9 +116,9 @@ namespace :export do
     result_all = []
     queries_all = Query.between($start_at, $end_at).all.find_all{|q|q.item}
     queries_valid = Query.valid.between($start_at, $end_at).all
-    col_qlm = Query.get_qlm_with(Query.between('20090101', '20091231').all.find_all{|q|q.item})
+    col_qlm = Query.get_qlm_with(Query.between('20090101', '20091231').all)
     #debug col_qlm.inspect.round
-    queries_valid.each do |q|
+    queries_all.each do |q|
       result = [q.id, q.query_text, q.user.uid, q.created_at, q.position, q.item.did, q.item.itype]
       parsed_query = InferenceNetwork.parse_query(q.query_text)
       rank_list = $searcher.search_by_keyword(q.query_text, :topk=>($topk||50))
@@ -134,7 +126,7 @@ namespace :export do
         #debugger
         col_score_opt = {
         :rank_list => rank_list.find_all{|e|col.dhid[e[0]]}, 
-        :gavg_m => ($gavg_m||5), :gavg_minql => Math.exp(set_def(rank_list[-1][1], Math::MIN_NUM)), 
+        :gavg_m => ($gavg_m||5), :gavg_minql => Math.exp(rank_list[-1][1]), 
         :qqls=> parsed_query.map{|e|col_qlm[col.cid].prob(e)},
         :cps => parsed_query.map{|e|col.lm.prob(e)},
         :mps => parsed_query.map{|e|col.flm.map_hash{|k,v|[k,v.prob(e)]}},
