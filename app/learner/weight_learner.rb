@@ -71,7 +71,7 @@ class WeightLearner
     system(cmd)
   end
   
-  def learn_by_grid_search(input, output, type, o = {})
+  def learn_by_grid_search(input_data, output, type, o = {})
     no_params = case $type
     when 'con' : Searcher::FEATURES.size
     when 'csel': ($cs_types || Searcher::CS_TYPES).size
@@ -82,10 +82,6 @@ class WeightLearner
     xvals = (1..no_params).to_a
     yvals = [] ; yvals << [0.5] * xvals.size
     results = []
-    input_data = case $type
-    when 'con' : self.parse_ranksvm_input(input)
-    when 'csel': read_csv(input)
-    end
     
     search_method = GoldenSectionSearchMethod.new(xvals , yvals)
     search_method.search(3) do |xvals , yvals , type , remote|

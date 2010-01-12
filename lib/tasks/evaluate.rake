@@ -95,12 +95,13 @@ namespace :evaluate do
       end
     end
     
-    def learn_with_weights(input, weights)
+    def learn_with_weights(input, weights, o = {})
       input_data = read_csv(input)
+      input_data = input_data.find_all{|e|e[:user] == o[:filter_user]} if o[:filter_user]
       learner = WeightLearner.new
-      learner.learn_by_grid_search(input, weights, $type, :grid_type=>ENV['grid_type'])
+      learner.learn_by_grid_search(input_data, weights, $type, :grid_type=>ENV['grid_type'])
       weight_values = Searcher.load_weights(Searcher::CS_TYPES || $cs_types, 'grid')
-      WeightLearner.evaluate_csel_with(input_data, weight_values)[0]
+      WeightLearner.evaluate_csel_with(input_data, weight_values)
     end
     
     desc "Leave one feature out"
@@ -112,9 +113,22 @@ namespace :evaluate do
       result_csel = [learn_with_weights(input, weights)]
       Searcher::CS_TYPES.each_with_index do |e,i|
         $cs_types = Searcher::CS_TYPES.dup ; $cs_types.delete_at(i)
-        result_csel << learn_with_weights(input, weights)
+        result_csel << learn_with_weights(input, weights)[0]
       end
       write_csv output, [result_csel], :header=>['all', Searcher::CS_TYPES].flatten
+    end
+
+    desc "User-specific feature weights"
+    task :personal_weights => :environment do
+      ENV['method'] = 'grid'
+      input = ENV['input'] || get_feature_file()
+      weights = ENV['weights'] || get_learner_output_file($method)
+      output = ENV['output'] || get_evaluation_file('personal_weights')
+      result_csel = [learn_with_weights(input, weights)]
+      ['uysal','sjh','youngah','jangwon','ulsanrub'].each do |uid|
+        result_csel << [uid,learn_with_weights(input, weights, :filter_user=>uid)].flatten
+      end
+      write_csv output, result_csel, :header=>['uid', 'score', Searcher::CS_TYPES.map{|e|"#{e}_weight"}].flatten
     end
     
     desc "Csel Features"

@@ -31,3 +31,9 @@ update items set itype='query' where itype='lfda_query';
 alter table rules change column dtype itype varchar(255);
 
 alter table queries change column document_id item_id int(11);
+
+
+select itype, count(*) from items 
+group by itype having count(*)>1;
+
+select date(basetime), count(*) from documents group by date(basetime);
