@@ -95,25 +95,23 @@ namespace :evaluate do
       end
     end
     
-    def learn_with_weights(input, weights, o = {})
-      input_data = read_csv(input)
-      input_data = input_data.find_all{|e|e[:user] == o[:filter_user]} if o[:filter_user]
+    def learn_weights(input_data, weights, o = {})
       learner = WeightLearner.new
       learner.learn_by_grid_search(input_data, weights, $type, :grid_type=>ENV['grid_type'])
       weight_values = Searcher.load_weights(Searcher::CS_TYPES || $cs_types, 'grid')
-      WeightLearner.evaluate_csel_with(input_data, weight_values)
     end
     
     desc "Leave one feature out"
     task :leave_one_out => :environment do
       ENV['method'] = 'grid'
       input = ENV['input'] || get_feature_file()
-      weights = ENV['weights'] || get_learner_output_file($method)
+      weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('leave_one_out')
-      result_csel = [learn_with_weights(input, weights)]
+      result_csel = [learn_weights(read_csv(input), weight_file)]
       Searcher::CS_TYPES.each_with_index do |e,i|
         $cs_types = Searcher::CS_TYPES.dup ; $cs_types.delete_at(i)
-        result_csel << learn_with_weights(input, weights)[0]
+        weight_values = learn_weights(read_csv(input), weight_file)
+        result_csel << WeightLearner.evaluate_csel_with(input_data, weight_values)[0]
       end
       write_csv output, [result_csel], :header=>['all', Searcher::CS_TYPES].flatten
     end
@@ -122,11 +120,15 @@ namespace :evaluate do
     task :personal_weights => :environment do
       ENV['method'] = 'grid'
       input = ENV['input'] || get_feature_file()
-      weights = ENV['weights'] || get_learner_output_file($method)
+      weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('personal_weights')
-      result_csel = [learn_with_weights(input, weights)]
+      global_weights = learn_weights(read_csv(input), weight_file)
+      result_csel = ['all',WeightLearner.evaluate_csel_with(read_csv(input), global_weights)].flatten
       ['uysal','sjh','youngah','jangwon','ulsanrub'].each do |uid|
-        result_csel << [uid,learn_with_weights(input, weights, :filter_user=>uid)].flatten
+        personal_input_data = read_csv(input).find_all{|e|e[:user] == uid}
+        personal_weights = learn_weights(personal_input_data, weight_file)
+        result_csel << [uid, WeightLearner.evaluate_csel_with(personal_input_data, global_weights)[0], 
+          WeightLearner.evaluate_csel_with(personal_input_data, personal_weights)].flatten
       end
       write_csv output, result_csel, :header=>['uid', 'score', Searcher::CS_TYPES.map{|e|"#{e}_weight"}].flatten
     end
