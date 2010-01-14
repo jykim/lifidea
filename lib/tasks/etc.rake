@@ -56,6 +56,15 @@ namespace :etc do
     File.open(filename.gsub(/grid/,method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
   end
   
+  desc "Collection Statistics"
+  task :col_stat => :environment do
+    $searcher = Searcher.new(:debug=>ENV['debug'])
+    $searcher.load_documents()
+    $searcher.cols.each do |c|
+      puts [c.cid, c.docs.map{|d|d.lm.size}.mean].join("\t")
+    end
+  end
+  
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
     filename = ENV['input'] || get_feature_file()
