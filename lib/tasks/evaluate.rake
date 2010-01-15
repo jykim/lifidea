@@ -107,17 +107,18 @@ namespace :evaluate do
       input = ENV['input'] || get_feature_file()
       weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('leave_one_out')
-      result_csel = [learn_weights(read_csv(input), weight_file)]
+      result_csel = [WeightLearner.evaluate_csel_with(read_csv(input), learn_weights(read_csv(input), weight_file))[0]]
+      puts "result(all) : #{result_csel}"
       Searcher::CS_TYPES.each_with_index do |e,i|
         $cs_types = Searcher::CS_TYPES.dup ; $cs_types.delete_at(i)
         weight_values = learn_weights(read_csv(input), weight_file)
-        result_csel << WeightLearner.evaluate_csel_with(input_data, weight_values)[0]
+        result_csel << WeightLearner.evaluate_csel_with(read_csv(input), weight_values)[0]
       end
       write_csv output, [result_csel], :header=>['all', Searcher::CS_TYPES].flatten
     end
 
     desc "User-specific feature weights"
-    task :personal_weights => :environment do
+    task :personalize => :environment do
       ENV['method'] = 'grid'
       input = ENV['input'] || get_feature_file()
       weight_file = ENV['weights'] || get_learner_output_file($method)
