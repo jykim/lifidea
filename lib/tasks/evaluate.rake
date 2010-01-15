@@ -123,7 +123,7 @@ namespace :evaluate do
       weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('personal_weights')
       global_weights = learn_weights(read_csv(input), weight_file)
-      result_csel = ['all',WeightLearner.evaluate_csel_with(read_csv(input), global_weights)].flatten
+      result_csel = [['all',WeightLearner.evaluate_csel_with(read_csv(input), global_weights)].flatten]
       ['uysal','sjh','youngah','jangwon','ulsanrub'].each do |uid|
         personal_input_data = read_csv(input).find_all{|e|e[:user] == uid}
         personal_weights = learn_weights(personal_input_data, weight_file)
