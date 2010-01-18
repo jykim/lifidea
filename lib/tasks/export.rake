@@ -21,17 +21,19 @@ namespace :export do
   desc "Export Documents into Text File"
   task(:docs => :environment) do
     path = ENV['dirname'] || "data/docs"
-    annotation = ENV['annotation'] || true
+    annotation = ENV['annotation'] || false
     ch = Indexer.init_concept_hash() if annotation
     Dir.mkdir( path ) if !File.exist?( path )
     Item.valid.documents.between($start_at, $end_at).all(:conditions=>{:itype=>Item.itype_lists}).each_with_index do |d,i|
       next if ENV['id'] && ENV['id'].to_i != d.id
       puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      str = "#{d.title}\n"
-      str += "#{d.m.values.join("\t")}\n"if d.m
-      str += clear_webpage(d.content)
-      ch.replace_concepts(str) if annotation
-      File.open("#{path}/doc_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
+      content = d.index_fields.map{|k,v|"<#{d.itype}_#{k}>#{v}</#{d.itype}_#{k}>"}.join("\n")
+      str = "<DOC> \n<DOCNO> #{d.did} </DOCNO>\n#{content}\n</DOC>"
+      #str = "#{d.title}\n"
+      #str += "#{d.m.values.join("\t")}\n"if d.m
+      #str += clear_webpage(d.content)
+      #ch.replace_concepts(str) if annotation
+      File.open("#{path}/doc_#{d.itype}_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
       puts str if ENV['id']
     end
   end

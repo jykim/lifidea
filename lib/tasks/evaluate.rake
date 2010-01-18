@@ -63,10 +63,13 @@ namespace :evaluate do
     result_csel, result_ret = [], []
     methods.each do |e|
       weights = Searcher.load_weights(Searcher::CS_TYPES, e)
-      result_csel << WeightLearner.evaluate_csel_with(input_data, weights)[0]
+      results = WeightLearner.evaluate_csel_with(input_data, weights)[0]
+      #Intermediate Output
+      #File.open(output+".#{e}.result","w"){|f|f.puts results.join("\n")}
+      result_csel << results.mean
       #result_ret  << WeightLearner.evaluate_keyword_search_with(input_data, weights)[0]
     end
-    write_csv output, [result_csel, result_ret] ,:mode=>'a', :header=>methods
+    write_csv output, [result_csel, result_ret] ,:mode=>'w', :header=>methods
   end
   
   namespace :batch do
@@ -75,20 +78,20 @@ namespace :evaluate do
       #when 'csel': Rake::Task['export:csel_features'].execute
       when 'con' : Rake::Task['export:concept_features'].execute
       end
-      Rake::Task['etc:split_file'].execute
+      #Rake::Task['etc:split_file'].execute
       1.upto(ENV['folds'].to_i) do |i|
         puts "====== Starting #{i}th fold ======="
         ENV['fold'] = i.to_s
         $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
-        ['ranksvm','grid','liblinear'].each do |method|
+        ['liblinear'].each do |method|
           $method = method
           Rake::Task['run:learner'].execute
         end
         case $type
         when 'con'
         when 'csel'
-          ENV['set_type'] = 'train'
-          Rake::Task['evaluate:csel_combs'].execute
+          #ENV['set_type'] = 'train'
+          #Rake::Task['evaluate:csel_combs'].execute
           ENV['set_type'] = 'test'
           Rake::Task['evaluate:csel_combs'].execute # evaluate at test set
         end
@@ -107,12 +110,12 @@ namespace :evaluate do
       input = ENV['input'] || get_feature_file()
       weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('leave_one_out')
-      result_csel = [WeightLearner.evaluate_csel_with(read_csv(input), learn_weights(read_csv(input), weight_file))[0]]
+      result_csel = [WeightLearner.evaluate_csel_with(read_csv(input), learn_weights(read_csv(input), weight_file))[0].mean]
       puts "result(all) : #{result_csel}"
       Searcher::CS_TYPES.each_with_index do |e,i|
         $cs_types = Searcher::CS_TYPES.dup ; $cs_types.delete_at(i)
         weight_values = learn_weights(read_csv(input), weight_file)
-        result_csel << WeightLearner.evaluate_csel_with(read_csv(input), weight_values)[0]
+        result_csel << WeightLearner.evaluate_csel_with(read_csv(input), weight_values)[0].mean
       end
       write_csv output, [result_csel], :header=>['all', Searcher::CS_TYPES].flatten
     end
@@ -124,12 +127,14 @@ namespace :evaluate do
       weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('personal_weights')
       global_weights = learn_weights(read_csv(input), weight_file)
-      result_csel = [['all',WeightLearner.evaluate_csel_with(read_csv(input), global_weights)].flatten]
+      result_csel = [['all',WeightLearner.evaluate_csel_with(read_csv(input), global_weights)[0].mean].flatten]
       ['uysal','sjh','youngah','jangwon','ulsanrub'].each do |uid|
-        personal_input_data = read_csv(input).find_all{|e|e[:user] == uid}
+        input_data = read_csv(input)
+        personal_input_data= input_data.find_all{|e|e[:user] == uid}
+        other_input_data = input_data.find_all{|e|e[:user] != uid}[0..personal_input_data.size]
         personal_weights = learn_weights(personal_input_data, weight_file)
-        result_csel << [uid, WeightLearner.evaluate_csel_with(personal_input_data, global_weights)[0], 
-          WeightLearner.evaluate_csel_with(personal_input_data, personal_weights)].flatten
+        result_csel << [uid, WeightLearner.evaluate_csel_with(personal_input_data, global_weights)[0].mean, 
+          WeightLearner.evaluate_csel_with(personal_input_data, personal_weights)[0.mean]].flatten
       end
       write_csv output, result_csel, :header=>['uid', 'score', Searcher::CS_TYPES.map{|e|"#{e}_weight"}].flatten
     end

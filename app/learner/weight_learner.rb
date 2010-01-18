@@ -35,7 +35,7 @@ class WeightLearner
       result[l[:qid]] = Searcher.recip_rank(rank_list, l[:did])
       debug "Q[#{l[:qid]}] #{result[l[:qid]]} (#{o[:rule]} / #{l[:query]} )"
     end
-    [result.values.mean, weights].flatten
+    [result.values, weights].flatten
   end
   
   def self.get_col_scores(input_line, weights)
@@ -51,7 +51,7 @@ class WeightLearner
       #p values_col.max_pair
       result[l[:qid]] = (l[:itype] == col_scores.max_pair[0])? 1.0 : 0.0
     end
-    [result.values.mean, weights].flatten
+    [result.values, weights]#.flatten
   end
   
   def self.parse_ranksvm_input(filename)
@@ -67,7 +67,7 @@ class WeightLearner
   def learn_by_liblinear(input, output, o={})
     cmd = "#{ENV['PG']}/liblinear/train -s #{o[:ll_type] || LL_TYPE_DEF} #{input}.train #{output}.model"
     puts "[learner] running: #{cmd}" ; system(cmd)
-    cmd = "#{ENV['PG']}/liblinear/predict #{input}.test  #{output}.model #{output}.output 1> #{output}.result"
+    cmd = "#{ENV['PG']}/liblinear/predict -b 1 #{input}.test  #{output}.model #{output}.output 1> #{output}.result"
     system(cmd)
   end
   
@@ -92,7 +92,7 @@ class WeightLearner
       end
       #puts results.inspect
       #puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
-      results[-1][0]
+      results[-1][0].mean
     end
     results_str = case (o[:grid_type] || 'single')
     when 'single'

@@ -11,6 +11,7 @@ $end_at = ENV['end_at']   || (Date.tomorrow+1).to_s
 $today = ENV['today'] || Time.now.to_ymd
 $cols = ['calendar','webpage','news','file','email'] #Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'csel'
+#$method = ENV['method'] || 'grid'
 $remark = ENV['remark'] if ENV['remark']
 
 def get_feature_file(method = nil)

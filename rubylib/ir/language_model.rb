@@ -1,7 +1,7 @@
 # LanguageModel Library
 # - Initialize from Frequency Distribution
 class LanguageModel
-  attr_accessor :f, :p, :size, :ql
+  attr_accessor :f, :p, :size, :ql, :text
   PTN_TERM = /[A-Za-z0-9]+/
   def initialize(input, o = {})
     #return if !text
@@ -11,7 +11,7 @@ class LanguageModel
     when "Hash" # fdist
       input
     when "String"
-      #@text = input
+      @text = input if o[:keep_text]
       if input.blank?
         {}
       else
