@@ -29,7 +29,7 @@ end
 begin
   server = TCPServer.open(Conf.searcher_port)  
 rescue Exception => e
-  errror "Failed to open socket!", e
+  error "Failed to open socket!", e
 end
 puts "Ready to accept client at #{Conf.searcher_port}"
 while($running) do

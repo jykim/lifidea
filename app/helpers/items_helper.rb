@@ -7,7 +7,7 @@ module ItemsHelper
 		#end
     #select_tag(:itype, options_for_select(options.map{|e|[e,e]},default), 
     #  :multiple=>true, :onchange => 'this.form.submit()')
-    options = ['all','webpage','email','pub','memo','file','concept','query']
+    options = ['all','webpage','email','pub','memo','news','blog','file','concept','query']
     select_tag(:itype, options_for_select(options.map{|e|[e,e]},default), 
       :multiple=>true, :onchange => 'this.form.submit()')
   end

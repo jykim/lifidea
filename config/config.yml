@@ -8,10 +8,10 @@ common:
   hour_daybreak: 4
   
 development:
-  searcher_port: 3100
+  searcher_port: 3200
   
 test:
-  searcher_port: 3101
+  searcher_port: 3201
 
 production:
-  searcher_port: 3102
+  searcher_port: 3202
