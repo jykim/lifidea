@@ -14,7 +14,9 @@ Up to this point, you have found <%=  @query_docs_found.size %> out of <%= @quer
 
 - Please do not copy and paste document text. (pasting to search box is disabled) <br>
 
-- The search engine used for this game indexes everything (type, title, uri, metadata and content) shown in the document page yet handles only simple keyword queries without fancy features. (e.g. phrase, spell correction, etc.)
+- The search engine used for this game indexes everything (type, title, uri, metadata and content) shown in the document page.
+
+- The search engine handles only simple keyword queries without fancy features. (e.g. phrase, spell correction, etc.)
 
 <% if @query_docs_total.size - @query_docs_found.size <= @pages_per_game %>
 	<h3>You have found all the documents available!</h3>

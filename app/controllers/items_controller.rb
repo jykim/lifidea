@@ -193,17 +193,4 @@ class ItemsController < ApplicationController
     end
     redirect_to :action=>:links
   end
-  
-  #def concepts
-  #  @occurrences = Occurrence.paginate(:order=>"weight desc", :page=>params[:page], :per_page=>50)
-  #end
-  
-private
-  def init_searcher
-    docs = Item.all(:conditions=>["textindex is not null"]).map{|d|IR::Document.create_from_yaml(d.textindex)}
-    #debugger
-    puts "[init_searcher] #{docs.size} docs loaded."
-    @col = IR::Index.new(docs)
-    Searcher.new(@col, Searcher::RULE_DEF)
-  end
 end

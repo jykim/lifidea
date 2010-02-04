@@ -21,17 +21,19 @@ namespace :export do
   desc "Export Documents into Text File"
   task(:docs => :environment) do
     path = ENV['dirname'] || "data/docs"
-    annotation = ENV['annotation'] || true
+    annotation = ENV['annotation'] || false
     ch = Indexer.init_concept_hash() if annotation
     Dir.mkdir( path ) if !File.exist?( path )
     Item.valid.documents.between($start_at, $end_at).all(:conditions=>{:itype=>Item.itype_lists}).each_with_index do |d,i|
       next if ENV['id'] && ENV['id'].to_i != d.id
       puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      str = "#{d.title}\n"
-      str += "#{d.m.values.join("\t")}\n"if d.m
-      str += clear_webpage(d.content)
-      ch.replace_concepts(str) if annotation
-      File.open("#{path}/doc_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
+      content = d.index_fields.map{|k,v|"<#{d.itype}_#{k}>#{v}</#{d.itype}_#{k}>"}.join("\n")
+      str = "<DOC> \n<DOCNO> #{d.did} </DOCNO>\n#{content}\n</DOC>"
+      #str = "#{d.title}\n"
+      #str += "#{d.m.values.join("\t")}\n"if d.m
+      #str += clear_webpage(d.content)
+      #ch.replace_concepts(str) if annotation
+      File.open("#{path}/doc_#{d.itype}_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
       puts str if ENV['id']
     end
   end
@@ -73,10 +75,22 @@ namespace :export do
     write_csv filename, result_total, 
       :header=>['query','target'].concat(Searcher::FEATURES)
   end
+    
+  desc "Export Stat table into CSV"
+  task(:stats => :environment) do
+    ["day","week","month"].each{|unit|export_stat_for(unit, $start_at, $end_at)}
+  end
+  
+  desc "Export Concept table into CSV"
+  task :concepts => :environment do
+    filename = ENV['filename'] || "data/concepts_#$renv.csv"
+    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.ctype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
+      :header=>['id','title','ctype','synonym_id','hidden_flag','modified_flag']
+  end
   
   desc "Export Learner Input from Click Histories"
-  task :learner_input => :environment do
-    filename = ENV['input'] || get_learner_input_file()
+  task :concept_features => :environment do
+    filename = ENV['input'] || get_feature_file()
     File.unlink(filename) if File.exists?(filename)
     $f_li = File.open(filename, 'a')
     $last_query_no = 0
@@ -91,41 +105,30 @@ namespace :export do
       end
       index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
-    puts "Splitting #{filename}..."
-    Rake::Task['etc:split_file'].execute
-  end
-    
-  desc "Export Stat table into CSV"
-  task(:stats => :environment) do
-    ["day","week","month"].each{|unit|export_stat_for(unit, $start_at, $end_at)}
-  end
-  
-  desc "Export Concept table into CSV"
-  task :concepts => :environment do
-    filename = ENV['filename'] || "data/concepts_#$renv.csv"
-    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.ctype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
-      :header=>['id','title','ctype','synonym_id','hidden_flag','modified_flag']
   end
   
   desc "Export Training Data for Collection Selection"
   task :csel_features => :environment do
-    filename = ENV['filename'] || "data/csel_#$renv-#$min_prob-#$mp_smt.csv"
+    #$remark = "#$min_prob-#$mp_smt"
+    #filename = ENV['filename'] || 
     if !$searcher
-      $searcher = Searcher.new(nil, :debug=>ENV['debug'])
+      $searcher = Searcher.new(:debug=>ENV['debug'])
       $searcher.load_documents()
     end
     result_all = []
     queries_all = Query.between($start_at, $end_at).all.find_all{|q|q.item}
     queries_valid = Query.valid.between($start_at, $end_at).all
-    col_qlm = queries_all.group_by{|q|q.item.itype}.map_hash{|k,v|[k , LanguageModel.new(v.map{|q|q.query_text}.join(" "))]}
-    debug col_qlm.inspect.round
+    col_qlm = Query.get_qlm_with(Query.valid.between('20090101', '20091231').all)
+    #debug col_qlm.inspect.round
     queries_all.each do |q|
       result = [q.id, q.query_text, q.user.uid, q.created_at, q.position, q.item.did, q.item.itype]
       parsed_query = InferenceNetwork.parse_query(q.query_text)
+      rank_list = $searcher.search_by_keyword(q.query_text, :topk=>($topk||50))
       $searcher.cols.each do |col|
         #debugger
         col_score_opt = {
-        :rank_list => $searcher.search_by_keyword(q.query_text, :col=>col.cid, :topk=>100).find_all{|e|col.dhid[e[0]]},
+        :rank_list => rank_list.find_all{|e|col.dhid[e[0]]}, 
+        :gavg_m => ($gavg_m||5), :gavg_minql => Math.exp(rank_list[-1][1]), 
         :qqls=> parsed_query.map{|e|col_qlm[col.cid].prob(e)},
         :cps => parsed_query.map{|e|col.lm.prob(e)},
         :mps => parsed_query.map{|e|col.flm.map_hash{|k,v|[k,v.prob(e)]}},
@@ -139,7 +142,7 @@ namespace :export do
       result_all << result
     end
     header_features = $searcher.cols.map{|e|Searcher::CS_TYPES.map{|e2|[e2.to_s,e.cid].join("_")}}
-    write_csv filename, result_all, :normalize=>[[nil]*7, [:minmax]*Searcher::CS_TYPES.size*$searcher.cols.size].flatten, 
+    write_csv get_feature_file('grid'), result_all, :normalize=>[[nil]*7, [:minmax]*Searcher::CS_TYPES.size*$searcher.cols.size].flatten, 
       :header=>["qid","query","user","date","position", "did", "itype", header_features].flatten
   end
   

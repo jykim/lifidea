@@ -105,6 +105,14 @@ class Array
     map_with_index{|e1,i| map_with_index{|e2,j| a << [e1,e2] if i < j}}
     a
   end
+  
+  def pad(n, pad_elem = nil)
+    if size < n
+      self.concat([pad_elem]*(n-size))
+    else
+      self[0..(n-1)]
+    end
+  end
 
   #def to_s
   #  join("\n")

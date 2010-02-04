@@ -39,7 +39,11 @@ end
 def read_csv(filename, o = {})
   #header = o[:header] || true
   content = FasterCSV.parse(IO.read(filename).to_lf, :row_sep => "\n")
-  content[1..-1].map{|c|content[0].map_hash_with_index{|h,i|[h.downcase.to_sym, c[i]]}}
+  if o[:output] == :array
+    content[1..-1]
+  else
+    content[1..-1].map{|c|content[0].map_hash_with_index{|h,i|[h.downcase.to_sym, c[i]]}}
+  end
 end
 
 def write_csv(filename, content, o = {})

@@ -5,7 +5,7 @@ require 'hpricot'
 # = Indexer
 # 
 class Indexer
-  INDEX_FIELD_LIMIT = 5000
+  INDEX_FIELD_LIMIT = 20000
   include CollectorHelper
   attr_accessor :ch
   TIKA_PATH = File.join(RAILS_ROOT, "vendor", "tika-0.3-standalone.jar")
@@ -79,7 +79,7 @@ class Indexer
   # Index a set of target items
   def index_item_set(all_items, o={})
     puts "Indexing #{all_items.size} items..." ; cur_docs = 0
-    Searcher.load_features() if !$clf
+    #Searcher.load_features() if !$clf
     all_items.in_groups_of(FileCollector::FILES_IN_BATCH) do |batch|
       items = batch.find_all{|d|d}
 

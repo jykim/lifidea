@@ -1,12 +1,12 @@
 <parameters>
 <corpus>
-<path>/Users/lifidea/dev/rails/ddl/test/fixtures/docs</path>
+<path>/Users/lifidea/dev/rails/pagehunt/test/fixtures/docs</path>
 <class>trectext</class>
 </corpus>
 <stemmer>
 <name>potter</name>
 </stemmer>
-<index>/Users/lifidea/dev/rails/ddl/test/fixtures/index</index>
+<index>/Users/lifidea/dev/rails/pagehunt/test/fixtures/index</index>
 <field>
   <name>a</name>
   <ordinal>true</ordinal>

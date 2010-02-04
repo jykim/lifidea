@@ -35,6 +35,7 @@ END
     when 'jm' : rule_parsed['lambda']
     when 'dirichlet' : rule_parsed['mu']
     end
+    debug "[parse_rule] #{rule} parsed"
     @rule_name, @rule_value = rule_name, rule_value.to_f
   end
   
@@ -59,7 +60,7 @@ END
   def op_wsum(*args)
     debug "#wsum(#{args.map{|e|e.join('*')}.join(' ')})" if @debug
     sum_weights = args.map{|e|e[0]}.sum
-    args.find_all{|e|e>0}.map{|e|e[0] * e[1] / sum_weights}.sum
+    args.find_all{|e|e[0]>0}.map{|e|e[0] * e[1] / sum_weights}.sum
   end
   
   # args = [score1, score2, ...]

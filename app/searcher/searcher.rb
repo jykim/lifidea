@@ -3,7 +3,7 @@ class Searcher
   include InferenceNetwork
   attr_accessor :cons, :docs
   RULE_DEF = 'method:jm,lambda:0.1'
-  #RULE_DEF = 'method:dirichlet,mu:1500'
+  #RULE_DEF = 'method:dirichlet,mu:50'
   FEATURES = ['c_title','c_content','c_uri','c_tag','time','co-oc','topic','occur']
   INDEX_FIELD_DEF = [:title, :content, :uri]
   INDEX_FIELDS = {"calendar"=>[:start_at, :location], "email"=>[:from, :to, :date], "file"=>[:filename], "news"=>[:tag_list], "webpage"=>[:tag_list]}
@@ -11,28 +11,28 @@ class Searcher
   #RULE_DEF = 'method:dirichlet,mu:100'
   
   # @param [Array<IR::Index>] cols : target collections
-  def initialize(cols = nil, o = {})
+  def initialize(o = {})
     @cols = cols
     @debug = o[:debug] || false
     @lambda = nil
     $clf = LinkFeatures.new
-    parse_rule(o[:rule] || RULE_DEF)
+    parse_rule(o[:rule] || Conf.rule_searcher ||RULE_DEF)
   end
   
-  def self.load_weights(rank = nil)
-    result = [0] * Searcher::FEATURES.size
+  def self.load_weights(features, rank = nil)
+    result = [0] * features.size
     rank ||= ENV['rank']
-    if FEATURES.include?(rank)
-      FEATURES.each_with_index{|e,i|result[i] = 1 if e == rank}
+    if features.include?(rank)
+      features.each_with_index{|e,i|result[i] = 1 if e == rank}
       return result
     elsif rank == 'uniform'
-      return [1] * Searcher::FEATURES.size 
+      return [1] * features.size 
     end
     
     begin
-      weight_hash = IO.read(read_recent_file_in(RAILS_ROOT+"/data/learner_output", :filter=>/#{ENV['RAILS_ENV']}.*#{rank}/)).
+      weight_hash = IO.read(read_recent_file_in(RAILS_ROOT+"/data/learner_output", :filter=>/#{ENV['RAILS_ENV']}.*#{$type}.*#{rank}/)).
         split("\n")[0].split(" ")[1..-1].map_hash{|e|r = e.split(":") ; [r[0].to_i, r[1].to_f]}
-      result = [] ; 1.upto(Searcher::FEATURES.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0)}
+      result = [] ; 1.upto(features.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0)}
     rescue Exception => e
       puts "[Searcher.load_weights] error:", e
     end
@@ -42,6 +42,13 @@ class Searcher
   
   def self.load_features()
     $clf.load Link.all.map{|l|[l.ltype, l.out_id.to_i, l.in_id.to_i, l.weight]}
+  end
+  
+  def self.recip_rank(rank_list, rel)
+    #p rank_list,rel
+    result = 0.0
+    rank_list.each_with_index{|e,i| result = 1.0 / (i+1) if e[0] == rel}
+    result
   end
   
   def load_items()
@@ -69,30 +76,19 @@ class Searcher
   end
   
   # Search given keyword query
-  # - 1) collection scoring
   # - 2) document scoring
   # - merging 1) and 2) into final score
   def search_by_keyword(query, o={})
-    parsed_query = InferenceNetwork.parse_query(query)
-    o[:indri_query] ||= "#combine(#{parsed_query.map{|w|w+'.(document)'}.join(' ')})"
+    #debugger
+    indri_query = o[:indri_query] || "#combine(#{InferenceNetwork.parse_query(query).map{|w|w+'.(document)'}.join(' ')})"
     #info "[searcher_daemon] indri_query = [#{o[:indri_query]}]"
-    #qws = query.scan(LanguageModel::PTN_TERM)
-    InferenceNetwork.eval_indri_query(o[:indri_query])
+    InferenceNetwork.eval_indri_query(indri_query)
     topk = o[:topk] || 50
+    col_weight = o[:col_weight] || 0.4
     doc_scores = {}
     @cols.each do |col|
-      col_score_log = MIN_NUM
-      #if !o[:col]
-      #  debug "[search] Scoring #{col.cid}"
-      #  col_score = score_col(col, parsed_query, :cql, :cqls => parsed_query.map{|e|col.lm.prob(e)})
-      #  col_score_log = if col_score == 0
-      #    MIN_NUM
-      #    #debug "[search] Skipping collection #{col.cid}"
-      #    #next
-      #  else
-      #    Math.log(col_score)
-      #  end
-      #end
+      col_score = (o[:col_scores])? o[:col_scores][col.cid] : MIN_PROB
+      #debug "col_scores : #{o[:col_scores]}"
       doc_scores[col.cid] = []
       col.docs.each do |doc|
         #debug "[search] Scoring #{doc.did}"
@@ -101,7 +97,13 @@ class Searcher
           @debug = true if o[:id]
           @match_found = false
           if( doc_score = score_doc(doc,col))
-            doc_scores[col.cid] << [doc.did, (col_score_log||0) + doc_score] if doc_score > MIN_NUM
+            next if doc_score <= MIN_NUM
+            final_score = if o[:col_scores]
+              col_score * Math.exp(doc_score) * col_weight + Math.exp(doc_score)
+            else
+              doc_score
+            end
+            doc_scores[col.cid] << [doc.did, final_score] 
           end
         rescue Exception => e
           @debug = true
@@ -115,7 +117,8 @@ class Searcher
     doc_scores.values.collapse.sort_by{|e|e[1]}.reverse[0..topk]
   end
   
-  CS_TYPES = [:cql, :mpmax, :mpmean, :smpmean, :mphmean, :mpgmean, :clarity, :qlm, :gmap, :redde, :dict]
+  CS_TYPES = [:cql, :mpmean, :dict, :qlm, :clarity, :gavg, :redde]# :mpmax, :smpmean, :mphmean, :mpgmean
+  CS_COMB_TYPES = ['uniform', 'grid', 'ranksvm']
   DICT_COLS = {
     "calendar"=>[:calendar, :schedule, :start_at, :location], "email"=>[:email, :from, :to, :date], 
     "file"=>[:file, :filename, :pdf, :html, :dvi, :ppt, :doc], "news"=>[:news, :tag_list, :blog, :tag], 
@@ -136,7 +139,7 @@ class Searcher
       when :mpgmean : o[:mps].map{|e|(e.values).gmean}.multiply_log
       when :clarity : col.dhid[o[:rank_list][0][0]].lm.kld(col.lm)
       when :qlm     : o[:qqls].multiply_log
-      when :gmap    : o[:rank_list].map{|e|Math.exp(e[1])}.gmean
+      when :gavg    : o[:rank_list].map{|e|Math.exp(e[1])}.pad(o[:gavg_m], o[:gavg_minql]).gmean
       when :redde   : o[:rank_list].map{|e|Math.exp(e[1])}.sum
       when :dict    : (DICT_COLS[col.cid].map{|e|e.to_s.stem} & parsed_query).size
       end
