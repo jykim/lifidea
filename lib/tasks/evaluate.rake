@@ -63,10 +63,10 @@ namespace :evaluate do
     result_csel, result_ret = [], []
     methods.each do |e|
       weights = Searcher.load_weights(Searcher::CS_TYPES, e)
-      results = WeightLearner.evaluate_csel_with(input_data, weights)[0]
+      results = WeightLearner.evaluate_csel_with(input_data, weights)
       #Intermediate Output
-      #File.open(output+".#{e}.result","w"){|f|f.puts results.join("\n")}
-      result_csel << results.mean
+      File.open(output+".#{e}.result","w"){|f|f.puts results[2][0].keys.join("\t")+"\n"+results[2].map{|e|e.values.join("\t")}.join("\n")}
+      result_csel << results[0].mean
       #result_ret  << WeightLearner.evaluate_keyword_search_with(input_data, weights)[0]
     end
     write_csv output, [result_csel, result_ret] ,:mode=>'w', :header=>methods
@@ -83,7 +83,7 @@ namespace :evaluate do
         puts "====== Starting #{i}th fold ======="
         ENV['fold'] = i.to_s
         $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
-        ['liblinear'].each do |method|
+        ['grid'].each do |method|#'ranksvm','grid','liblinear'
           $method = method
           Rake::Task['run:learner'].execute
         end
@@ -134,7 +134,7 @@ namespace :evaluate do
         other_input_data = input_data.find_all{|e|e[:user] != uid}[0..personal_input_data.size]
         personal_weights = learn_weights(personal_input_data, weight_file)
         result_csel << [uid, WeightLearner.evaluate_csel_with(personal_input_data, global_weights)[0].mean, 
-          WeightLearner.evaluate_csel_with(personal_input_data, personal_weights)[0.mean]].flatten
+          WeightLearner.evaluate_csel_with(personal_input_data, personal_weights)[0].mean].flatten
       end
       write_csv output, result_csel, :header=>['uid', 'score', Searcher::CS_TYPES.map{|e|"#{e}_weight"}].flatten
     end

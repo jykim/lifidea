@@ -1,5 +1,6 @@
 class WeightLearner
   LL_TYPE_DEF = 5
+  LS_TYPE_DEF = 0
   
   def initialize()
     
@@ -46,12 +47,13 @@ class WeightLearner
   # @param [Array] input_data : parsed csv of input_learner_col*
   def self.evaluate_csel_with(input_data, weights, o={})
     result = {}
-    input_data.each do |l|
-      col_scores = WeightLearner.get_col_scores(l, weights)
+    col_scores = []
+    input_data.each_with_index do |l,i|
+      col_scores[i] = WeightLearner.get_col_scores(l, weights)
       #p values_col.max_pair
-      result[l[:qid]] = (l[:itype] == col_scores.max_pair[0])? 1.0 : 0.0
+      result[l[:qid]] = (l[:itype] == col_scores[i].max_pair[0])? 1.0 : 0.0
     end
-    [result.values, weights]#.flatten
+    [result.values, weights, col_scores]#.flatten
   end
   
   def self.parse_ranksvm_input(filename)
@@ -68,6 +70,13 @@ class WeightLearner
     cmd = "#{ENV['PG']}/liblinear/train -s #{o[:ll_type] || LL_TYPE_DEF} #{input}.train #{output}.model"
     puts "[learner] running: #{cmd}" ; system(cmd)
     cmd = "#{ENV['PG']}/liblinear/predict -b 1 #{input}.test  #{output}.model #{output}.output 1> #{output}.result"
+    system(cmd)
+  end
+  
+  def learn_by_libsvm(input, output, o={})
+    cmd = "#{ENV['PG']}/libsvm/svm-train -b 1 -s #{o[:ls_type] || LS_TYPE_DEF} #{input}.train #{output}.model"
+    puts "[learner] running: #{cmd}" ; system(cmd)
+    cmd = "#{ENV['PG']}/libsvm/svm-predict -b 1 #{input}.test  #{output}.model #{output}.output 1> #{output}.result"
     system(cmd)
   end
   
@@ -96,7 +105,7 @@ class WeightLearner
     end
     results_str = case (o[:grid_type] || 'single')
     when 'single'
-      results.sort_by{|e|e[0]}.reverse.map{|l|l.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
+      results.sort_by{|e|e[0].mean}.reverse.map{|l|[l[0].mean, l[1]].flatten.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
     when 'avg'
       max_perf = results.sort_by{|l|l[0]}[-1][0]
       results_str = results.find_all{|l|l[0] == max_perf}.merge_array_by_avg().map_with_index{|e,i|[i,e].join(":")}.join(" ")

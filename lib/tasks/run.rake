@@ -72,6 +72,7 @@ namespace :run do
     case ($method || ENV['method'])
     when 'ranksvm' : learner.learn_by_ranksvm(input, weights)
     when 'liblinear' : learner.learn_by_liblinear(input, weights, :ll_type=>ENV['ll_type'])
+    when 'libsvm' : learner.learn_by_libsvm(input, weights, :ls_type=>ENV['ls_type'])
     when 'grid'
       input_data = case $type
       when "con" : self.parse_ranksvm_input(input+'.train')
