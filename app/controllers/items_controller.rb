@@ -35,7 +35,7 @@ class ItemsController < ApplicationController
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
     begin
-      @rank_list = search_remote('k', @query)
+      @rank_list = search_local('k', @query)
       info "Ranklist : #{@rank_list.inspect}"      
     rescue Exception => e
       error "Search failed!!"
@@ -53,8 +53,10 @@ class ItemsController < ApplicationController
     History.create(:htype=>params[:htype], :basetime=>Time.now, :src_item_id=>src_item, :item_id=>tgt_item, :user_id=>get_user_id(),
       :metadata=>{:position=>params[:position].to_i, :skipped_items=>params[:skipped_items], :url=>request.url})
     Link.find_or_create(src_item, tgt_item, 'c', :add=>1)
-    if params[:htype] == 'con_con' && params[:skipped_items].split("|").size > 1
-      search_remote('c', "#{params[:src_item_id]}|#{params[:skipped_items]}", :jtype=>'log')
+    if ['con','doc'].include?(params[:htype]) && params[:skipped_items].split("|").size > 1
+      $searcher = SolrSearcher.new
+      $searcher.log_preference(params[:src_item_id].to_i, params[:htype] , params[:position].to_i)
+      #search_remote('c', "#{params[:src_item_id]}|#{params[:skipped_items]}", :jtype=>'log')
     end
     redirect_to :action=>:show
   end
@@ -64,22 +66,27 @@ class ItemsController < ApplicationController
   def show
     @item = Item.find(params[:id])
     @link_docs, @link_cons = [], []
-    if @item.concept?
+    $items = {}
+    #if @item.concept?
       begin
-        @rank_list = (search_remote('c', @item.id) || [])[0..9]
-        info "Ranklist : #{@rank_list.inspect}"
-        #debugger        
-        @cons = Item.find(@rank_list.map{|e|e[0]}).map_hash{|c|[c.id, c]} 
+        @rel_cons = (search_local('c', @item.id) || [])[0..9]
+        #info "Ranklist(con) : #{@rel_cons.inspect}"
+        @rel_docs = (search_local('d', @item.id) || [])[0..9]
+        #info "Ranklist(doc) : #{@rel_docs.inspect}"
+        #debugger
       rescue Exception => e
         error "Failed to get Ranklist!", e
-        @rank_list = []        
+        @rel_cons = []        
+        @rel_docs = []        
       end
       @item.link_items.uniq.each do |e|
         (e.concept?)? (@link_cons << e) : (@link_docs << e)
       end
-    else
-      @rank_list = []
-    end
+      #result = cache('foo') { $clf }
+      #puts "Result : " + cache('foo').inspect      
+    #else
+    #  @rank_list = []
+    #end
     
     respond_to do |format|
       format.html # show.html.erb
@@ -192,5 +199,11 @@ class ItemsController < ApplicationController
       Link.find(e[0]).update_attributes!(:remark=>e[1])
     end
     redirect_to :action=>:links
+  end
+  
+protected  
+  def search_local(qtype, query, o={})
+    $searcher = SolrSearcher.new
+    @rank_list = $searcher.process_request(qtype, query)
   end
 end

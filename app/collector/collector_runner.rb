@@ -4,7 +4,7 @@ $collectors = {}
 
 def get_collector(src)
   return $collectors[src.id] if $collectors[src.id]
-  debug "Generating new collector #{src.title}"
+  #debug "Generating new collector #{src.title}"
   $collectors[src.id] = case src.uri
   when /^http/ : RSSCollector.new(src)
   when /^webcal/ : ICALCollector.new(src)

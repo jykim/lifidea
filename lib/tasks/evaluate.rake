@@ -8,8 +8,8 @@ namespace :evaluate do
     output = ENV['output'] || "data/evaluation_#{$renv}_#{$today}.csv"
     $searcher = Searcher.new
     $searcher.load_concepts() ; index = $searcher.cons
-    methods = [Searcher::FEATURES, 'uniform','grid','svm'].flatten
-    weights = methods.map{|e|Searcher::load_weights(Searcher::FEATURES, e)}
+    methods = [Searcher::CON_FEATURES, 'uniform','grid','svm'].flatten
+    weights = methods.map{|e|Searcher::load_weights(Searcher::CON_FEATURES, 'con', e)}
     weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
     result_all = []
     WrightLearner.parse_ranksvm_input(input).each do |ids|
@@ -36,7 +36,7 @@ namespace :evaluate do
       result = [l[:qid], l[:query], l[:user], l[:date], l[:position], l[:did], l[:itype]]
       values_cs_type = l.find_all{|k,v|k.to_s=~/_/}.group_by{|e|e[0].to_s.split("_")[0]}
       #debugger
-      Searcher::CS_TYPES.each do |cs_type|
+      RubySearcher::CS_TYPES.each do |cs_type|
         #p values_cs_type[cs_type.to_s]
         col_scores = values_cs_type[cs_type.to_s].sort_by{|e|e[1].to_f}
         if col_scores[-1][1] == col_scores[-2][1]
@@ -50,19 +50,19 @@ namespace :evaluate do
       result_all << result
     end
     #puts result_all.map{|e|e.join(" ")}.join("\n")
-    write_csv output, result_all, :summary=>["summary", [nil]*6, [:sum]*Searcher::CS_TYPES.size].flatten, 
-      :mode=>'a', :header=>["qid","query","user","date","position", "did", "itype",Searcher::CS_TYPES].flatten
+    write_csv output, result_all, :summary=>["summary", [nil]*6, [:sum]*RubySearcher::CS_TYPES.size].flatten, 
+      :mode=>'a', :header=>["qid","query","user","date","position", "did", "itype",RubySearcher::CS_TYPES].flatten
   end
   
   desc "Calculate Combination Result"
   task :csel_combs => :environment do
     input = ENV['input'] || get_learner_input_file()+'.'+ENV['set_type']
     output = ENV['output'] || get_evaluation_file('col_combs')
-    methods = [Searcher::CS_TYPES, Searcher::CS_COMB_TYPES].flatten
+    methods = [RubySearcher::CS_TYPES, RubySearcher::CS_COMB_TYPES].flatten
     input_data = read_csv(input)
     result_csel, result_ret = [], []
     methods.each do |e|
-      weights = Searcher.load_weights(Searcher::CS_TYPES, e)
+      weights = Searcher.load_weights(RubySearcher::CS_TYPES, e)
       results = WeightLearner.evaluate_csel_with(input_data, weights)
       #Intermediate Output
       File.open(output+".#{e}.result","w"){|f|f.puts results[2][0].keys.join("\t")+"\n"+results[2].map{|e|e.values.join("\t")}.join("\n")}
@@ -101,7 +101,7 @@ namespace :evaluate do
     def learn_weights(input_data, weights, o = {})
       learner = WeightLearner.new
       learner.learn_by_grid_search(input_data, weights, $type, :grid_type=>ENV['grid_type'])
-      weight_values = Searcher.load_weights(Searcher::CS_TYPES || $cs_types, 'grid')
+      weight_values = Searcher.load_weights(RubySearcher::CS_TYPES || $cs_types, 'grid')
     end
     
     desc "Leave one feature out"
@@ -112,12 +112,12 @@ namespace :evaluate do
       output = ENV['output'] || get_evaluation_file('leave_one_out')
       result_csel = [WeightLearner.evaluate_csel_with(read_csv(input), learn_weights(read_csv(input), weight_file))[0].mean]
       puts "result(all) : #{result_csel}"
-      Searcher::CS_TYPES.each_with_index do |e,i|
-        $cs_types = Searcher::CS_TYPES.dup ; $cs_types.delete_at(i)
+      RubySearcher::CS_TYPES.each_with_index do |e,i|
+        $cs_types = RubySearcher::CS_TYPES.dup ; $cs_types.delete_at(i)
         weight_values = learn_weights(read_csv(input), weight_file)
         result_csel << WeightLearner.evaluate_csel_with(read_csv(input), weight_values)[0].mean
       end
-      write_csv output, [result_csel], :header=>['all', Searcher::CS_TYPES].flatten
+      write_csv output, [result_csel], :header=>['all', RubySearcher::CS_TYPES].flatten
     end
 
     desc "User-specific feature weights"
@@ -136,7 +136,7 @@ namespace :evaluate do
         result_csel << [uid, WeightLearner.evaluate_csel_with(personal_input_data, global_weights)[0].mean, 
           WeightLearner.evaluate_csel_with(personal_input_data, personal_weights)[0].mean].flatten
       end
-      write_csv output, result_csel, :header=>['uid', 'score', Searcher::CS_TYPES.map{|e|"#{e}_weight"}].flatten
+      write_csv output, result_csel, :header=>['uid', 'score', RubySearcher::CS_TYPES.map{|e|"#{e}_weight"}].flatten
     end
     
     desc "Csel Features"

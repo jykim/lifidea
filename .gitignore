@@ -8,3 +8,7 @@ test/fixtures/docs/trec/*
 test/fixtures/index
 data/*
 *.orig
+.yardoc/*
+doc/*
+log/*.pid
+solr

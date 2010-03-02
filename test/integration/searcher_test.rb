@@ -13,7 +13,7 @@ class SearcherTest < ActiveSupport::TestCase
     0.upto(10){|i|@docs[i] = create_doc(i, "d"+i.to_s)}
     @col = IR::Index.new(@docs, :cid=>'test', :fields=>@fields)
     debug @col.flm.map{|k,v|[k,v.size]}.inspect
-    @searcher = Searcher.new(:rule=>Searcher::RULE_DEF)
+    @searcher = RubySearcher.new
     @searcher.cols = [@col]
   end
   
@@ -51,7 +51,7 @@ class SearcherTest < ActiveSupport::TestCase
     
   end
 
-  def run_indri(query, rule = Searcher::RULE_DEF)
+  def run_indri(query, rule = RubySearcher::RULE_DEF)
     `rm -rf #{RAILS_ROOT}/test/fixtures/index`
     `#{INDRI_ROOT}/buildindex #{RAILS_ROOT}/test/fixtures/index_docs.xml`
     puts `#{INDRI_ROOT}/runquery -index=#{RAILS_ROOT}/test/fixtures/index -rule='#{rule}' -query='#{query}'`

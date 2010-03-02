@@ -18,6 +18,14 @@ def get_cur_time()
   Time.now.in_time_zone(TIMEZONE)
 end
 
+def cache(key, value = "none")
+  if value == "none"
+    CACHE.get(ENV['RAILS_ENV']+'_'+key)
+  else
+    CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+  end
+end
+
 def parse_value(value)
   return value if value.class != String
   begin

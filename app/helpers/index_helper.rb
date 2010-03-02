@@ -18,10 +18,10 @@ module IndexHelper
     begin
       @index ||= if textindex
         features = {:basetime=>basetime, :occur_count=>$clf.read_sum('o',id), :click_count=>$clf.read_sum('c',id)}
-        IR::Document.create_from_yaml(textindex, :features=>features)
+        IR::Document.create_from_yaml(textindex, o.merge(:features=>features))
       else
-        IR::Document.new(id, did, index_fields.values.join(" "))
-      end  
+        IR::Document.new(id, did, index_fields.values.join(" "), o)
+      end
     rescue Exception => e
       error "[get_index] Unknown error in #{id}", e
       []

@@ -82,7 +82,7 @@ class WeightLearner
   
   def learn_by_grid_search(input_data, output, type, o = {})
     no_params = case $type
-    when 'con' : Searcher::FEATURES.size
+    when 'con' : Searcher::CON_FEATURES.size
     when 'csel': ($cs_types || Searcher::CS_TYPES).size
     else
       error("[learn_by_grid_search] no type parameter!")

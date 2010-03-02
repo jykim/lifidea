@@ -11,6 +11,7 @@ class RSSCollector < Collector
       IO.read("#{RAILS_ROOT}/test/fixtures/sources/#{@src.itype}.xml")
     else read_uri(@src)
     end
+    puts feed_text
     feed_text.gsub!(/prism:category/,"category") if @src.uri =~ /citeulike/
     #debugger
     return nil if !@src.update_sync_content(feed_text) && !o[:force]

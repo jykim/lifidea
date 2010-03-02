@@ -1,3 +1,5 @@
+#require 'searcher/more_like_this'
+
 class Item < ActiveRecord::Base
   include TagHelper, IndexHelper
   include MetadataHelper, RuleHelper, MarkupHelper, CollectorHelper
@@ -41,6 +43,11 @@ class Item < ActiveRecord::Base
   named_scope :queries, {:conditions=>{:itype=>['query']}}
   named_scope :documents, {:conditions=>["itype != ? and itype != ?",'query', 'concept']}
   
+  # Sunspot/Solr search indexing  
+  searchable do
+    text :title, :content, :uri, :itype
+    #more_like_this :title, :content, :uri, :itype
+  end
   
   def concept?
     ITYPE_CONCEPT.include?(itype)
@@ -97,3 +104,18 @@ class Item < ActiveRecord::Base
     @@itypes ||=  find(:all, :select=>'distinct(itype)').map{|e|e.itype}
   end
 end
+
+#Sunspot.setup(Item) do 
+#   text :title, :content, :uri 
+#   more_like_this :title, :content, :uri
+#end
+
+#Sunspot.setup(Item) do 
+#   text :title, :content, :uri 
+#   more_like_this do 
+#      fields :title, :content, :uri 
+#      min_document_frequency 10 
+#      boost true 
+#      max_query_terms 10 
+#    end 
+#end

@@ -46,8 +46,8 @@ namespace :etc do
       when 'liblinear'
         result << [col_hash[rel_col]].concat(l[7..-1].map_with_index{|e,j|[j+1,e].join(":")})
       when 'ranksvm'
-        raise DataError, "Col size not consistent! #{l[7..-1].size}!=#{$cols.size * Searcher::CS_TYPES.size}" if l[7..-1].size != $cols.size * Searcher::CS_TYPES.size
-        values_col = l[7..-1].map_with_index{|e,j|[e,j]}.group_by{|e|e[1]/Searcher::CS_TYPES.size}
+        raise DataError, "Col size not consistent! #{l[7..-1].size}!=#{$cols.size * RubySearcher::CS_TYPES.size}" if l[7..-1].size != $cols.size * RubySearcher::CS_TYPES.size
+        values_col = l[7..-1].map_with_index{|e,j|[e,j]}.group_by{|e|e[1]/RubySearcher::CS_TYPES.size}
         result.concat values_col.map{|col,features|
           [((col+1 == col_hash[rel_col])? 2 : 1), "qid:#{i+1}", features.map_with_index{|e,j|[j+1,e[0]].join(":")}].flatten
           }.sort_by{|e|e[0]}.reverse

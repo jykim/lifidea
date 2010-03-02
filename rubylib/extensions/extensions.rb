@@ -190,9 +190,21 @@ class Hash
 end
 
 class Float
+  MAX_FEATURE_VALUE = Math.log(10+1)
+  
   def round_at(places)
    temp = self.to_s.length
    sprintf("%#{temp}.#{places}f",self).to_f
+  end
+  
+  def normalize(threshold = MAX_FEATURE_VALUE)
+    new_value = Math.log(self+1) / threshold
+    (new_value > 1)? 1 : new_value
+  end
+  
+  def normalize_time()
+    value_n = 1 / Math.log((self / 3600).abs+1)
+    (value_n > 1)? 1 : value_n
   end
 
   def r3

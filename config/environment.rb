@@ -6,7 +6,7 @@ TIMEZONE = 'Eastern Time (US & Canada)'
 APP_ROOT = ""
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
-
+require 'memcache'
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
@@ -37,6 +37,9 @@ Rails::Initializer.run do |config|
   #config.gem 'mislav-will_paginate', :version => '~> 2.3.11', :lib => 'will_paginate', 
   #  :source => 'http://gems.github.com'
   
+  config.gem 'sunspot', :lib => 'sunspot'
+  config.gem 'sunspot_rails', :lib => 'sunspot/rails'
+  
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
   config.action_mailer.delivery_method = :smtp
@@ -63,4 +66,5 @@ end
 #TagList.delimiter = " "
 #ActiveRecord::Base.logger.level = :error
 #$lgr = ActiveRecord::Base.logger
+CACHE = MemCache.new('127.0.0.1')
 require 'ddl_include'

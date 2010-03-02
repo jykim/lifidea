@@ -28,7 +28,7 @@ namespace :run do
         info "Processing #{doc}"
         doc.process_all()
         doc.save!
-      end    
+      end
     end
 
     desc "Run metadata validator"
@@ -54,6 +54,7 @@ namespace :run do
     else
       Item.valid.between($start_at, $end_at).all
     end
+    $clf = Searcher.load_features()
     #debugger
     $idx = Indexer.new
     puts 'Indexing Documents'

@@ -54,11 +54,11 @@ module IR
     end
     
     def cosim(doc, field = :document)
-      @cosim[doc.id] = {} if !@cosim[doc.id]
-      return @cosim[doc.id][field] if @cosim[doc.id][field]
+      @cosim[doc.dno] = {} if !@cosim[doc.dno]
+      return @cosim[doc.dno][field] if @cosim[doc.dno][field]
       result = tfidf(field).product(doc.tfidf(field)).sum{|k,v|v} / 
                (tfidf_size(field) * doc.tfidf_size(field))
-      @cosim[doc.id][field] =  (result.nan?)? 0 : result
+      @cosim[doc.dno][field] =  (result.nan?)? 0 : result
       #tfidf.cosim(doc.tfidf)
     end
     
@@ -71,10 +71,10 @@ module IR
     end
     
     def tsim(doc)
-      return @tsim[doc.id] if @tsim[doc.id]
+      return @tsim[doc.dno] if @tsim[doc.dno]
       value_sec = @fts[:basetime] - doc.fts[:basetime]
       value_n = 1 / Math.log((value_sec / 3600).abs+1)
-      @tsim[doc.id] = (value_n > 1)? 1 : value_n
+      @tsim[doc.dno] = (value_n > 1)? 1 : value_n
     end
     
     def normalize(value, threshold = MAX_FEATURE_VALUE)
@@ -87,6 +87,7 @@ module IR
       result << normalize($clf.read('o', @dno, doc.dno))
       result << $clf.read('t', @dno, doc.dno)
       result << normalize($clf.read_sum('o', @dno), MAX_FEATURE_VALUE2)
+      puts "[feature_vector] #{@did} = #{result.inspect}"
       Vector.elements(result)
     end
     
