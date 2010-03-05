@@ -142,18 +142,6 @@ namespace :export do
     write_csv filename, result_all, :normalize=>[[nil]*7, [:minmax]*RubySearcher::CS_TYPES.size*$searcher.cols.size].flatten, 
       :header=>["qid","query","user","date","position", "did", "itype", header_features].flatten
   end
-  
-  desc "Export Items along with Tags into Text File"
-  task(:docs => :environment) do
-    filename = ENV['filename'] || "data/docs_#$renv.csv"
-    result = []
-    itype = ENV['itype'] || 'all'
-    Item.valid.between($start_at, $end_at).itype(itype).each_with_index do |e,i|
-      puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      result << [e.id, e.basetime, e.itype, e.title, e.did, e.uri, e.hidden_flag_before_type_cast, e.query_flag_before_type_cast]
-    end
-    write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' , 'query_flag' ]
-  end
 
   desc "Export Concept Links into dot file"
   task :concept_links => :environment do

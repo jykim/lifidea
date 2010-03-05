@@ -41,7 +41,7 @@ class SolrSearcher < Searcher
     result = result.sort_by{|fts| 
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
     }.reverse
-    cache(type+'_result', result )
+    cache_data(type+'_result', result )
     result.map{|fts|[fts[:id], fts[:score]]}
   end
   
@@ -59,7 +59,7 @@ class SolrSearcher < Searcher
   def log_preference(query, type, click_position, o={})
     $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.to_ymd}.txt", 'a')
     
-    result = cache(type+'_result' )
+    result = cache_data(type+'_result' )
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i
     #debugger
     log = result[0..(click_position-1)].reverse.map_with_index{|e,i|

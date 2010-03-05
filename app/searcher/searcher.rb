@@ -5,16 +5,16 @@ class Searcher
   # @param [Array<IR::Index>] cols : target collections
   def initialize(o = {})
     @debug = o[:debug] || false
-    @clf = cache('clf')
-    @con_weights = cache('con_weights')
-    @doc_weights = cache('doc_weights')
+    @clf = cache_data('clf')
+    @con_weights = cache_data('con_weights')
+    @doc_weights = cache_data('doc_weights')
   end
   
   # Implement this
   def open_index(o={})
-    @clf = cache('clf', Searcher.load_features())
-    @con_weights = cache('con_weights', Searcher.load_weights(CON_FEATURES, 'con'))
-    @doc_weights = cache('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc'))
+    @clf = cache_data('clf', Searcher.load_features())
+    @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con'))
+    @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc'))
   end
   
   def process_request(qtype, query)

@@ -18,7 +18,8 @@ def get_cur_time()
   Time.now.in_time_zone(TIMEZONE)
 end
 
-def cache(key, value = "none")
+def cache_data(key, value = "none")
+  #error "[cache_data] #{key}=#{value}"
   if value == "none"
     CACHE.get(ENV['RAILS_ENV']+'_'+key)
   else

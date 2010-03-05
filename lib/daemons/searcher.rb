@@ -11,7 +11,7 @@ $searcher.open_index()
 #$searcher.load_concepts()
 #$basedate = Time.now.to_ymd
 #$weights = Searcher.load_weights()
-#$f_li = File.open(RAILS_ROOT+"/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{$basedate}.txt", 'a')
+$f_li = File.open(RAILS_ROOT+"/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{$basedate}.txt", 'a')
 #puts "Weights Read : #{$weights.inspect} / LAST_QUERY_NO = #{$last_query_no}"  
 
 if $profile

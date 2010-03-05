@@ -27,10 +27,13 @@ protected
   end
   
   def init_controller
-    if !session[:init_flag]
+    #error "[init_controller] initializing... #{cache_data("exists")}"
+    if !cache_data("exists")
+      #debugger
+      error "[init_controller] searcher initializd..."
       $searcher = SolrSearcher.new
       $searcher.open_index()
-      session[:init_flag] = true
+      cache_data("exists", "true")
     end
   end
 end

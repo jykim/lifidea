@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>app/controllers/items_controller.rb</string>
+	<string>lib/tasks/export.rake</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -35,7 +35,21 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>app/collector/collector_runner.rb</key>
+		<key>anton/mallet-2.0.5/src/cc/mallet/topics/LDAHyper.java</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>4</integer>
+				<key>line</key>
+				<integer>737</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>493</integer>
+		</dict>
+		<key>anton/mallet-2.0.5/src/cc/mallet/topics/PolylingualTopicModel.java</key>
 		<dict>
 			<key>caret</key>
 			<dict>
@@ -49,19 +63,75 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>app/controllers/application_controller.rb</key>
+		<key>anton/mallet-2.0.5/src/cc/mallet/topics/tui/Vectors2Topics.java</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>59</integer>
+				<key>line</key>
+				<integer>397</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>376</integer>
+		</dict>
+		<key>app/collector/collector_runner.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>3</integer>
+				<key>line</key>
+				<integer>6</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/collector/rss_collector.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>12</integer>
+				<key>line</key>
+				<integer>26</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/controllers/admin_controller.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>43</integer>
+				<integer>25</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>12</integer>
+			<integer>0</integer>
+		</dict>
+		<key>app/controllers/application_controller.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>32</integer>
+				<key>line</key>
+				<integer>32</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>app/controllers/documents_controller.rb</key>
 		<dict>
@@ -98,14 +168,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>34</integer>
+				<integer>45</integer>
 				<key>line</key>
-				<integer>82</integer>
+				<integer>55</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>55</integer>
+			<integer>28</integer>
 		</dict>
 		<key>app/controllers/sources_controller.rb</key>
 		<dict>
@@ -134,6 +204,20 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+		</dict>
+		<key>app/learner/weight_learner.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>94</integer>
+			<key>firstVisibleLine</key>
+			<integer>76</integer>
 		</dict>
 		<key>app/models/document.rb.old</key>
 		<dict>
@@ -168,14 +252,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>49</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>48</integer>
+				<integer>75</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>27</integer>
+			<integer>58</integer>
 		</dict>
 		<key>app/models/tag.rb</key>
 		<dict>
@@ -191,19 +275,33 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>app/searcher/indexer.rb</key>
+		<key>app/models/user.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>7</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>28</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+		</dict>
+		<key>app/searcher/indexer.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>27</integer>
+				<key>line</key>
+				<integer>81</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>61</integer>
 		</dict>
 		<key>app/searcher/link_features.rb</key>
 		<dict>
@@ -224,29 +322,29 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>18</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>32</integer>
+				<integer>38</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>19</integer>
+			<integer>18</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>15</integer>
+				<integer>26</integer>
 				<key>line</key>
-				<integer>32</integer>
+				<integer>42</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>18</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>32</integer>
+				<integer>38</integer>
 			</dict>
 		</dict>
 		<key>app/searcher/pd_searcher_runner.rb</key>
@@ -275,36 +373,36 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>36</integer>
+			<integer>98</integer>
 		</dict>
 		<key>app/searcher/searcher.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>8</integer>
+				<integer>54</integer>
 				<key>line</key>
-				<integer>55</integer>
+				<integer>2</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>26</integer>
+			<integer>34</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>4</integer>
+				<integer>50</integer>
 				<key>line</key>
-				<integer>55</integer>
+				<integer>2</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>8</integer>
+				<integer>57</integer>
 				<key>line</key>
-				<integer>55</integer>
+				<integer>2</integer>
 			</dict>
 		</dict>
 		<key>app/searcher/searcher_client.rb</key>
@@ -314,26 +412,26 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>15</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>6</integer>
+			<integer>2</integer>
 		</dict>
 		<key>app/searcher/solr_searcher.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>36</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>43</integer>
+				<integer>75</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>35</integer>
 		</dict>
 		<key>app/views/items/new.html.erb</key>
 		<dict>
@@ -368,14 +466,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>8</integer>
 				<key>line</key>
-				<integer>36</integer>
+				<integer>41</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>11</integer>
+			<integer>16</integer>
 		</dict>
 		<key>app/views/sidebars/_linked_concepts.rhtml</key>
 		<dict>
@@ -424,30 +522,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>190</integer>
+				<integer>105</integer>
 				<key>line</key>
 				<integer>4</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>182</integer>
-				<key>line</key>
-				<integer>4</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>190</integer>
-				<key>line</key>
-				<integer>4</integer>
-			</dict>
 		</dict>
 		<key>app/views/sidebars/_search.rhtml</key>
 		<dict>
@@ -457,6 +539,20 @@
 				<integer>0</integer>
 				<key>line</key>
 				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>config/config.yml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>36</integer>
+				<key>line</key>
+				<integer>20</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -482,9 +578,23 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>17</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>8</integer>
+				<integer>70</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>31</integer>
+		</dict>
+		<key>config/environments/development.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>50</integer>
+				<key>line</key>
+				<integer>16</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -510,30 +620,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>14</integer>
+				<integer>4</integer>
 				<key>line</key>
-				<integer>9</integer>
+				<integer>17</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
+		</dict>
+		<key>db/ddl_dml.sql</key>
+		<dict>
+			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>10</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>9</integer>
+				<integer>0</integer>
 			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>14</integer>
-				<key>line</key>
-				<integer>9</integer>
-			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>db/pagehunt.sql</key>
 		<dict>
@@ -570,12 +678,28 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>14</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>19</integer>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>14</integer>
+			</dict>
 		</dict>
 		<key>lib/daemons/searcher_ctl</key>
 		<dict>
@@ -612,7 +736,7 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>23</integer>
+				<integer>45</integer>
 				<key>line</key>
 				<integer>24</integer>
 			</dict>
@@ -626,9 +750,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>13</integer>
 				<key>line</key>
-				<integer>27</integer>
+				<integer>22</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -640,58 +764,72 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>130</integer>
-		</dict>
-		<key>lib/tasks/export.rake</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
 				<integer>16</integer>
 				<key>line</key>
-				<integer>15</integer>
+				<integer>93</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>73</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>15</integer>
+				<integer>11</integer>
 				<key>line</key>
-				<integer>15</integer>
+				<integer>93</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
 				<integer>16</integer>
 				<key>line</key>
-				<integer>15</integer>
+				<integer>93</integer>
 			</dict>
 		</dict>
-		<key>lib/tasks/run.rake</key>
+		<key>lib/tasks/evaluate.rake</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>lib/tasks/export.rake</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>5</integer>
+				<key>line</key>
+				<integer>36</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>lib/tasks/run.rake</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>11</integer>
+				<key>line</key>
 				<integer>56</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>30</integer>
+			<integer>32</integer>
 		</dict>
 		<key>lifidea</key>
 		<dict>
@@ -895,6 +1033,34 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>vendor/plugins/shoulda/test/rails_root/config/environment.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>vendor/plugins/shoulda/test/rails_root/public/.htaccess</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>vendor/plugins/will_paginate/Rakefile</key>
 		<dict>
 			<key>caret</key>
@@ -930,12 +1096,14 @@
 	<array>
 		<string>config/database.yml</string>
 		<string>app/searcher/searcher.rb</string>
+		<string>app/learner/weight_learner.rb</string>
 		<string>app/searcher/link_features.rb</string>
 		<string>app/collector/collector_runner.rb</string>
+		<string>app/collector/rss_collector.rb</string>
 		<string>app/searcher/solr_searcher.rb</string>
+		<string>app/controllers/admin_controller.rb</string>
 		<string>app/views/sidebars/_pagehunt_status.rhtml</string>
 		<string>rubylib/extensions/vector.rb</string>
-		<string>app/searcher/searcher_client.rb</string>
 		<string>lib/ddl_global.rb</string>
 		<string>app/models/document.rb.old</string>
 		<string>app/models/game.rb</string>
@@ -951,16 +1119,22 @@
 		<string>app/views/items/show.html.erb</string>
 		<string>rubylib/ir/inference_network.rb</string>
 		<string>lib/ddl_include.rb</string>
+		<string>db/ddl_dml.sql</string>
 		<string>rubylib/ir/concept_hash.rb</string>
 		<string>app/views/items/search.html.erb</string>
 		<string>Rakefile</string>
 		<string>app/controllers/documents_controller.rb</string>
 		<string>config/sunspot.yml</string>
 		<string>solr/conf/solrconfig.xml</string>
-		<string>app/models/item.rb</string>
 		<string>config/environment.rb</string>
 		<string>app/searcher/more_like_this.rb</string>
+		<string>app/models/item.rb</string>
+		<string>config/environments/development.rb</string>
+		<string>config/config.yml</string>
+		<string>vendor/plugins/shoulda/test/rails_root/public/.htaccess</string>
 		<string>app/controllers/items_controller.rb</string>
+		<string>vendor/plugins/shoulda/test/rails_root/config/environment.rb</string>
+		<string>app/searcher/searcher_client.rb</string>
 		<string>app/views/sidebars/_linked_concepts.rhtml</string>
 		<string>app/views/sidebars/_search.rhtml</string>
 		<string>app/views/sidebars/_linked_documents.rhtml</string>
@@ -973,7 +1147,11 @@
 		<string>log/production.log</string>
 		<string>config/environments/production.rb</string>
 		<string>lib/tasks/export.rake</string>
+		<string>anton/mallet-2.0.5/src/cc/mallet/topics/tui/Vectors2Topics.java</string>
+		<string>anton/mallet-2.0.5/src/cc/mallet/topics/PolylingualTopicModel.java</string>
+		<string>anton/mallet-2.0.5/src/cc/mallet/topics/LDAHyper.java</string>
 		<string>lib/tasks/etc.rake</string>
+		<string>lib/tasks/evaluate.rake</string>
 		<string>vendor/plugins/will_paginate/Rakefile</string>
 		<string>lib/daemons/searcher_ctl</string>
 		<string>lib/daemon_include.rb</string>
@@ -984,6 +1162,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{2, 0}, {744, 777}}</string>
+	<string>{{-5, 1}, {732, 777}}</string>
 </dict>
 </plist>
