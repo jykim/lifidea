@@ -10,7 +10,7 @@ while($running) do
     procs[row[1]] = {:user=>row[0],:cpu=>row[2],:pmem=>row[3],:time=>row[4],:cmd=>row[5..-1].join(" ")}
   end
   # @TODO make it environment-aware ;  v[:cmd] =~ /#{$rails_env}/ && 
-  target_procs = procs.find_all{|k,v|v[:user] == ENV['USER'] && (v[:cmd] =~ /\.rb/ || v[:cmd] =~ /ruby.*?server/) && !(v[:cmd] =~ /manager\.rb|_monitor/)}
+  target_procs = procs.find_all{|k,v|v[:user] == ENV['USER'] && (v[:cmd] =~ /\.rb/ || v[:cmd] =~ /memcache/ || v[:cmd] =~ /solr/ || v[:cmd] =~ /ruby.*?server/) && !(v[:cmd] =~ /manager\.rb|_monitor/)}
   target_procs.each do |e|
     if $command == 'killall'
       `kill -9 #{e[0]}` ; puts "Killing #{e[0]}/#{e[1][:cmd]}"

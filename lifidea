@@ -1,7 +1,9 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -I lib -I app -I rubylib
+#require 'ddl_include.rb'
 ENV['RAILS_ENV'] = $rails_env = ARGV[1] || 'production'
 require File.dirname(__FILE__) + '/config/boot'
 $command = ARGV[0]
+memcached_pid = File.join(RAILS_ROOT, "tmp/pids/memcached_#$rails_env.pid")
 $server_port = case $rails_env
 when 'development' : 3000
 when 'test' : 3001
@@ -11,12 +13,18 @@ end
 
 case $command
 when 'start'
-  `script/server -d -p #{$server_port} -e #{$rails_env}`
+  `rake tmp:pids:clear`
+  `memcached -d -P #{memcached_pid}` if !File.exists?(memcached_pid)
   `lib/daemons/collector_ctl start  #{$rails_env}`
+  `rake sunspot:solr:start RAILS_ENV=#$rails_env`
+  `script/server -d -p #{$server_port} -e #{$rails_env}`
+  #Rake::Task['sunspot:solr:start'].execute
 #  `lib/daemons/indexer_ctl start`
 #  `lib/daemons/searcher_ctl start`
 when 'stop'
+  File.unlink(memcached_pid)  if File.exists?(memcached_pid)
   `lib/daemons/collector_ctl stop  #{$rails_env}`
+  `rake sunspot:solr:stop RAILS_ENV=#$rails_env`
 #  `lib/daemons/indexer_ctl stop`
 #  `lib/daemons/searcher_ctl stop`
   $command = 'killall'

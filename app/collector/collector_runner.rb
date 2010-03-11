@@ -29,7 +29,7 @@ def run_collector(o = {})
     begin
       counts[src.title] = collector.collect(o)
     rescue Exception => e
-      error [e.inspect,e.backtrace[0..5]].join("\n")
+      error [e.inspect,e.backtrace].join("\n")
     end
   end
   counts = counts.find_all{|k,v|v && v > 0}.to_hash

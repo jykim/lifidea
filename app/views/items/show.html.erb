@@ -25,7 +25,7 @@
 
 <p>
   <b>Content:</b> <br>
-  <%= @item.content.gsub("\n","<br/>") if @item.content %>
+  <%= @item.content.gsub("\n","<br/>")[0..3000] if @item.content %>
 </p>
 <%= link_to 'Edit', edit_item_path(@item) %> |
 <%= link_to 'Back', items_path %>
@@ -40,7 +40,7 @@
 	</tr>
 <% end %>
 </table>
-<% if @link_docs %>
+<% if nil && @link_docs %>
 	<h2>Linked Documents</h2>
 	<table>
 	<% @link_docs.each do |item| %>

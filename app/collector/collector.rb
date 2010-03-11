@@ -12,7 +12,7 @@ class Collector < ApplicationController
   
   def collect(o = {})
     return 0 if !@src.sync_now? && !o[:force]
-    info "[run_collector] Working on #{@src.title}"
+    error "[run_collector] Working on #{@src.title}"
     open_source()
     count = save_docs(read_from_source(o), o)
     close_source()
@@ -66,7 +66,7 @@ class Collector < ApplicationController
           doc_db.save
         end
       rescue Exception => e
-        error("[save_docs] error ", e)
+        error "[save_docs] "+[e.inspect,e.backtrace].join("\n")
       end
     end
     #puts "[save_docs] saved_count = #{saved_count}"

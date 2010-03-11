@@ -4,7 +4,7 @@
 # NB must reload app after changing this file
 
 common:
-  collector_sync_interval: 5
+  collector_sync_interval: 30
   hour_daybreak: 4
   rule_searcher: "method:jm,lambda:0.1"
 #  rule_searcher: "method:dirichlet,mu:100"
