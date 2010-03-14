@@ -4,7 +4,7 @@ class Item < ActiveRecord::Base
   include TagHelper, IndexHelper
   include MetadataHelper, RuleHelper, MarkupHelper, CollectorHelper
   ITYPE_CONCEPT = ['concept','person']
-  ITYPE_DOCUMENT = ['webpage','bookmark_webpage','email','email_memo','tweet','pub']
+  ITYPE_DOCUMENT = ['webpage','bookmark_webpage','email','email_memo','paper','blog','tweet','pub']
   #ITYPE_QUERY = ['concept','person']
   
   belongs_to :source
@@ -53,6 +53,10 @@ class Item < ActiveRecord::Base
     ITYPE_CONCEPT.include?(itype)
   end
   
+  def document?
+    ITYPE_DOCUMENT.include?(itype)
+  end
+  
   def link_items
     #[inlinks.map{|l|[l, l.initem]}, outlinks.map{|l|[l, l.outitem]}].collapse
     [initems,outitems].flatten
@@ -63,7 +67,7 @@ class Item < ActiveRecord::Base
   end
       
   def to_s(verbose = false)
-    result = "[#{id}:#{itype}] #{title} #{basetime.to_s(:db) if basetime}"
+    result = "#{title} [#{id}:#{itype}] #{basetime.to_s(:db) if basetime}"
     result += "\n#{metadata.inspect}\n#{content[0..50]}" if content && verbose
     result
   end

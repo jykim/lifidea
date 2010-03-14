@@ -48,31 +48,59 @@ namespace :export do
     write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'tags']
   end
   
-  desc "Export Top K relevant concepts into CSV"
-  task :rel_concepts => :environment do
+  desc "Export Top K relevant items"
+  task :rel_items => :environment do
     result_total = []
-    filename = ENV['filename'] || "data/rel_concepts_#$renv.csv"
+    filename = ENV['filename'] || "data/rel_items_#$renv.csv"
     topk = (ENV['topk'] && ENV['topk'].to_i) || 10
-    queries = (ENV['queries'] && ENV['queries'].split(",").map{|e|e.to_i}) || Item.valid.concepts.map{|c|c.id}.sample(10).uniq
-    $searcher = Searcher.new
-    $searcher.load_concepts() ; index = $searcher.cons
+    queries = ENV['queries'] && ENV['queries'].split(",").map{|e|e.to_i}
+    type = ENV['type'] || 'con'
+    case type
+    when 'con'
+      features = Searcher::CON_FEATURES
+      queries = Item.valid.concepts.map{|c|c.id}.sample(10).uniq if !ENV['queries']
+    when 'doc'
+      features = Searcher::DOC_FEATURES
+      queries = Item.valid.documents.map{|c|c.id}.sample(10).uniq if !ENV['queries']
+    end
+    
+    searcher = SolrSearcher.new
+    searcher.open_index()
     queries.each do |q|
-      result = [] ; query = index.dh[q]
-      if !query
-        puts "Query #{q} not found!" ; next
-      end
-      puts "[export:rel_concepts] Scoring #{query}"
-      index.docs.sample(topk).each_with_index do |d,i|
-        next if d.dno == query.dno
-        result << [query, d, d.feature_vector(query).to_a].flatten
-        #break if i >= topk
-      end
-      #p result[0..topk].map{|e|e[2..-1]}
-      result_total.concat result[0..topk].sort_by{|e|e[2..-1].sum}.reverse
+      query_item = Item.find(q)
+      result = searcher.search_by_item(q, type)
+      result_total.concat result[0..topk].map{|e|[query_item, Item.find(e[:id]) , e[:score], features.map{|f|e[f]}].flatten}
     end
     write_csv filename, result_total, 
-      :header=>['query','target'].concat(Searcher::CON_FEATURES)
+      :header=>['query','target','score'].concat(features)
   end
+  
+  # @deprecated
+  #desc "Export Top K relevant concepts into CSV"
+  #task :rel_concepts => :environment do
+  #  result_total = []
+  #  filename = ENV['filename'] || "data/rel_concepts_#$renv.csv"
+  #  topk = (ENV['topk'] && ENV['topk'].to_i) || 10
+  #  queries = (ENV['queries'] && ENV['queries'].split(",").map{|e|e.to_i}) || Item.valid.concepts.map{|c|c.id}.sample(10).uniq
+  #  $searcher = Searcher.new
+  #  $searcher.load_concepts() ; index = $searcher.cons
+  #  queries.each do |q|
+  #    result = [] ; query = index.dh[q]
+  #    if !query
+  #      puts "Query #{q} not found!" ; next
+  #    end
+  #    puts "[export:rel_concepts] Scoring #{query}"
+  #    index.docs.sample(topk).each_with_index do |d,i|
+  #      next if d.dno == query.dno
+  #      result << [query, d, d.feature_vector(query).to_a].flatten
+  #      #break if i >= topk
+  #    end
+  #    #p result[0..topk].map{|e|e[2..-1]}
+  #    result_total.concat result[0..topk].sort_by{|e|e[2..-1].sum}.reverse
+  #  end
+  #  write_csv filename, result_total, 
+  #    :header=>['query','target'].concat(Searcher::CON_FEATURES)
+  #end
   
   desc "Export Learner Input from Click Histories"
   task :learner_input => :environment do
@@ -103,8 +131,8 @@ namespace :export do
   desc "Export Concept table into CSV"
   task :concepts => :environment do
     filename = ENV['filename'] || "data/concepts_#$renv.csv"
-    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.ctype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
-      :header=>['id','title','ctype','synonym_id','hidden_flag','modified_flag']
+    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.itype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
+      :header=>['id','title','itype','synonym_id','hidden_flag','modified_flag']
   end
   
   desc "Export Training Data for Collection Selection"

@@ -11,6 +11,7 @@ class SolrSearcher < Searcher
   # Search based on similarity
   # - Find target document
   # - Evaluate similarity query
+  # @param item <Int> : id of item sought for
   def search_by_item(item, type ,o={})
     query_item = Item.find(item.to_i)
     return nil if !query_item
@@ -42,7 +43,7 @@ class SolrSearcher < Searcher
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
     }.reverse
     cache_data(type+'_result', result )
-    result.map{|fts|[fts[:id], fts[:score]]}
+    result
   end
   
   # Search given keyword query

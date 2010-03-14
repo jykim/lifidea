@@ -24,6 +24,7 @@ def cache_data(key, value = "none")
     CACHE.get(ENV['RAILS_ENV']+'_'+key)
   else
     CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+    value
   end
 end
 

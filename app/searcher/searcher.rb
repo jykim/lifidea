@@ -12,17 +12,19 @@ class Searcher
   
   # Implement this
   def open_index(o={})
+    $items = {}
     @clf = cache_data('clf', Searcher.load_features())
     @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con'))
     @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc'))
   end
   
   def process_request(qtype, query)
-    case qtype
+    result = case qtype
     when 'k' : search_by_keyword(query)
     when 'c' : search_by_item(query, 'con')
     when 'd' : search_by_item(query, 'doc')
     end
+    result.map{|fts|[fts[:id], fts[:score]]}
   end
   
   # Imprement this

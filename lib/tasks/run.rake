@@ -58,7 +58,7 @@ namespace :run do
     #debugger
     $idx = Indexer.new
     puts 'Indexing Documents'
-    $idx.index_item_set(item_set.find_all{|i|!i.concept?}, :download=>ENV['download']) if !ENV['concept_only']
+    $idx.index_item_set(item_set.find_all{|i|i.document?}, :download=>ENV['download']) if !ENV['concept_only']
     puts 'Indexing Concepts'
     $idx.index_item_set(item_set.find_all{|i|i.concept?}, :download=>ENV['download']) if !ENV['document_only']
   end

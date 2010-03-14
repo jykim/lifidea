@@ -76,7 +76,7 @@ class Indexer
     end
   end
   
-  # Index a set of target items
+  # Index a set of items
   def index_item_set(all_items, o={})
     puts "Indexing #{all_items.size} items..." ; cur_docs = 0
     #Searcher.load_features() if !$clf
@@ -101,22 +101,25 @@ class Indexer
   # - extract concept links (occurrences)
   def index_item(item)
     #debug "[index_item] Indexing #{item.title}(#{item.id})"
-    if item.content
-      item.create_index
-    else
-      #debug "[index_item] using content from #{item.link_items[0..9].map{|e|e.id}.inspect}"
-      content = item.link_items[0..25].map{|d|d.get_index.get_flm([:title,:uri,:tag]).f}.merge_by_sum
-      #puts content.inspect
-      item.create_index(:title=>LanguageModel.new(item.title), :tag=>LanguageModel.new(item.tag_titles.join(",")), 
-      :content => LanguageModel.new(content), :uri => LanguageModel.new(item.uri))
+    #if item.content
+    #  item.create_index
+    #else
+    #  #debug "[index_item] using content from #{item.link_items[0..9].map{|e|e.id}.inspect}"
+    #  content = item.link_items[0..25].map{|d|d.get_index.get_flm([:title,:uri,:tag]).f}.merge_by_sum
+    #  #puts content.inspect
+    #  item.create_index(:title=>LanguageModel.new(item.title), :tag=>LanguageModel.new(item.tag_titles.join(",")), 
+    #  :content => LanguageModel.new(content), :uri => LanguageModel.new(item.uri))
+    #end
+    if item.content.blank?
+      item.update_attributes! :content=>item.link_items[0..25].find_all{|e|e.document?}.map{|e|[e.title,e.uri].join("\t")}.join("\n")
     end
-
     # Extract concept occurrences
     concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}
     #debug "[index_item] concepts in  #{item.title} = #{concepts.uniq.inspect}" if concepts.size > 0
     concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>v.size) }
     
     # Extract concept co-occurrence
+    # - count increases whenever the item is re-indexed!
     concepts.uniq.to_comb.each do |pair|
       Link.find_or_create(pair[0],pair[1],"o", :add=>1)
     end
