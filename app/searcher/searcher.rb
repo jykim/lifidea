@@ -1,10 +1,11 @@
 class Searcher
-  CON_FEATURES = [:content, :tag, :time, :topic, :cooc, :occur]
+  CON_FEATURES = [:title, :content, :tag, :time, :topic, :cooc, :occur]
   DOC_FEATURES = [:content, :tag, :time, :topic, :concept]
     
   # @param [Array<IR::Index>] cols : target collections
   def initialize(o = {})
     @debug = o[:debug] || false
+    $items = {} if !$items
     @clf = cache_data('clf')
     @con_weights = cache_data('con_weights')
     @doc_weights = cache_data('doc_weights')
@@ -12,7 +13,6 @@ class Searcher
   
   # Implement this
   def open_index(o={})
-    $items = {}
     @clf = cache_data('clf', Searcher.load_features())
     @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con'))
     @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc'))
@@ -21,10 +21,11 @@ class Searcher
   def process_request(qtype, query)
     result = case qtype
     when 'k' : search_by_keyword(query)
-    when 'c' : search_by_item(query, 'con')
-    when 'd' : search_by_item(query, 'doc')
+    when 'c' : search_by_item(query, 'con').map{|fts|[fts[:id], fts[:score]]}
+    when 'd' : search_by_item(query, 'doc').map{|fts|[fts[:id], fts[:score]]}
     end
-    result.map{|fts|[fts[:id], fts[:score]]}
+    #puts result.inspect
+    #debugger
   end
   
   # Imprement this

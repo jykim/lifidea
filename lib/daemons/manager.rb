@@ -19,8 +19,8 @@ while($running) do
     end
   end
   puts 'No process running!' if target_procs.size == 0
-  docs_for_day = Item.all(:conditions=>['created_at > ?',Time.now.yesterday]).size
-  Notifier.deliver_warning!("No document for Day!") if docs_for_day == 0
+  #docs_for_day = Item.all(:conditions=>['created_at > ?',Time.now.yesterday]).size
+  #Notifier.deliver_warning!("No document for Day!") if docs_for_day == 0
   
   if ARGV.size == 0 && $0 == __FILE__ 
     sleep 500

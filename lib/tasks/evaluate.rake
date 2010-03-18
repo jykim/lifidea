@@ -5,25 +5,28 @@ namespace :evaluate do
   task(:sim_search => :environment) do
     set_type = ENV['set_type'] || 'test'
     input = ENV['input'] || get_learner_input_file()+".#{set_type}"
-    output = ENV['output'] || "data/evaluation_#{$renv}_#{$today}.csv"
-    $searcher = Searcher.new
-    $searcher.load_concepts() ; index = $searcher.cons
-    methods = [Searcher::CON_FEATURES, 'uniform','grid','svm'].flatten
-    weights = methods.map{|e|Searcher::load_weights(Searcher::CON_FEATURES, 'con', e)}
+    output = ENV['output'] || get_evaluation_file($type)
+    searcher = SolrSearcher.new
+    features = case $type
+    when 'con' : Searcher::CON_FEATURES
+    when 'doc' : Searcher::DOC_FEATURES
+    end
+    methods = [features, 'uniform','grid','svm'].flatten
+    weights = methods.map{|e|Searcher::load_weights(features, $type, e)}
     weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
     result_all = []
-    WrightLearner.parse_ranksvm_input(input).each do |ids|
+    WeightLearner.parse_ranksvm_input(input).each do |ids|
       result = [] ; query, rel = ids[0].to_i, ids[1].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
       weights.each_with_index do |weight,i|
-        rank_list = index.find_similar(query, :weights=>weight)
+        rank_list = searcher.search_by_item(query, $type, :weights=>weight).map{|fts|[fts[:id], fts[:score]]}
         recip_rank = 0 ; rank_list.each_with_index{|e,i|recip_rank = 1.0 / (i+1) if e[0] == rel}
         result << recip_rank
       end
       result_all << [query, result].flatten
     end
-    result_all << ["summary(#{set_type})", (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}].flatten
+    result_all << ["summary(#$type/#{set_type})", (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}].flatten
     write_csv(output, result_all, :mode=>'a', :header=>["query", methods].flatten)
   end
   
@@ -75,24 +78,25 @@ namespace :evaluate do
   namespace :batch do
     task(:cval) do
       case $type
-      #when 'csel': Rake::Task['export:csel_features'].execute
-      when 'con' : Rake::Task['export:concept_features'].execute
+      when 'csel': Rake::Task['export:csel_features'].execute
+      when /con|doc/ : Rake::Task['export:sim_features'].execute
       end
-      #Rake::Task['etc:split_file'].execute
+      Rake::Task['etc:split_file'].execute
       1.upto(ENV['folds'].to_i) do |i|
         puts "====== Starting #{i}th fold ======="
         ENV['fold'] = i.to_s
         $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
-        ['grid'].each do |method|#'ranksvm','grid','liblinear'
+        ['grid','ranksvm'].each do |method|#'ranksvm','grid','liblinear'
           $method = method
           Rake::Task['run:learner'].execute
         end
+        ENV['set_type'] = 'test'
         case $type
         when 'con'
+          Rake::Task['evaluate:sim_search'].execute # evaluate at test set
         when 'csel'
           #ENV['set_type'] = 'train'
           #Rake::Task['evaluate:csel_combs'].execute
-          ENV['set_type'] = 'test'
           Rake::Task['evaluate:csel_combs'].execute # evaluate at test set
         end
       end

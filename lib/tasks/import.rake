@@ -45,6 +45,18 @@ namespace :import do
     end
   end
   
+  #IO.read('data/doc_topics3.txt').split("\n").map_hash{|l|e=l.split(",");[e[0],e[1..-1]]}
+  desc "Import Topics from File"
+  task(:topics => :environment) do
+    IO.read(ENV['path']).split("\n").each do |l|
+      e = l.split(",")
+      item = Item.find(e[0].scan(/doc_(\d+)_/)[0][0])
+      next if !item
+      item.update_attributes!(:remark=>e[1..-1].join(","))
+      puts "updated!"
+    end
+  end
+  
   desc "Import Documents from File"
   task(:docs => :environment) do
     read_csv(ENV['path'] || "#{RAILS_ROOT}/data/docs_#$renv.csv").each_with_index do |e,i|

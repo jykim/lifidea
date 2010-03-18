@@ -102,26 +102,66 @@ namespace :export do
   #    :header=>['query','target'].concat(Searcher::CON_FEATURES)
   #end
   
+  
   desc "Export Learner Input from Click Histories"
-  task :learner_input => :environment do
-    filename = ENV['input'] || get_learner_input_file()
+  task :sim_features => :environment do
+    filename = ENV['input'] || get_feature_file('ranksvm')
     File.unlink(filename) if File.exists?(filename)
-    $f_li = File.open(filename, 'a')
+    $f_li = File.open(filename,'w')
     $last_query_no = 0
-    $searcher = Searcher.new
-    $searcher.load_concepts() ; index = $searcher.cons
-    History.between($start_at, $end_at).find_all_by_htype("con").each do |h|
+
+    type = ENV['type']
+    case type
+    when 'con'
+      features = Searcher::CON_FEATURES
+      queries = Item.valid.concepts.map{|c|c.id}.sample(10).uniq if !ENV['queries']
+    when 'doc'
+      features = Searcher::DOC_FEATURES
+      queries = Item.valid.documents.map{|c|c.id}.sample(10).uniq if !ENV['queries']
+    end
+
+    searcher = SolrSearcher.new
+    searcher.open_index()
+
+    History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
       puts "Exporting #{h.id}"
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
       skipped_items = params["skipped_items"].split("|")
-      if ENV['random_items']
-        skipped_items = [skipped_items[0], index.docs.map{|e|e.dno}.sample(ENV['random_items'].to_i)]
+      begin
+        result = searcher.search_by_item(h.src_item_id, h.htype, :items=>skipped_items, :rows=>200)        
+      rescue Exception => e
+        puts e.inspect
+        next
       end
-      index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
+      next if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0].to_i}.size == 0
+      $f_li.puts result.map{|r|
+        "#{(r[:id]==skipped_items[0].to_i)? 2 : 1} qid:#$last_query_no #{features.map_with_index{|f,i|"#{i+1}:#{r[f]||0}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "
+      }.sort_by{|e|e[0..0].to_i}.reverse
+      $last_query_no += 1
+      #index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
-    puts "Splitting #{filename}..."
-    Rake::Task['etc:split_file'].execute
   end
+  
+  #desc "Export Learner Input from Click Histories"
+  #task :learner_input => :environment do
+  #  filename = ENV['input'] || get_learner_input_file()
+  #  File.unlink(filename) if File.exists?(filename)
+  #  $f_li = File.open(filename, 'a')
+  #  $last_query_no = 0
+  #  $searcher = Searcher.new
+  #  $searcher.load_concepts() ; index = $searcher.cons
+  #  History.between($start_at, $end_at).find_all_by_htype("con").each do |h|
+  #    puts "Exporting #{h.id}"
+  #    params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
+  #    skipped_items = params["skipped_items"].split("|")
+  #    if ENV['random_items']
+  #      skipped_items = [skipped_items[0], index.docs.map{|e|e.dno}.sample(ENV['random_items'].to_i)]
+  #    end
+  #    index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
+  #  end
+  #  puts "Splitting #{filename}..."
+  #  Rake::Task['etc:split_file'].execute
+  #end
     
   desc "Export Stat table into CSV"
   task(:stats => :environment) do
@@ -139,7 +179,7 @@ namespace :export do
   task :csel_features => :environment do
     filename = ENV['filename'] || "data/csel_#$renv-#$min_prob-#$mp_smt.csv"
     if !$searcher
-      $searcher = Searcher.new(nil, :debug=>ENV['debug'])
+      $searcher = Searcher.new(:debug=>ENV['debug'])
       $searcher.load_documents()
     end
     result_all = []

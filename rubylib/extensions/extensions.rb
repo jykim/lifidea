@@ -79,6 +79,39 @@ class String
   def replace_tag(tag_name, tag_name_after)
     gsub(/\<#{tag_name}\>(.*?)\<\/#{tag_name}\>/im, "<#{tag_name_after}>\\1</#{tag_name_after}>")
   end
+  
+  def levenshtein(other, ins=1, del=1, sub=2)
+    # ins, del, sub are weighted costs
+    return nil if self.nil?
+    return nil if other.nil?
+    dm = []        # distance matrix
+
+    # Initialize first row values
+    dm[0] = (0..self.length).collect { |i| i * ins }
+    fill = [0] * (self.length - 1)
+
+    # Initialize first column values
+    for i in 1..other.length
+      dm[i] = [i * del, fill.flatten]
+    end
+
+    # populate matrix
+    for i in 1..other.length
+      for j in 1..self.length
+    # critical comparison
+        dm[i][j] = [
+             dm[i-1][j-1] +
+               (self[j-1] == other[i-1] ? 0 : sub),
+                 dm[i][j-1] + ins,
+             dm[i-1][j] + del
+       ].min
+      end
+    end
+
+    # The last value in matrix is the
+    # Levenshtein distance between the strings
+    dm[other.length][self.length]
+  end
 end
 
 class Array
@@ -190,7 +223,7 @@ class Hash
 end
 
 class Float
-  MAX_FEATURE_VALUE = Math.log(10+1)
+  MAX_FEATURE_VALUE = 10
   
   def round_at(places)
    temp = self.to_s.length
@@ -198,7 +231,7 @@ class Float
   end
   
   def normalize(threshold = MAX_FEATURE_VALUE)
-    new_value = Math.log(self+1) / threshold
+    new_value = Math.log(self+1) / Math.log(threshold+1)
     (new_value > 1)? 1 : new_value
   end
   

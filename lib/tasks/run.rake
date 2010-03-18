@@ -76,7 +76,7 @@ namespace :run do
     when 'libsvm' : learner.learn_by_libsvm(input, weights, :ls_type=>ENV['ls_type'])
     when 'grid'
       input_data = case $type
-      when "con" : self.parse_ranksvm_input(input+'.train')
+      when /con|doc/ : WeightLearner.parse_ranksvm_input(get_learner_input_file('ranksvm')+'.train')
       when "csel" : read_csv(input+'.train')
       end
       #debugger
@@ -94,7 +94,7 @@ namespace :run do
 
   task(:searcher_client => :environment) do
     puts search_remote((ENV['qtype']||'k'), ENV['query'], :port=>(ENV['port']||Conf.searcher_port))
-  end  
+  end
   
   task(:batch => :environment) do
     enque_daily_job()

@@ -36,14 +36,14 @@ class ItemsController < ApplicationController
     @query_did = [get_user_id(),@query].join(" ").to_id
     begin
       @rank_list = search_local('k', @query)
-      info "Ranklist : #{@rank_list.inspect}"      
+      #error "Ranklist : #{@rank_list.inspect}"      
     rescue Exception => e
       error "Search failed!!"
     end
+    #@docs = Item.find(@rank_list.map{|e|e[0]}).map_hash{|d|[d.id, d]}
     #debugger
-    @docs = Item.find(@rank_list.map{|e|e[0]}).map_hash{|d|[d.id, d]}
     @query_doc = Item.find_or_create(@query, 'query', :uri=>request.url, 
-     :content=>@docs.values.map(&:title).join("\n"))
+     :content=>@rank_list.map{|e|e[0].title}.join("\n"))
   end
   
   def click
@@ -76,9 +76,11 @@ class ItemsController < ApplicationController
         #debugger
       rescue Exception => e
         error "Failed to get Ranklist!", e
-        @rel_cons = []        
-        @rel_docs = []        
+        @rel_cons = []
+        @rel_docs = []
       end
+      #debugger
+      #puts @rel_cons.inspect
       @item.link_items.uniq.each do |e|
         (e.concept?)? (@link_cons << e) : (@link_docs << e)
       end
@@ -140,7 +142,7 @@ class ItemsController < ApplicationController
     #  @item = Item.find_or_create_concept(params[:])
     #  @concept = Concept.find(params[:source_id])
     when 'Query'
-      @item = Item.find_or_create(params[:query], 'concept')
+      @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept')
       params[:checked_docs].each do |dno|
         Link.find_or_create(dno.to_i, @item.id, 'u')
       end

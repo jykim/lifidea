@@ -6,18 +6,15 @@ class WeightLearner
     
   end
   
-  def self.evaluate_sim_search_with(input_data, weights, o={})
+  def self.evaluate_sim_search_with(input_data, type, weights, o={})
     result = {}
-    if !$index
-      searcher = Searcher.new
-      searcher.load_concepts() ; $index = searcher.cons
-    end
+    searcher = SolrSearcher.new
     #debugger
     input_data.each do |ids|
       query, rel = ids[0].to_i, ids[1].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
-      rank_list = $index.find_similar(query, :weights=>weights)
+      rank_list = searcher.search_by_item(query, type, :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
       result[query] = Searcher.recip_rank(rank_list, rel)
     end
     [result.values.mean, weights].flatten
@@ -36,7 +33,7 @@ class WeightLearner
       result[l[:qid]] = Searcher.recip_rank(rank_list, l[:did])
       debug "Q[#{l[:qid]}] #{result[l[:qid]]} (#{o[:rule]} / #{l[:query]} )"
     end
-    [result.values, weights].flatten
+    [result.values.mean, weights].flatten
   end
   
   def self.get_col_scores(input_line, weights)
@@ -57,7 +54,7 @@ class WeightLearner
   end
   
   def self.parse_ranksvm_input(filename)
-    IO.read(input+'.train').split("\n").find_all{|l|l =~ /^2/}.map{|l|a = l.scan(/\# (\d+) \-\> (\d+)/)[0]}
+    IO.read(filename).split("\n").find_all{|l|l =~ /^2/}.map{|l|a = l.scan(/\# (\d+) \-\> (\d+)/)[0]}
   end
   
   def learn_by_ranksvm(input, output)
@@ -83,6 +80,7 @@ class WeightLearner
   def learn_by_grid_search(input_data, output, type, o = {})
     no_params = case $type
     when 'con' : Searcher::CON_FEATURES.size
+    when 'doc' : Searcher::DOC_FEATURES.size
     when 'csel': ($cs_types || Searcher::CS_TYPES).size
     else
       error("[learn_by_grid_search] no type parameter!")
@@ -96,16 +94,16 @@ class WeightLearner
     search_method.search(3) do |xvals , yvals , type , remote|
       #do_retrieval_at(xvals , yvals.map{|e|(e.to_s.scan(/e/).size>0)? 0.0 : e} , $o.merge(:remote_query=>remote))[$opt_for]
       results << case $type
-      when 'con' : WeightLearner.evaluate_sim_search_with(input_data, yvals)
+      when /con|doc/ : WeightLearner.evaluate_sim_search_with(input_data, $type, yvals)
       when 'csel': WeightLearner.evaluate_csel_with(input_data, yvals)
       end
       #puts results.inspect
-      #puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
-      results[-1][0].mean
+      puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
+      results[-1][0]
     end
     results_str = case (o[:grid_type] || 'single')
     when 'single'
-      results.sort_by{|e|e[0].mean}.reverse.map{|l|[l[0].mean, l[1]].flatten.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
+      results.sort_by{|e|e[0]}.reverse.map{|l|l.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
     when 'avg'
       max_perf = results.sort_by{|l|l[0]}[-1][0]
       results_str = results.find_all{|l|l[0] == max_perf}.merge_array_by_avg().map_with_index{|e,i|[i,e].join(":")}.join(" ")
