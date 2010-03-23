@@ -36,17 +36,22 @@ class SolrSearcher < Searcher
       next if o[:items] && !o[:items].include?(e["id"])
       begin
         item = $items[e["id"].to_i]
-        leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
-        fts = {:id=>item.id, :content=>(e["score"]/4), :title=>leven_dist}
-        #fts[:tag] = (item.tags & query_item.tags).size
+        #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
+        fts = {:id=>item.id, :content=>(e["score"]/2), :string=>item.did.str_sim(query_item.did)}
+        fts[:tag] = item.tags.overlap(query_item.tags)
         fts[:time] = (item.basetime - query_item.basetime ).normalize_time
-        fts[:topic] = if type == 'con' : @clf.read('t', item.id, query_item.id)
-        elsif item.remark && query_item.remark
-          arr1, arr2 = item.remark.split(",").map{|e|e.to_f}, query_item.remark.split(",").map{|e|e.to_f}
-          arr1.map_with_index{|e,i|e*arr2[i]}.sum
+        case type
+        when 'con'
+          fts[:topic] = @clf.read('t', item.id, query_item.id)
+          fts[:cooc] = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
+          fts[:occur] = @clf.read_sum('o', item.id).normalize(Item.count_docs)
+        when 'doc'
+          if item.remark && query_item.remark
+            arr1, arr2 = item.remark.split(",").map{|e|e.to_f}, query_item.remark.split(",").map{|e|e.to_f}
+            fts[:topic] = arr1.map_with_index{|e,i|e*arr2[i]}.sum
+          end
+          fts[:concept] =  item.link_cons.overlap(query_item.link_cons)
         end
-        fts[:cooc] = @clf.read('o', item.id, query_item.id).normalize(10)
-        fts[:occur] = @clf.read_sum('o', item.id).normalize(50)
         #puts fts.inspect        
       rescue Exception => e
         error "[search_by_item] Error in #{query_item} -> #{item}", e

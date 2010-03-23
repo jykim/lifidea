@@ -3,12 +3,16 @@ class ItemsController < ApplicationController
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :search
   sidebar :concept_cloud, :if=>:source_given?
-  sidebar :relevant_concepts, :only=>:show
+  sidebar :relevant_concepts, :only=>:show, :if=>:item_concept?
   sidebar :linked_concepts, :only=>:show
   #sidebar :linked_documents, :only=>:show
   
   def source_given?
     params && params[:source]
+  end
+  
+  def item_concept?
+    Item.find(params[:id]).concept?
   end
   
   # GET /items
@@ -85,11 +89,11 @@ class ItemsController < ApplicationController
         (e.concept?)? (@link_cons << e) : (@link_docs << e)
       end
       #result = cache('foo') { $clf }
-      #puts "Result : " + cache('foo').inspect      
+      #puts "Result : " + cache('foo').inspect
     #else
     #  @rank_list = []
     #end
-    
+    #debugger
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @item }
@@ -142,7 +146,8 @@ class ItemsController < ApplicationController
     #  @item = Item.find_or_create_concept(params[:])
     #  @concept = Concept.find(params[:source_id])
     when 'Query'
-      @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept')
+      @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept', :url=>nil, :content=>Item.find(params[:checked_docs]).map{|e|e.title}.join("\n"))
+      puts params.inspect
       params[:checked_docs].each do |dno|
         Link.find_or_create(dno.to_i, @item.id, 'u')
       end
@@ -154,14 +159,6 @@ class ItemsController < ApplicationController
   # PUT /items/1.xml
   def update
     @item = Item.find(params[:id])
-    #@item.add_tags(params[:item][:concept_titles], 'u')
-    #debugger
-    #params_update = case @item.type.to_s
-    #when "Document" : params[:document]
-    #when 'Concept' : params[:concept]
-    #when 'Query' : params[:query]
-    #when 'Item' : params[:item]
-    #end
     respond_to do |format|
       if @item.update_attributes(params[:item].merge(:modified_flag=>true))
         flash[:notice] = 'Item was successfully updated.'

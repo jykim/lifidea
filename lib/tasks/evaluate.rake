@@ -87,12 +87,13 @@ namespace :evaluate do
         ENV['fold'] = i.to_s
         $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
         ['grid','ranksvm'].each do |method|#'ranksvm','grid','liblinear'
+          next if ENV['method'] && ENV['method'] != method
           $method = method
           Rake::Task['run:learner'].execute
         end
         ENV['set_type'] = 'test'
         case $type
-        when 'con'
+        when /con|doc/
           Rake::Task['evaluate:sim_search'].execute # evaluate at test set
         when 'csel'
           #ENV['set_type'] = 'train'

@@ -7,7 +7,7 @@
   </tr>
 	<% @rank_list.each do |e| %>
 	  <tr>
-	    <td><%= check_box_tag("checked_docs[]", e[0]) %><% e[1].round_at(3) %></td>
+	    <td><%= check_box_tag("checked_docs[]", e[0].id) %><% e[1].round_at(3) %></td>
 	    <td><%= e[0].itype %></td>
 	    <td><%= link_to e[0].title, {:controller=>'items', :action=>'click', :htype=>'qry_doc', :id=>e[0].id, :src_item_id=>@query_doc.id} %></td>
 	    <td><%= link_to 'Edit', edit_item_path(e[0]) %></td>

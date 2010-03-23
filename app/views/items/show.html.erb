@@ -30,17 +30,26 @@
 <%= link_to 'Edit', edit_item_path(@item) %> |
 <%= link_to 'Back', items_path %>
 
-<h2>Relevant Documents</h2>
-<table>
-<% @rel_docs.each_with_index do |e,i| %>
+<% if @item.document? %>
+	<h2>Relevant Documents</h2>
+	<table class="sortable" id="sortabletable">
 	<tr>
-	  <td width='80'><%= $items[e[0]].basetime.to_date %></td>
-	  <td><%= $items[e[0]].itype %></td>
-	  <td><%= link_to $items[e[0]].title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[0], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e|e[0]}.join("|")} %></td>
+		<%= ['time','type','title','score'].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
+	<% @rel_docs.each_with_index do |e,i| %>
+		<tr>
+		  <td width='80'><%= $items[e[:id]].basetime.to_date %></td>
+		  <td><%= $items[e[:id]].itype %></td>
+		  <td><%= link_to $items[e[:id]].title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
+		<% if Conf.debug %>
+			<%=[:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
+		<% end %>
+		</tr>
+	<% end %>
+	</table>
 <% end %>
-</table>
-<% if nil && @link_docs %>
+
+<% if @link_docs %>
 	<h2>Linked Documents</h2>
 	<table>
 	<% @link_docs.each do |item| %>

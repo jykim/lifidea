@@ -48,6 +48,16 @@ module Math
   def self.min(a, b)
     a < b ? a : b
   end
+  
+  def self.overlap(xy, x, y, type = :cosine)
+    return 0 if xy == 0
+    case type
+    when :jaccard : xy.to_f / (x + y - xy )
+    when :dice : 2 * xy.to_f / (x + y)
+    when :overlap : xy.to_f / Math.min(x, y)
+    when :cosine : xy.to_f / Math.sqrt(x * y)
+    end
+  end
 end
 
 class String
@@ -80,7 +90,13 @@ class String
     gsub(/\<#{tag_name}\>(.*?)\<\/#{tag_name}\>/im, "<#{tag_name_after}>\\1</#{tag_name_after}>")
   end
   
-  def levenshtein(other, ins=1, del=1, sub=2)
+  def str_sim(other)
+    max = Math.max(self.size, other.size)
+    min = (self.size - other.size).abs.to_f
+    1 - (self.levenshtein(other)-min) / (max - min)
+  end
+  
+  def levenshtein(other, ins=1, del=1, sub=1)
     # ins, del, sub are weighted costs
     return nil if self.nil?
     return nil if other.nil?
@@ -230,6 +246,7 @@ class Float
    sprintf("%#{temp}.#{places}f",self).to_f
   end
   
+  # threshold : maximum feature value
   def normalize(threshold = MAX_FEATURE_VALUE)
     new_value = Math.log(self+1) / Math.log(threshold+1)
     (new_value > 1)? 1 : new_value

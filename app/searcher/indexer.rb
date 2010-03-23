@@ -58,7 +58,7 @@ class Indexer
   # Read webpage content from URI
   # 
   def read_webpage(doc)
-    return if doc.content || doc.uri =~ /\.(pdf|ps|eps|doc|ppt|xls|mov|avi|jpg|png|jpeg|gif|tif)$/i
+    return if doc.uri =~ /\.(pdf|ps|eps|doc|ppt|xls|mov|avi|jpg|png|jpeg|gif|tif)$/i
     begin
       timeout(TIMEOUT) do
         info "[read_webpage] Downloading #{doc.uri}"
@@ -86,7 +86,7 @@ class Indexer
       #read contents
       if o[:download]
         $idx.read_files(items.find_all{|d|d.itype =~ /file/ && !d.content})
-        items.each{|d| $idx.read_webpage(d) if !d.content && d.itype =~ /webpage|concept/ && d.uri =~ /^http/}
+        items.each{|d| $idx.read_webpage(d) if d.itype =~ /webpage|concept/ && d.uri =~ /^http/}
       end
       #run indexing
       items.each{|d|$idx.index_item(d)}
@@ -116,7 +116,7 @@ class Indexer
     # Extract concept occurrences
     concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}
     #debug "[index_item] concepts in  #{item.title} = #{concepts.uniq.inspect}" if concepts.size > 0
-    concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>v.size) }
+    concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>1) }
     
     # Extract concept co-occurrence
     # - count increases whenever the item is re-indexed!

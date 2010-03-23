@@ -1,5 +1,5 @@
 class Searcher
-  CON_FEATURES = [:title, :content, :tag, :time, :topic, :cooc, :occur]
+  CON_FEATURES = [:content, :tag, :time, :topic, :string, :cooc, :occur]
   DOC_FEATURES = [:content, :tag, :time, :topic, :concept]
     
   # @param [Array<IR::Index>] cols : target collections
@@ -21,8 +21,8 @@ class Searcher
   def process_request(qtype, query)
     result = case qtype
     when 'k' : search_by_keyword(query)
-    when 'c' : search_by_item(query, 'con').map{|fts|[fts[:id], fts[:score]]}
-    when 'd' : search_by_item(query, 'doc').map{|fts|[fts[:id], fts[:score]]}
+    when 'c' : search_by_item(query, 'con')
+    when 'd' : search_by_item(query, 'doc')
     end
     #puts result.inspect
     #debugger

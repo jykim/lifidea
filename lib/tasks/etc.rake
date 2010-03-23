@@ -22,6 +22,14 @@ namespace :etc do
     Game.destroy_all
   end
   
+  desc "Re-build Index & Links"
+  task :rebuild => :environment do
+    $start_at = "20010101"
+    Link.find_all_by_ltype(['o','e']).each{|e|e.destroy}
+    Rake::Task['run:indexer'].execute
+    Rake::Task['sunspot:solr:reindex'].execute
+  end
+  
   def split_file(filename, data, o={})
     result_train, result_test = [o[:header]], [o[:header]]
     data.each_with_index do |e,i|
@@ -80,6 +88,7 @@ namespace :etc do
     else
       error "[split_file] No parameter specified!"
     end
+    #debugger
     error "[split_file] Data is blank!" if data.blank?
     if ENV['train_ratio'] 
       train_ratio = ENV['train_ratio'].to_f

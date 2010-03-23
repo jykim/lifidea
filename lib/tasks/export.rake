@@ -51,10 +51,10 @@ namespace :export do
   desc "Export Top K relevant items"
   task :rel_items => :environment do
     result_total = []
-    filename = ENV['filename'] || "data/rel_items_#$renv.csv"
+    type = ENV['type'] || 'con'
+    filename = ENV['filename'] || "data/rel_items_#{type}_#$renv.csv"
     topk = (ENV['topk'] && ENV['topk'].to_i) || 10
     queries = ENV['queries'] && ENV['queries'].split(",").map{|e|e.to_i}
-    type = ENV['type'] || 'con'
     case type
     when 'con'
       features = Searcher::CON_FEATURES
@@ -114,10 +114,8 @@ namespace :export do
     case type
     when 'con'
       features = Searcher::CON_FEATURES
-      queries = Item.valid.concepts.map{|c|c.id}.sample(10).uniq if !ENV['queries']
     when 'doc'
       features = Searcher::DOC_FEATURES
-      queries = Item.valid.documents.map{|c|c.id}.sample(10).uniq if !ENV['queries']
     end
 
     searcher = SolrSearcher.new
@@ -133,11 +131,15 @@ namespace :export do
         puts e.inspect
         next
       end
-      next if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0].to_i}.size == 0
+      if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0].to_i}.size == 0
+        puts '[export:sim_features] skipping this record...'
+        next 
+      end
       $f_li.puts result.map{|r|
         "#{(r[:id]==skipped_items[0].to_i)? 2 : 1} qid:#$last_query_no #{features.map_with_index{|f,i|"#{i+1}:#{r[f]||0}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "
       }.sort_by{|e|e[0..0].to_i}.reverse
       $last_query_no += 1
+      $f_li.flush
       #index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
   end
@@ -168,12 +170,12 @@ namespace :export do
     ["day","week","month"].each{|unit|export_stat_for(unit, $start_at, $end_at)}
   end
   
-  desc "Export Concept table into CSV"
-  task :concepts => :environment do
-    filename = ENV['filename'] || "data/concepts_#$renv.csv"
-    write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.itype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
-      :header=>['id','title','itype','synonym_id','hidden_flag','modified_flag']
-  end
+  #desc "Export Concept table into CSV"
+  #task :concepts => :environment do
+  #  filename = ENV['filename'] || "data/concepts_#$renv.csv"
+  #  write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.itype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
+  #    :header=>['id','title','itype','synonym_id','hidden_flag','modified_flag']
+  #end
   
   desc "Export Training Data for Collection Selection"
   task :csel_features => :environment do

@@ -105,6 +105,11 @@ module Statistics
     result
   end
   
+  def overlap(other, type = :cosine)
+    intersection = self & other
+    Math.overlap(intersection.size, self.size, other.size, type)
+  end
+  
   def shuffle
     sort_by { rand }
   end

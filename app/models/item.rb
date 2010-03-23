@@ -54,12 +54,20 @@ class Item < ActiveRecord::Base
   end
   
   def document?
-    ITYPE_DOCUMENT.include?(itype)
+    !['concept','person','query'].include?(itype)#ITYPE_DOCUMENT.include?(itype)
   end
   
   def link_items
     #[inlinks.map{|l|[l, l.initem]}, outlinks.map{|l|[l, l.outitem]}].collapse
     [initems,outitems].flatten
+  end
+  
+  def link_cons
+    link_items.find_all{|e|e.concept?}
+  end
+
+  def link_docs
+    link_items.find_all{|e|e.document?}
   end
 
   def links
@@ -85,6 +93,15 @@ class Item < ActiveRecord::Base
   #  doc_db.update_attributes!(doc.merge(:source_id=>1, :basetime=>Time.now(), :metadata=>{}))
   #  doc_db
   #end
+  
+  def self.count_docs
+    @count_docs ||= Item.all.size - find_all_by_itype([ITYPE_CONCEPT,'query'].flatten).size
+  end
+  
+  
+  def self.count_cons
+    @count_cons ||= find_all_by_itype(ITYPE_CONCEPT).size
+  end
   
   # Initialize new document
   def self.find_or_create(title, itype, o={})

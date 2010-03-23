@@ -40,6 +40,14 @@ img {
   text-decoration:none;
 }
 
+table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+}
+
+
 /* Header styles */
 #header {
 	clear:both;
