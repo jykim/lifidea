@@ -8,26 +8,50 @@ class SolrSearcher < Searcher
     super(o)
   end
   
+  # Search given keyword query
+  # - 2) document scoring
+  # - merging 1) and 2) into final score
+  def search_by_keyword(query, o={})
+    result = Sunspot.search(Item) do
+      keywords query
+    end
+    result.hits.map{|e|[e.instance, e.score]}
+  end
+  
   # Search based on similarity
   # - Find target document
   # - Evaluate similarity query
   # @param item <Int> : id of item sought for
   def search_by_item(item, type ,o={})
     query_item = Item.find(item.to_i)
-    result = []
     return nil if !query_item
-    
     case type
     when 'con' : features, weights, filter_qry = CON_FEATURES, (o[:weights] || @con_weights), "itype_text:concept -itype_text:query"
     when 'doc' : features, weights, filter_qry = DOC_FEATURES, (o[:weights] || @doc_weights), "-itype_text:concept -itype_text:query"
     end
     #debugger
     #puts "[search_by_item] weights = #{weights.inspect}"
+    result = if cache_data([item, type, 'result'].join("_"))
+      cache_data([item, type, 'result'].join("_"))
+    else
+      cache_data([item, type, 'result'].join("_"), calc_sim_features(query_item, type, filter_qry, o))
+    end
+    #puts result.inspect
+    result.sort_by{|fts| 
+      fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
+    }.reverse
+  end
+  
+  def calc_sim_features(query_item, type, filter_qry, o={})
+    #puts "[calc_sim_features] query_item = #{query_item} "
+    #debugger
+    result = []
     # Initial Solr Query
     solr = RSolr.connect :url=>Conf.solr_server
     solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
       "mlt.fl" => "title_text,content_text,uri_text,itype_text", "mlt.mintf" => 1, "rows" => (o[:rows] || 50)
-    Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).each{|i| $items[i.id] = i}    
+    Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
+      each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}
 
     # Feature Vector generation
     solr_result['response']['docs'].each do |e|
@@ -59,32 +83,17 @@ class SolrSearcher < Searcher
       end
       result << fts
     end
-    #debugger
-    result = result.sort_by{|fts| 
-      fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
-    }.reverse
-    cache_data(type+'_result', result )
     result
   end
   
-  # Search given keyword query
-  # - 2) document scoring
-  # - merging 1) and 2) into final score
-  def search_by_keyword(query, o={})
-    result = Sunspot.search(Item) do
-      keywords query
-    end
-    result.hits.map{|e|[e.instance, e.score]}
-  end
-  
-  def log_preference(query, type, click_position, o={})
+  def log_preference(query_item, type, click_position, o={})
     $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.to_ymd}.txt", 'a')
     
-    result = cache_data(type+'_result' )
+    result = search_by_item(query_item, type)
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i
     #debugger
     log = result[0..(click_position-1)].reverse.map_with_index{|e,i|
-      [((i==0)? 2 : 1), "qid:#{last_query_no}", e, "# #{query} -> #{e[:id]}" ]
+      [((i==0)? 2 : 1), "qid:#{last_query_no}", e, "# #{query_item} -> #{e[:id]}" ]
     }
     if !o[:export_mode]
       #$clf.increment('c', dnos[0], dnos[1])

@@ -77,23 +77,27 @@ namespace :evaluate do
   
   namespace :batch do
     task(:cval) do
-      case $type
-      when 'csel': Rake::Task['export:csel_features'].execute
-      when /con|doc/ : Rake::Task['export:sim_features'].execute
+      unless ENV['skip_export']
+        case $type
+        when 'csel': Rake::Task['export:csel_features'].execute
+        when /con|doc/ : Rake::Task['export:sim_features'].execute
+        end
+        Rake::Task['etc:split_file'].execute
       end
-      Rake::Task['etc:split_file'].execute
       1.upto(ENV['folds'].to_i) do |i|
         puts "====== Starting #{i}th fold ======="
         ENV['fold'] = i.to_s
         $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
         ['grid','ranksvm'].each do |method|#'ranksvm','grid','liblinear'
-          next if ENV['method'] && ENV['method'] != method
+          #next if ENV['method'] && ENV['method'] != method
           $method = method
           Rake::Task['run:learner'].execute
         end
-        ENV['set_type'] = 'test'
         case $type
         when /con|doc/
+          ENV['set_type'] = 'train'
+          Rake::Task['evaluate:sim_search'].execute # evaluate at test set
+          ENV['set_type'] = 'test'
           Rake::Task['evaluate:sim_search'].execute # evaluate at test set
         when 'csel'
           #ENV['set_type'] = 'train'

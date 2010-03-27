@@ -2,7 +2,7 @@
 	<div class="title">Relevant Concepts</div>
 	<ul>
 	<% @rel_cons.each_with_index do |e,i| %>
-	    <li><%= link_to $items[e[:id]].title, {:controller=>'items', :action=>'click', :htype=>'con', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_cons[0..i].reverse.map{|e2|e2[:id]}.join("|")}, :title=>[:score].concat(Searcher::CON_FEATURES).map{|f|"#{f}:#{(e[f]||0).to_f.r3}"}.join(" ") %></li>
+	  <li><%= link_to cache_data("item_#{e[:id]}").title, {:controller=>'items', :action=>'click', :htype=>'con', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_cons[0..i].reverse.map{|e2|e2[:id]}.join("|")}, :title=>[:score].concat(Searcher::CON_FEATURES).map{|f|"#{f}:#{(e[f]||0).to_f.r3}"}.join(" ") %></li>
 	<% end %>
 	</ul>
 </div>

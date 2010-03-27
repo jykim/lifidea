@@ -99,6 +99,12 @@ class ItemsController < ApplicationController
       format.xml  { render :xml => @item }
     end    
   end
+  
+  # Show textual content of the document (for back-up)
+  def show_content
+    @item = Item.find(params[:id])
+    render :action=>:show_content, :layout=>"content_only"
+  end
 
   # GET /items/new
   # GET /items/new.xml
@@ -146,8 +152,10 @@ class ItemsController < ApplicationController
     #  @item = Item.find_or_create_concept(params[:])
     #  @concept = Concept.find(params[:source_id])
     when 'Query'
-      @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept', :url=>nil, :content=>Item.find(params[:checked_docs]).map{|e|e.title}.join("\n"))
-      puts params.inspect
+      content = Item.find(params[:checked_docs]).map{|e|e.title}.join("\n") if !params[:checked_docs].blank?
+      @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept', :uri=>params[:uri], :content=>content)
+      @item.replace_tags(params[:tags]) if !params[:tags].blank?
+      #puts params.inspect
       params[:checked_docs].each do |dno|
         Link.find_or_create(dno.to_i, @item.id, 'u')
       end
@@ -160,6 +168,7 @@ class ItemsController < ApplicationController
   def update
     @item = Item.find(params[:id])
     respond_to do |format|
+      @item.replace_tags(params[:tags]) if !params[:tags].blank?
       if @item.update_attributes(params[:item].merge(:modified_flag=>true))
         flash[:notice] = 'Item was successfully updated.'
         format.html { redirect_to(item_url(@item)) }

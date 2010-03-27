@@ -1,4 +1,4 @@
-<h1>Search Result ( <% @query %>)</h1>
+<h1>Search Result ( <%= @query %>)</h1>
 <% debug(request.url)%>
 
 <% form_tag :action => 'create_concept', :method => 'POST' do %> 
@@ -15,8 +15,11 @@
 	  </tr>
 	<% end %>
 </table>
+
 <%= hidden_field_tag "query", @query %>
 <%= hidden_field_tag "source_type", 'Query' %>
+<div align='right'>URL : <%= text_field_tag "uri" %></div>
+<div align='right'>Tag : <%= text_field_tag "tags" %></div>
 <div align='right'><%= submit_tag 'Add as New Concept' %></div>
 <% end %>
 

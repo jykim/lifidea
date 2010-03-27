@@ -18,12 +18,14 @@ module DocumentsHelper
       :multiple=>true, :onchange => 'this.form.submit()')
   end
   
-  def display_url(uri)
-    case uri
+  def display_url(item)
+    case item.uri
     when /\.(#{FileCollector::FILE_FORMAT_BINARY})$/
-      "http://docs.google.com/viewer?url=#{url_encode(uri.strip)}&embedded=true"
+      "http://docs.google.com/viewer?url=#{url_encode(item.uri.strip)}&embedded=true"
+    when /^http/
+      item.uri      
     else
-      uri
+      url_for :action=>:show_content, :id=>@item.id
     end
   end
   

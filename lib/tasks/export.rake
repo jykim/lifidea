@@ -102,10 +102,10 @@ namespace :export do
   #    :header=>['query','target'].concat(Searcher::CON_FEATURES)
   #end
   
-  
   desc "Export Learner Input from Click Histories"
   task :sim_features => :environment do
-    filename = ENV['input'] || get_feature_file('ranksvm')
+    $method ||= ENV['method']
+    filename = ENV['input'] || get_feature_file($method)
     File.unlink(filename) if File.exists?(filename)
     $f_li = File.open(filename,'w')
     $last_query_no = 0
@@ -117,31 +117,45 @@ namespace :export do
     when 'doc'
       features = Searcher::DOC_FEATURES
     end
-
+    $f_li.puts ['pref','basetime','src_id','target_id','src','target','sum'].concat(features).join(",") if $method=='grid'
     searcher = SolrSearcher.new
     searcher.open_index()
-
+    
     History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
       puts "Exporting #{h.id}"
+      result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
       skipped_items = params["skipped_items"].split("|")
       begin
-        result = searcher.search_by_item(h.src_item_id, h.htype, :items=>skipped_items, :rows=>200)        
+        result = searcher.search_by_item(h.src_item_id, h.htype, :rows=>200).find_all{|r|skipped_items.include?(r[:id].to_s)}
+        puts result.size
+        raise DataError, "Record not found!" if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0].to_i}.size == 0
+        result_str = result.map{|r|
+          #debugger
+          preference = (r[:id]==skipped_items[0].to_i)? 2 : 1
+          feature_values = features.map{|f|r[f]||0}
+          next if preference == 1 && searcher.clf.read('c', h.src_item_id.to_i, r[:id]) > 0
+          case $method
+          when 'grid'
+            [preference, h.basetime, h.src_item_id, r[:id], Item.find(h.src_item_id).title, Item.find(r[:id]).title, feature_values.sum].
+              concat(feature_values).to_csv
+          when 'ranksvm'
+            "#{preference} qid:#$last_query_no #{feature_values.map_with_index{|f,i|"#{i+1}:#{f}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "          
+          end
+        }.find_all{|e|e}.sort_by{|e|e[0..0].to_i}.reverse
+        raise DataError, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
+      rescue Interrupt
+        break
       rescue Exception => e
-        puts e.inspect
+        #error '[export:sim_features] skipping this record...', e
         next
       end
-      if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0].to_i}.size == 0
-        puts '[export:sim_features] skipping this record...'
-        next 
-      end
-      $f_li.puts result.map{|r|
-        "#{(r[:id]==skipped_items[0].to_i)? 2 : 1} qid:#$last_query_no #{features.map_with_index{|f,i|"#{i+1}:#{r[f]||0}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "
-      }.sort_by{|e|e[0..0].to_i}.reverse
+      $f_li.puts result_str
       $last_query_no += 1
-      $f_li.flush
       #index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
+    puts "#$last_query_no items exported..."
+    $f_li.flush
   end
   
   #desc "Export Learner Input from Click Histories"

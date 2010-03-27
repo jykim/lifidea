@@ -1,4 +1,5 @@
 class Searcher
+  attr_reader :clf
   CON_FEATURES = [:content, :tag, :time, :topic, :string, :cooc, :occur]
   DOC_FEATURES = [:content, :tag, :time, :topic, :concept]
     

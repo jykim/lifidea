@@ -11,16 +11,16 @@
     <%= f.text_field :did %>
   </p>
   <p>
+    <%= f.label :tags %> : 
+    <%= text_field_tag :tags, @item.tags.map{|e|e.title}.join(",") %>
+  </p>
+  <p>
     <%= f.label :uri %> : 
     <%= f.text_field :uri %>
   </p>
   <p>
     <%= f.label :itype %> : 
     <%= f.text_field :itype %>
-  </p>
-  <p>
-    <%= f.label :remark %><br />
-    <%= f.text_area :remark %>
   </p>
 	<p>
 	  <b>Content:</b> <br>

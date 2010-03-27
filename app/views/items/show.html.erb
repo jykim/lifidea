@@ -4,6 +4,12 @@
 </p>
 
 <p>
+  <b>Tags:</b>
+	<%=  @item.tags.map{|e|e.title}.join(",") if @item.tags %>
+</p>
+
+
+<p>
   <b>Type:</b>
   <%=h @item.itype %>
 </p>
@@ -20,12 +26,15 @@
 
 <p>
   <b>Metadata:</b> <br>
-  <%= @item.metadata.map{|k,v|"#{k} : #{v}"}.join("<br/>") if @item.metadata %>
+	<table border='1' cellspacing=0 cellpadding=2>
+  <%= (@item.metadata||{}).find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
+	</table>
 </p>
 
 <p>
   <b>Content:</b> <br>
-  <%= @item.content.gsub("\n","<br/>")[0..3000] if @item.content %>
+		(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
+		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="780" style="border: none;"></iframe>
 </p>
 <%= link_to 'Edit', edit_item_path(@item) %> |
 <%= link_to 'Back', items_path %>
@@ -37,10 +46,11 @@
 		<%= ['time','type','title','score'].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
+		<% item = cache_data("item_#{e[:id]}") %>
 		<tr>
-		  <td width='80'><%= $items[e[:id]].basetime.to_date %></td>
-		  <td><%= $items[e[:id]].itype %></td>
-		  <td><%= link_to $items[e[:id]].title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
+		  <td width='80'><%= item.basetime.to_date %></td>
+		  <td><%= item.itype %></td>
+		  <td><%= link_to item.title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
 		<% if Conf.debug %>
 			<%=[:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 		<% end %>
