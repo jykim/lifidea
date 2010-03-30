@@ -111,7 +111,7 @@ class Indexer
     #  :content => LanguageModel.new(content), :uri => LanguageModel.new(item.uri))
     #end
     if item.content.blank?
-      item.update_attributes! :content=>item.link_items[0..25].find_all{|e|e.document?}.map{|e|[e.title,e.uri].join("\t")}.join("\n")
+      item.update_attributes! :content=>item.link_items[0..25].find_all{|e|e.document?}.map{|e|e.to_s(true)}.join("\n")
     end
     # Extract concept occurrences
     concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}

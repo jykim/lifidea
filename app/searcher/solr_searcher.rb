@@ -26,16 +26,17 @@ class SolrSearcher < Searcher
     query_item = Item.find(item.to_i)
     return nil if !query_item
     case type
-    when 'con' : features, weights, filter_qry = CON_FEATURES, (o[:weights] || @con_weights), "itype_text:concept -itype_text:query"
-    when 'doc' : features, weights, filter_qry = DOC_FEATURES, (o[:weights] || @doc_weights), "-itype_text:concept -itype_text:query"
+    when 'con' : features, weights, filter_qry = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights), "itype_text:concept -itype_text:query"
+    when 'doc' : features, weights, filter_qry = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights), "-itype_text:concept -itype_text:query"
     end
     #debugger
-    #puts "[search_by_item] weights = #{weights.inspect}"
+    #puts "[search_by_item] features/weights = #{features.inspect}/#{weights.inspect}"
     result = if cache_data([item, type, 'result'].join("_"))
       cache_data([item, type, 'result'].join("_"))
     else
       cache_data([item, type, 'result'].join("_"), calc_sim_features(query_item, type, filter_qry, o))
     end
+    #weights.map!{|e|Math.max(e,0.0)}
     #puts result.inspect
     result.sort_by{|fts| 
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
@@ -61,11 +62,12 @@ class SolrSearcher < Searcher
       begin
         item = $items[e["id"].to_i]
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
-        fts = {:id=>item.id, :content=>(e["score"]/2), :string=>item.did.str_sim(query_item.did)}
+        fts = {:id=>item.id, :content=>(e["score"]/2)}
         fts[:tag] = item.tags.overlap(query_item.tags)
         fts[:time] = (item.basetime - query_item.basetime ).normalize_time
         case type
         when 'con'
+          fts[:string] = item.did.str_sim(query_item.did)
           fts[:topic] = @clf.read('t', item.id, query_item.id)
           fts[:cooc] = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
           fts[:occur] = @clf.read_sum('o', item.id).normalize(Item.count_docs)

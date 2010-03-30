@@ -18,10 +18,25 @@ def get_cur_time()
   Time.now.in_time_zone(TIMEZONE)
 end
 
+def get_features_by_type(type)
+  case type
+  when 'con' : Searcher::CON_FEATURES
+  when 'doc' : Searcher::DOC_FEATURES
+  when 'csel' : RubySearcher::CS_TYPES
+  end
+end
+
 def cache_data(key, value = "none")
   #error "[cache_data] #{key}=#{value}"
+  trial = 0
   if value == "none"
-    CACHE.get(ENV['RAILS_ENV']+'_'+key)
+    begin
+      trial += 1
+      CACHE.get(ENV['RAILS_ENV']+'_'+key)
+    rescue Exception => e
+      errer "[cache_data]", e
+      retry if trial < 3
+    end
   else
     CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
     value

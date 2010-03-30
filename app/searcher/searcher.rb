@@ -7,9 +7,16 @@ class Searcher
   def initialize(o = {})
     @debug = o[:debug] || false
     $items = {} if !$items
-    @clf = cache_data('clf')
-    @con_weights = cache_data('con_weights')
-    @doc_weights = cache_data('doc_weights')
+    if !cache_data("exists")
+      #debugger
+      open_index()
+      cache_data("exists", "true")
+      error "[init_controller] searcher initializd..."
+    else
+      @clf = cache_data('clf')
+      @con_weights = cache_data('con_weights')
+      @doc_weights = cache_data('doc_weights')
+    end
   end
   
   # Implement this
@@ -56,7 +63,7 @@ class Searcher
     rescue Exception => e
       puts "[Searcher.load_weights] error : ", e
     end
-    puts "[Searcher.load_weights] weights(#{rank}) = #{result.inspect}"
+    puts "[Searcher.load_weights] #{features.inspect}(#{rank}) = #{result.inspect}"
     result
   end
   

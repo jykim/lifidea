@@ -42,6 +42,7 @@ class Item < ActiveRecord::Base
   named_scope :concepts, {:conditions=>{:itype=>'concept'}}
   named_scope :queries, {:conditions=>{:itype=>['query']}}
   named_scope :documents, {:conditions=>["itype != ? and itype != ?",'query', 'concept']}
+  named_scope :searchables, {:conditions=>["itype != ?",'query']}
   
   # Sunspot/Solr search indexing  
   searchable do
@@ -75,8 +76,8 @@ class Item < ActiveRecord::Base
   end
       
   def to_s(verbose = false)
-    result = "#{title} [#{id}:#{itype}] #{basetime.to_s(:db) if basetime}"
-    result += "\n#{metadata.inspect}\n#{content[0..50]}" if content && verbose
+    result = "#{title} [#{id}:#{itype}] "##{basetime.to_s(:db) if basetime}
+    result += "\n#{metadata.inspect}\n#{uri}\n#{content[0..1000]}" if content && verbose
     result
   end
   

@@ -28,12 +28,12 @@ protected
   
   def init_controller
     #error "[init_controller] initializing... #{cache_data("exists")}"
-    if !cache_data("exists")
-      #debugger
-      error "[init_controller] searcher initializd..."
-      $searcher = SolrSearcher.new
-      $searcher.open_index()
-      cache_data("exists", "true")
-    end
+    #if !cache_data("exists")
+    #  #debugger
+    #  error "[init_controller] searcher initializd..."
+    #  $searcher = SolrSearcher.new
+    #  $searcher.open_index()
+    #  cache_data("exists", "true")
+    #end
   end
 end

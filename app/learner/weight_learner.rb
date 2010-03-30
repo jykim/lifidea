@@ -8,13 +8,15 @@ class WeightLearner
   
   def self.evaluate_sim_search_with(input_data, type, weights, o={})
     result = {}
+    #puts weights.inspect
     searcher = SolrSearcher.new
     #debugger
     input_data.each do |ids|
       query, rel = ids[0].to_i, ids[1].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
-      rank_list = searcher.search_by_item(query, type, :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
+      rank_list = searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
+      #puts rank_list.inspect
       result[query] = Searcher.recip_rank(rank_list, rel)
     end
     [result.values.mean, weights].flatten
@@ -78,14 +80,7 @@ class WeightLearner
   end
   
   def learn_by_grid_search(input_data, output, type, o = {})
-    no_params = case $type
-    when 'con' : Searcher::CON_FEATURES.size
-    when 'doc' : Searcher::DOC_FEATURES.size
-    when 'csel': ($cs_types || Searcher::CS_TYPES).size
-    else
-      error("[learn_by_grid_search] no type parameter!")
-      return nil
-    end
+    no_params = o[:features].size
     xvals = (1..no_params).to_a
     yvals = [] ; yvals << [0.5] * xvals.size
     results = []
@@ -94,11 +89,11 @@ class WeightLearner
     search_method.search(3) do |xvals , yvals , type , remote|
       #do_retrieval_at(xvals , yvals.map{|e|(e.to_s.scan(/e/).size>0)? 0.0 : e} , $o.merge(:remote_query=>remote))[$opt_for]
       results << case $type
-      when /con|doc/ : WeightLearner.evaluate_sim_search_with(input_data, $type, yvals)
-      when 'csel': WeightLearner.evaluate_csel_with(input_data, yvals)
+      when /con|doc/ : WeightLearner.evaluate_sim_search_with(input_data, $type, yvals, o)
+      when 'csel': WeightLearner.evaluate_csel_with(input_data, yvals, o)
       end
       #puts results.inspect
-      puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
+      #puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"
       results[-1][0]
     end
     results_str = case (o[:grid_type] || 'single')

@@ -23,7 +23,7 @@ class ItemsController < ApplicationController
     conditions = {:hidden_flag=>false}
     conditions.merge!({:source_id=>params[:source]}) if params[:source] && !params[:source].include?("-1")
     conditions.merge!({:itype=>params[:itype]}) if params[:itype] && !params[:itype].include?("all")
-    @items = Item.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
+    @items = Item.searchables.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
     #Item.all(:conditions=>["basetime > ?",Time.now - 86400], :order=>"basetime desc")
     
     respond_to do |format|
@@ -152,7 +152,7 @@ class ItemsController < ApplicationController
     #  @item = Item.find_or_create_concept(params[:])
     #  @concept = Concept.find(params[:source_id])
     when 'Query'
-      content = Item.find(params[:checked_docs]).map{|e|e.title}.join("\n") if !params[:checked_docs].blank?
+      content = Item.find(params[:checked_docs]).map{|e|e.to_s(true)}.join("\n") if !params[:checked_docs].blank?
       @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept', :uri=>params[:uri], :content=>content)
       @item.replace_tags(params[:tags]) if !params[:tags].blank?
       #puts params.inspect

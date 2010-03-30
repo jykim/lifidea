@@ -125,29 +125,38 @@ namespace :export do
       puts "Exporting #{h.id}"
       result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
-      skipped_items = params["skipped_items"].split("|")
+      skipped_items = params["skipped_items"].split("|").map{|e|e.to_i}
       begin
-        result = searcher.search_by_item(h.src_item_id, h.htype, :rows=>200).find_all{|r|skipped_items.include?(r[:id].to_s)}
-        puts result.size
-        raise DataError, "Record not found!" if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0].to_i}.size == 0
+        result_raw = searcher.search_by_item(h.src_item_id, h.htype, :rows=>200)
+        raise DataError, "Source Item not found!"  if !result_raw
+        result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
+        #puts result.size
+        raise DataError, "Record not found!" if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0]}.size == 0
         result_str = result.map{|r|
           #debugger
-          preference = (r[:id]==skipped_items[0].to_i)? 2 : 1
+          preference = (r[:id]==skipped_items[0])? 2 : 1
           feature_values = features.map{|f|r[f]||0}
-          next if preference == 1 && searcher.clf.read('c', h.src_item_id.to_i, r[:id]) > 0
+          if preference == 1 && searcher.clf.read('c', h.src_item_id.to_i, r[:id]) > 0
+            puts "clicked item : #{h.src_item_id}-#{r[:id]} #{preference} / #{searcher.clf.read('c', h.src_item_id.to_i, r[:id])}"
+            next 
+          end
           case $method
           when 'grid'
             [preference, h.basetime, h.src_item_id, r[:id], Item.find(h.src_item_id).title, Item.find(r[:id]).title, feature_values.sum].
               concat(feature_values).to_csv
           when 'ranksvm'
             "#{preference} qid:#$last_query_no #{feature_values.map_with_index{|f,i|"#{i+1}:#{f}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "          
+          else
+            error "No argument!!!!!"
           end
         }.find_all{|e|e}.sort_by{|e|e[0..0].to_i}.reverse
+        #puts result_str
         raise DataError, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
       rescue Interrupt
         break
       rescue Exception => e
-        #error '[export:sim_features] skipping this record...', e
+        error "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result).inspect} not found!" if skipped_items && result
+        #debugger
         next
       end
       $f_li.puts result_str

@@ -107,26 +107,44 @@ namespace :evaluate do
       end
     end
     
-    def learn_weights(input_data, weights, o = {})
+    def get_input_data(input_file)
+      case $type
+      when :csel : read_csv(input_file)
+      when /con|doc/ : WeightLearner.parse_ranksvm_input(input_file)
+      end
+    end
+    
+    # Learn weights using given features 
+    def learn_weights(input_data, features, o = {})
       learner = WeightLearner.new
-      learner.learn_by_grid_search(input_data, weights, $type, :grid_type=>ENV['grid_type'])
-      weight_values = Searcher.load_weights(RubySearcher::CS_TYPES || $cs_types, 'grid')
+      learner.learn_by_grid_search(input_data, get_learner_output_file($method), $type, :features=>features, :grid_type=>ENV['grid_type'])
+      Searcher.load_weights(features, $type, 'grid')
+    end
+    
+    def evaluate_features(input_data, features)
+      case $type
+      when :csel : [WeightLearner.evaluate_csel_with(input_data[1], learn_weights(input_data[0], features), :features=>features)[0]]
+      when /con|doc/ : [WeightLearner.evaluate_sim_search_with(input_data[1], $type, learn_weights(input_data[0], features), :features=>features)[0]]
+      end
     end
     
     desc "Leave one feature out"
     task :leave_one_out => :environment do
       ENV['method'] = 'grid'
       input = ENV['input'] || get_feature_file()
-      weight_file = ENV['weights'] || get_learner_output_file($method)
       output = ENV['output'] || get_evaluation_file('leave_one_out')
-      result_csel = [WeightLearner.evaluate_csel_with(read_csv(input), learn_weights(read_csv(input), weight_file))[0].mean]
+      features = get_features_by_type($type)
+      Rake::Task['etc:split_file'].execute
+      input_data = [get_input_data(input+'.train'), get_input_data(input+'.test')]
+      #puts input_data.inspect
+      result_csel = [evaluate_features(input_data, features)]
       puts "result(all) : #{result_csel}"
-      RubySearcher::CS_TYPES.each_with_index do |e,i|
-        $cs_types = RubySearcher::CS_TYPES.dup ; $cs_types.delete_at(i)
-        weight_values = learn_weights(read_csv(input), weight_file)
-        result_csel << WeightLearner.evaluate_csel_with(read_csv(input), weight_values)[0].mean
+      features.each_with_index do |e,i|
+        cur_features = features.dup ; cur_features.delete_at(i)
+        puts "=== #{cur_features.inspect} ==="
+        result_csel << evaluate_features(input_data, cur_features)
       end
-      write_csv output, [result_csel], :header=>['all', RubySearcher::CS_TYPES].flatten
+      write_csv output, [result_csel], :header=>['all', features].flatten
     end
 
     desc "User-specific feature weights"
