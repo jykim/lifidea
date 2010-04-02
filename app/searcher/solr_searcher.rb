@@ -13,6 +13,7 @@ class SolrSearcher < Searcher
   # - merging 1) and 2) into final score
   def search_by_keyword(query, o={})
     result = Sunspot.search(Item) do
+      without :itype, 'query'
       keywords query
     end
     result.hits.map{|e|[e.instance, e.score]}

@@ -34,7 +34,7 @@ def cache_data(key, value = "none")
       trial += 1
       CACHE.get(ENV['RAILS_ENV']+'_'+key)
     rescue Exception => e
-      errer "[cache_data]", e
+      error "[cache_data]", e
       retry if trial < 3
     end
   else
