@@ -15,6 +15,7 @@ class SolrSearcher < Searcher
     result = Sunspot.search(Item) do
       keywords query
       without :itype_str, 'query'
+      without :hidden_flag, '1'
     end
     result.hits.map{|e|[e.instance, e.score]}
   end

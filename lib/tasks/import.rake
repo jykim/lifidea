@@ -18,13 +18,13 @@ namespace :import do
       #debugger
       next unless e[:id]
       begin
-        item = Item.find(e[:id])
-        case e[:itype]
+        did = case e[:itype]
         when 'concept'
           did = e[:title].to_id
         else
           did = e[:did]
         end
+        item = Item.find_or_create(did, e[:itype])
         item.replace_tags([e[:tags],e[:more_tags]].join(","))
         e.delete(:tags) ; e.delete(:more_tags)
         item.update_attributes! e.merge(:did=>did, :modified_flag=>true)
