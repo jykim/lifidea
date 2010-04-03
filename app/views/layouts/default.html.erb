@@ -19,8 +19,8 @@
 		<% end -%> 
 
 		<ul>
-			<li><a href="/items">Items</a></li>
-			<li><a href="/tags">Tags</a></li>
+			<li><%= link_to 'Items', :controller => 'items' %></li>
+			<li><%= link_to 'Tags', :controller => 'tags' %></li>
 			<% if session[:user_id] %> 
 			<li><%= link_to 'Logout', :controller => 'admin', :action => 'logout' %> </li>
 			<% else %>
