@@ -1,6 +1,6 @@
 require 'ddl_include'
 require 'extractor/stat_extractor'
-include CollectorHelper
+#include CollectorHelper
 
 def extract_fixture_from(table_name, o = {})
   i = "000"

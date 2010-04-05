@@ -2,7 +2,7 @@
 
 class Item < ActiveRecord::Base
   include TagHelper, IndexHelper
-  include MetadataHelper, RuleHelper, MarkupHelper, CollectorHelper
+  include MetadataHelper, RuleHelper, MarkupHelper
   ITYPE_CONCEPT = ['concept','person']
   ITYPE_DOCUMENT = ['webpage','bookmark_webpage','email','email_memo','paper','blog','tweet','pub']
   #ITYPE_QUERY = ['concept','person']

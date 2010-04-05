@@ -1,9 +1,12 @@
 #require 'ddl_include' CHANGED : avoid including reference to the file which includes this file
 # Abstract collector framework
-# - 
-class Collector < ApplicationController
-  include CollectorHelper
+require 'timeout.rb'
+require 'hpricot'
+
+class Collector #< ApplicationController
+  #include CollectorHelper
   attr_accessor :src
+  TIMEOUT = 5
   
   def initialize(source)
     @src = source
@@ -86,5 +89,21 @@ class Collector < ApplicationController
   
   def close_source()
     nil
+  end
+    
+  def read_uri(src)
+    uri = case src.uri
+    when /^webcal/
+      src.uri.gsub("webcal://","http://")
+    else
+      src.uri
+    end
+    
+    if src.o[:id]
+      open_opt = {:ssl_verify => false,  :http_basic_authentication=>[src.o[:id], src.o[:password]]}
+    else
+      open_opt = {}
+    end
+    open(uri, open_opt){|f|return f.read}
   end
 end

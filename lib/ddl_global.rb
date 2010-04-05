@@ -26,6 +26,16 @@ def get_features_by_type(type)
   end
 end
 
+def clear_webpage(html)
+  return "" if !html
+  hpricot = Hpricot(html)
+  hpricot.search("script").remove
+  hpricot.search("link").remove
+  hpricot.search("meta").remove
+  hpricot.search("style").remove
+  hpricot.inner_text.gsub(/\s{5,}/,"\n")
+end
+
 def cache_data(key, value = "none")
   #error "[cache_data] #{key}=#{value}"
   trial = 0
