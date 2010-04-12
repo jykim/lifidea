@@ -2,6 +2,7 @@
 $renv = ENV['RAILS_ENV']
 puts "Running on #$renv environment..."
 require 'ddl_include'
+#require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 $start_at = if ENV['all']
   "20010101"
 else

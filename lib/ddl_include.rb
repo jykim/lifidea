@@ -33,5 +33,4 @@ require 'searcher/searcher_client'
 require 'learner/weight_learner'
 
 $lgr_e = Logger.new( File.expand_path(File.dirname(__FILE__) + "/../log/#{ENV["RAILS_ENV"]}_error.log") )
-ActiveRecord::Base.logger.level = Logger::WARN if ENV['RAILS_ENV'] == 'production'
 CACHE = MemCache.new('127.0.0.1')

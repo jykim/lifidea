@@ -59,4 +59,5 @@ end
 #TagList.delimiter = " "
 #ActiveRecord::Base.logger.level = :error
 #$lgr = ActiveRecord::Base.logger
+ActiveRecord::Base.logger.level = Logger::WARN if ENV['RAILS_ENV'] == 'production'
 require 'ddl_include'
