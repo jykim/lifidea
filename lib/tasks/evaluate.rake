@@ -180,7 +180,7 @@ namespace :evaluate do
       end
     end
     
-    desc "Learner parameter of liblinear"
+    desc "Learner the parameter of liblinear"
     task :learner_params => :environment do
       [0,1,2,3,4,5,6].each do |ll_type|
         puts "=============== TYPE #{ll_type} ==============="

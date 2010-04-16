@@ -1,15 +1,15 @@
 #ENV['RAILS_ENV'] = 'production' if ARGV.find_all{|e|e=='--p'}.size > 0
 $renv = ENV['RAILS_ENV']
-puts "Running on #$renv environment..."
+#puts "Running on #$renv environment..."
 require 'ddl_include'
-#require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 $start_at = if ENV['all']
   "20010101"
 else
   ENV['start_at'] || Date.today.at_beginning_of_month.to_s
 end
 $end_at = ENV['end_at']   || (Date.tomorrow+1).to_s
-$today = ENV['today'] || Time.now.to_ymd
+$today = ENV['today'] || Time.now.ymd
 $cols = ['calendar','webpage','news','file','email'] #Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'csel'
 #$method = ENV['method'] || 'grid'

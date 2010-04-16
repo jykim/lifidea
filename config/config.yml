@@ -8,6 +8,8 @@ common:
   hour_daybreak: 4
   rule_searcher: "method:jm,lambda:0.1"
   debug: true
+  weight_con: uniform
+  weight_doc: uniform
 #  rule_searcher: "method:dirichlet,mu:100"
   
 development:
@@ -16,7 +18,8 @@ development:
   
 test:
   searcher_port: 3201
-
+  solr_server: http://localhost:8981/solr
+  
 production:
   searcher_port: 3202
   solr_server: http://localhost:8983/solr

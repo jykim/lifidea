@@ -1,6 +1,6 @@
 
 # Statistical Functions
-# Included to Array
+# - Included to Array
 module Statistics
   include Math
   #Determine the type of elements TODO
@@ -105,6 +105,7 @@ module Statistics
     result
   end
   
+  # Set overlap between two arrays
   def overlap(other, type = :cosine)
     intersection = self & other
     Math.overlap(intersection.size, self.size, other.size, type)

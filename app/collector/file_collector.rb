@@ -10,7 +10,6 @@ class FileCollector < Collector
   
   # Prepare Collection
   # - Keep the list of indexed files so that they won't be indexed again
-  # @TODO consider 
   def open_source()
     if @docs_read.size > 0
       return 

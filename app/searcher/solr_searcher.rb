@@ -66,6 +66,7 @@ class SolrSearcher < Searcher
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
         fts = {:id=>item.id, :content=>(e["score"]/2)}
         fts[:tag] = item.tags.overlap(query_item.tags)
+        fts[:title] = (item.title || "").word_sim(query_item.title || "")
         fts[:time] = (item.basetime - query_item.basetime ).normalize_time
         case type
         when 'con'
@@ -79,8 +80,9 @@ class SolrSearcher < Searcher
             fts[:topic] = arr1.map_with_index{|e,i|e*arr2[i]}.sum
           end
           fts[:concept] =  item.link_cons.overlap(query_item.link_cons)
+          fts[:path] = (item.uri || "").path_sim(query_item.uri || "")
         end
-        #puts fts.inspect        
+        #puts fts.inspect
       rescue Exception => e
         error "[search_by_item] Error in #{query_item} -> #{item}", e
         next
@@ -91,7 +93,7 @@ class SolrSearcher < Searcher
   end
   
   def log_preference(query_item, type, click_position, o={})
-    $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.to_ymd}.txt", 'a')
+    $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt", 'a')
     
     result = search_by_item(query_item, type)
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i

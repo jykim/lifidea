@@ -6,13 +6,13 @@ class TestConceptHash < Test::Unit::TestCase
     @words = ['korean','korean boy','korean handsome boy', 'korean food','korean food kimchi',
       'japanese','japanese food', 'chinese food', 'french', 'dannish'].map_hash_with_index{|e,i|[i,e]}
     @words.each{|k,v| @ch.put_concepts(k,v)}
-    p @ch
+    debug @ch
   end
   
   # 
   def test_word_lookup
     @words.each do |k,v| 
-      puts "Concept : #{v}(#{k}th)"
+      debug "Concept : #{v}(#{k}th)"
       assert_equal(1, @ch.find_concepts(v).size, "only one concept is returned")
       assert_equal(k, @ch.find_concepts(v)[0][0], "right concept was returned")
     end

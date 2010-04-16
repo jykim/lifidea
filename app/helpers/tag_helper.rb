@@ -37,4 +37,8 @@ module TagHelper
     cond = otype ? {:occurrences=>{:otype=>otype, :item_id=>id}} : {:occurrences=>{:item_id=>id}}
     Tag.all(:joins=>{:occurrences=>:tag}, :conditions=>cond).map(&:title)
   end
+  
+  def tagged_with?(tag)
+    tag_titles.include?(tag)
+  end
 end

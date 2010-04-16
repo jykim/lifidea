@@ -69,7 +69,6 @@ class ConceptHash
   end
   
   # Replace concept occurrence with explicit expression:
-  # {id:cid}
   def replace_concepts(s)
     concepts = find_concepts(s).uniq
     #debugger

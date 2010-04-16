@@ -23,11 +23,31 @@ namespace :etc do
   end
   
   desc "Re-build Index & Links"
-  task :rebuild => :environment do
+  task :rebuild_all => :environment do
     $start_at = "20010101"
     Link.find_all_by_ltype(['o','e']).each{|e|e.destroy}
     Rake::Task['run:indexer'].execute
     Rake::Task['sunspot:solr:reindex'].execute
+  end
+  
+  desc "Re-calculate Weights using all clicks"
+  task :recalc_weights => :environment do
+    $start_at = "20010101"
+    $method ||= ENV['method']
+    Rake::Task['export:sim_features'].execute
+    ENV['input'] = get_feature_file($method)
+    ENV['train_ratio'] = "0.9"
+    Rake::Task['etc:split_file'].execute
+    Rake::Task['run:learner'].execute
+  end
+  
+  desc "Collection Statistics"
+  task :col_stat => :environment do
+    $searcher = Searcher.new(:debug=>ENV['debug'])
+    $searcher.load_documents()
+    $searcher.cols.each do |c|
+      puts [c.cid, c.docs.map{|d|d.lm.size}.mean].join("\t")
+    end
   end
   
   def split_file(filename, data, o={})
@@ -64,17 +84,9 @@ namespace :etc do
     File.open(filename.gsub(/grid/,method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
   end
   
-  desc "Collection Statistics"
-  task :col_stat => :environment do
-    $searcher = Searcher.new(:debug=>ENV['debug'])
-    $searcher.load_documents()
-    $searcher.cols.each do |c|
-      puts [c.cid, c.docs.map{|d|d.lm.size}.mean].join("\t")
-    end
-  end
-  
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
+    total_ratio = ENV['total_ratio'] || 1
     filename = ENV['input'] || get_feature_file()
     puts "Splitting #{filename}... (#{ENV['method']})"
     header = nil

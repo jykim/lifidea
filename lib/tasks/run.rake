@@ -58,7 +58,7 @@ namespace :run do
     #debugger
     $idx = Indexer.new
     puts 'Indexing Documents'
-    $idx.index_item_set(item_set.find_all{|i|i.document?}, :download=>ENV['download']) if !ENV['concept_only']
+    $idx.index_item_set(item_set.find_all{|i|i.concept? || i.document?}, :download=>ENV['download']) if !ENV['concept_only']
     puts 'Indexing Concepts'
     $idx.index_item_set(item_set.find_all{|i|i.concept?}, :download=>ENV['download']) if !ENV['document_only']
   end
@@ -66,11 +66,12 @@ namespace :run do
   desc "Run Learner to Train Weights"
   task(:learner => :environment) do
     #puts "run:learner!"
+    #debugger
     input = ENV['input'] || get_learner_input_file($method)
     #puts input
     weights = ENV['weights'] || get_learner_output_file($method)
     learner = WeightLearner.new
-    case ($method || ENV['method'])
+    case $method
     when 'ranksvm' : learner.learn_by_ranksvm(input, weights)
     when 'liblinear' : learner.learn_by_liblinear(input, weights, :ll_type=>ENV['ll_type'])
     when 'libsvm' : learner.learn_by_libsvm(input, weights, :ls_type=>ENV['ls_type'])

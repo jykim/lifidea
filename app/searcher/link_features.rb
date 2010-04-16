@@ -40,6 +40,12 @@ class LinkFeatures
     v[ltype][id].values.sum
   end
   
+  def read_links(ltype, id, threshold = 0)
+    return [] if !v[ltype]
+    return [] if !v[ltype][id]
+    v[ltype][id].find_all{|k,v|v >= threshold}.map{|e|e[0]}
+  end
+  
   def increment(ltype, out_id, in_id)
     in_id, out_id = out_id, in_id if out_id > in_id
     #debug "[LinkFeatures::increment] v[#{ltype}][#{in_id}][#{out_id}]+1"

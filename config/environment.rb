@@ -26,7 +26,7 @@ Rails::Initializer.run do |config|
   #config.gem 'pauldix-feedzirra'
   #config.gem 'yard'
   #config.gem 'openrain-action_mailer_tls'
-  #config.gem 'thoughtbot-shoulda', :lib => "shoulda", :source => "http://gems.github.com"
+  config.gem 'thoughtbot-shoulda', :lib => "shoulda", :source => "http://gems.github.com"
   #config.gem 'mislav-will_paginate', :version => '~> 2.3.11', :lib => 'will_paginate', 
   #  :source => 'http://gems.github.com'
   

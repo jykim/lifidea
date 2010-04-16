@@ -10,6 +10,6 @@ class BatchJobTest < ActiveSupport::TestCase
   # @todo easier matching of date column ?
   def test_daily_jobs
     @dj.create_stat
-    assert_equal(2, Stat.all(:conditions=>{:basedate=>(@basedate-1).to_time.in_time_zone}).size)
+    assert_equal 2, Stat.all(:conditions=>{:basedate=>(@basedate-1).to_time.in_time_zone}).size
   end
 end
