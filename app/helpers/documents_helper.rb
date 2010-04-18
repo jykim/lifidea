@@ -23,7 +23,11 @@ module DocumentsHelper
     when /\.(#{FileCollector::FILE_FORMAT_BINARY})$/
       "http://docs.google.com/viewer?url=#{url_encode(item.uri.strip)}&embedded=true"
     when /^http/
-      item.uri      
+      if item.url =~ /wikipedia/
+        item.uri + "?printable=true"
+      else
+        item.uri
+      end
     else
       url_for :action=>:show_content, :id=>@item.id
     end

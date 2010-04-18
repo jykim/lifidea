@@ -36,19 +36,22 @@ def clear_webpage(html)
   hpricot.inner_text.gsub(/\s{5,}/,"\n")
 end
 
+# - Do not use cached data when executing a task
 def cache_data(key, value = "none")
   #error "[cache_data] #{key}=#{value}"
   trial = 0
   if value == "none"
-    begin
-      trial += 1
+    if $task_flag
+      $cache[ENV['RAILS_ENV']+'_'+key]
+    else
       CACHE.get(ENV['RAILS_ENV']+'_'+key)
-    rescue Exception => e
-      error "[cache_data]", e
-      retry if trial < 3
     end
   else
-    CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+    if $task_flag
+      $cache[ENV['RAILS_ENV']+'_'+key] = value
+    else
+      CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+    end
     value
   end
 end

@@ -1,7 +1,7 @@
 class Searcher
   attr_reader :clf
   CON_FEATURES = [:title, :content, :tag, :time, :topic, :string, :cooc, :occur]
-  DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :concept]
+  DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :concept, :concept2]
     
   # @param [Array<IR::Index>] cols : target collections
   def initialize(o = {})
@@ -67,9 +67,11 @@ class Searcher
     result
   end
   
+  # Load link & occurrence table to memory
   def self.load_features()
     clf = LinkFeatures.new
     clf.load Link.all.map{|l|[l.ltype, l.out_id.to_i, l.in_id.to_i, l.weight]}
+    clf.load Occurrence.all.map{|l|['s', l.tag_id.to_i, l.item_id.to_i, 1]}
     info "[load_features] done!"
     clf
   end

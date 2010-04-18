@@ -35,15 +35,16 @@ class LinkFeatures
   end
   
   def read_sum(ltype, id)
-    return 0.0 if !v[ltype]
-    return 0.0 if !v[ltype][id]
-    v[ltype][id].values.sum
+    read_links(ltype, id).values.sum.to_f
   end
   
-  def read_links(ltype, id, threshold = 0)
-    return [] if !v[ltype]
-    return [] if !v[ltype][id]
-    v[ltype][id].find_all{|k,v|v >= threshold}.map{|e|e[0]}
+  # Read the links associated with given item
+  # @param ltype <Char>
+  # @param id <Int>
+  def read_links(ltype, id)
+    return {} if !v[ltype]
+    return {} if !v[ltype][id]
+    v[ltype][id]
   end
   
   def increment(ltype, out_id, in_id)

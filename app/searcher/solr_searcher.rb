@@ -45,6 +45,27 @@ class SolrSearcher < Searcher
     }.reverse
   end
   
+  # Calculate Indirect Concept Similarity
+  def get_concept_feature(doc1, doc2)
+    result = []
+    @clf.read_links('e',doc1).each do |k,v|
+      @clf.read_links('e',doc2).each do |k2,v2|
+        if k == k2 
+          result << 3 * v * v2
+        else
+          result << @clf.read('k',k,k2) * v * v2
+        end
+      end
+    end
+    #p result
+    result.mean
+  end
+  
+  # Get tag or concept overlap feature
+  def get_overlap_feature(ltype, item1, item2)
+    @clf.read_links(ltype, item1.id).keys.overlap(@clf.read_links(ltype, item2.id).keys)
+  end
+  
   def calc_sim_features(query_item, type, filter_qry, o={})
     #puts "[calc_sim_features] query_item = #{query_item} "
     #debugger
@@ -65,21 +86,22 @@ class SolrSearcher < Searcher
         item = $items[e["id"].to_i]
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
         fts = {:id=>item.id, :content=>(e["score"]/2)}
-        fts[:tag] = item.tags.overlap(query_item.tags)
+        fts[:tag]   = get_overlap_feature('s', item, query_item)
         fts[:title] = (item.title || "").word_sim(query_item.title || "")
-        fts[:time] = (item.basetime - query_item.basetime ).normalize_time
+        fts[:time]  = (item.basetime - query_item.basetime ).normalize_time
         case type
         when 'con'
           fts[:string] = item.did.str_sim(query_item.did)
           fts[:topic] = @clf.read('t', item.id, query_item.id)
-          fts[:cooc] = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
+          fts[:cooc]  = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
           fts[:occur] = @clf.read_sum('o', item.id).normalize(Item.count_docs)
         when 'doc'
           if item.remark && query_item.remark
             arr1, arr2 = item.remark.split(",").map{|e|e.to_f}, query_item.remark.split(",").map{|e|e.to_f}
             fts[:topic] = arr1.map_with_index{|e,i|e*arr2[i]}.sum
           end
-          fts[:concept] =  item.link_cons.overlap(query_item.link_cons)
+          fts[:concept] =  get_overlap_feature('e', item, query_item)
+          fts[:concept2] = get_concept_feature(item.id, query_item.id) / 3
           fts[:path] = (item.uri || "").path_sim(query_item.uri || "")
         end
         #puts fts.inspect

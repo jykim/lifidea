@@ -1,5 +1,7 @@
 #ENV['RAILS_ENV'] = 'production' if ARGV.find_all{|e|e=='--p'}.size > 0
 $renv = ENV['RAILS_ENV']
+$task_flag = true
+$cache = {}
 #puts "Running on #$renv environment..."
 require 'ddl_include'
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")

@@ -25,16 +25,18 @@ namespace :etc do
   desc "Re-build Index & Links"
   task :rebuild_all => :environment do
     $start_at = "20010101"
-    Link.find_all_by_ltype(['o','e']).each{|e|e.destroy}
+    Link.find_all_by_ltype(['o','e','k']).each{|e|e.destroy}
     Rake::Task['run:indexer'].execute
+    Rake::Task['export:topk_concept_feature'].execute
     Rake::Task['sunspot:solr:reindex'].execute
   end
   
   desc "Re-calculate Weights using all clicks"
   task :recalc_weights => :environment do
     $start_at = "20010101"
-    $method ||= ENV['method']
+    $method = 'ranksvm'
     Rake::Task['export:sim_features'].execute
+    $method = ENV['method']
     ENV['input'] = get_feature_file($method)
     ENV['train_ratio'] = "0.9"
     Rake::Task['etc:split_file'].execute

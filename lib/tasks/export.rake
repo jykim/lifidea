@@ -48,10 +48,10 @@ namespace :export do
     write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'tags']
   end
   
-  desc "Export Top-K Concept Feature"
-  task :topk_concept_feature => :environment do
+  desc "Export Top-K Concept Features"
+  task :topk_concept_features => :environment do
     topk = (ENV['topk'] && ENV['topk'].to_i) || 3
-    weights = Searcher::load_weights(Searcher::CON_FEATURES, $type, ENV['weights'] || 'grid')
+    weights = Searcher::load_weights(Searcher::CON_FEATURES, 'con', ENV['method'] || 'grid')
     searcher = SolrSearcher.new
     searcher.open_index()
     Link.find_all_by_ltype(['k']).each{|e|e.destroy}
@@ -85,7 +85,12 @@ namespace :export do
     queries.each do |q|
       query_item = Item.find(q)
       result = searcher.search_by_item(q, type)
-      result_total.concat result[0..topk].map{|e|[query_item, Item.find(e[:id]) , e[:score], features.map{|f|e[f]}].flatten}
+      result_total.concat result[0..topk].map{|e|
+        [query_item, Item.find(e[:id]) , e[:score], 
+        features.map{|f|e[f]},
+        #query_item.tag_titles.join(','), Item.find(e[:id]).tag_titles.join(',')
+        query_item.con_titles.join(','), Item.find(e[:id]).con_titles.join(',')
+        ].flatten}
     end
     write_csv filename, result_total, 
       :header=>['query','target','score'].concat(features)
@@ -201,7 +206,7 @@ namespace :export do
   
   # Traverse link graph and return relevant concept set
   def get_relevant_concepts(concept_id, threshold, level = 1)
-    result = $clf.read_links('k', concept_id, threshold)
+    result = $clf.read_links('k', concept_id).find_all{|k,v|v >= threshold}.map{|e|e[0]}
     if level > 0
       result.concat result.map{|e|get_relevant_concepts(e, threshold, level-1)}.flatten
     end

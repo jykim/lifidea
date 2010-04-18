@@ -14,7 +14,7 @@ class Item < ActiveRecord::Base
   has_many :outitems, :through=>:outlinks
 
   has_many :occurrences , :dependent => :destroy
-  has_many :tags, :through => :occurrences
+  has_many :tags, :through => :occurrences # @todo : use links instead of occurrences?
   #has_and_belongs_to_many :tags
 
   has_many :links , :dependent => :destroy
@@ -70,6 +70,10 @@ class Item < ActiveRecord::Base
   def link_cons
     link_items.find_all{|e|e.concept?}
   end
+  
+  def con_titles
+    link_cons.uniq.map{|e|e.title}
+  end
 
   def link_docs
     link_items.find_all{|e|e.document?}
@@ -89,6 +93,11 @@ class Item < ActiveRecord::Base
   def changed_content?(doc)
     return true if title != doc[:title] || content != doc[:content] || m[:tag_list] != doc[:metadata][:tag_list]
     false
+  end
+  
+  # 
+  def concept_similarity(doc)
+    
   end
   
   # Create new document from given query
