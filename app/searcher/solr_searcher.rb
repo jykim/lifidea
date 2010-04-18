@@ -72,11 +72,16 @@ class SolrSearcher < Searcher
     result = []
     # Initial Solr Query
     solr = RSolr.connect :url=>Conf.solr_server
-    solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
-      "mlt.fl" => "title_text,content_text,uri_text,itype_text", "mlt.mintf" => 1, "rows" => (o[:rows] || 50)
-    Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
-      each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}
-
+    begin
+      solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
+        "mlt.fl" => "title_text,content_text,uri_text,itype_text", "mlt.mintf" => 1, "rows" => (o[:rows] || 50)
+      Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
+        each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}  
+    rescue Exception => e
+      error "[search_by_item] Error in Calling Solr", e
+      return result
+    end
+    
     # Feature Vector generation
     solr_result['response']['docs'].each do |e|
       #debugger
