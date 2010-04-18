@@ -15,9 +15,9 @@ case $command
 when 'start'
   `rake tmp:pids:clear`
   `memcached -d -P #{memcached_pid}` if !File.exists?(memcached_pid)
-  `lib/daemons/collector_ctl start  #{$rails_env}`
+  #`lib/daemons/collector_ctl start  #{$rails_env}`
   `rake sunspot:solr:start RAILS_ENV=#$rails_env`
-  `script/server -d -p #{$server_port} -e #{$rails_env}`
+  #`script/server -d -p #{$server_port} -e #{$rails_env}`
   #Rake::Task['sunspot:solr:start'].execute
 #  `lib/daemons/indexer_ctl start`
 #  `lib/daemons/searcher_ctl start`
