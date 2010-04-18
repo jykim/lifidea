@@ -27,8 +27,8 @@ namespace :etc do
     $start_at = "20010101"
     Link.find_all_by_ltype(['o','e','k']).each{|e|e.destroy}
     Rake::Task['run:indexer'].execute
-    Rake::Task['export:topk_concept_feature'].execute
     Rake::Task['sunspot:solr:reindex'].execute
+    #Rake::Task['export:topk_concept_features'].execute
   end
   
   desc "Re-calculate Weights using all clicks"
