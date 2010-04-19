@@ -71,7 +71,7 @@ class Searcher
   def self.load_features()
     clf = LinkFeatures.new
     clf.load Link.all.map{|l|[l.ltype, l.out_id.to_i, l.in_id.to_i, l.weight]}
-    clf.load Occurrence.all.map{|l|['s', l.tag_id.to_i, l.item_id.to_i, 1]}
+    clf.load Occurrence.all.map{|l|['s', l.tag_id.to_i, l.item_id.to_i, 1]}, :force=>true
     info "[load_features] done!"
     clf
   end

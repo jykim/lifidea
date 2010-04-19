@@ -8,11 +8,12 @@ class LinkFeatures
   
   # Load from Link Records
   # @param [Array<[ltype, out_id, in_id, weight]>]
+  # - o[:force] : ignore consistency checking for output
   # - constraint : in_id should be bigger than out_id (otherwise, it's skipped)
-  def load(links)
+  def load(links, o = {})
     i = 0.0
     links.each do |l|
-      if l[1] >= l[2]
+      if l[1] >= l[2] && !o[:force]
         error "Inconsistent Input #{l.inspect}, skipping..." if l[0] != 'e'
         next
       end
