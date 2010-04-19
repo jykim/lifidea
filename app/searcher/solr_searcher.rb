@@ -105,9 +105,10 @@ class SolrSearcher < Searcher
             arr1, arr2 = item.remark.split(",").map{|e|e.to_f}, query_item.remark.split(",").map{|e|e.to_f}
             fts[:topic] = arr1.map_with_index{|e,i|e*arr2[i]}.sum
           end
-          fts[:concept] =  get_overlap_feature('e', item, query_item)
-          fts[:concept2] = get_concept_feature(item.id, query_item.id) / 3
+          #fts[:concept] =  get_overlap_feature('e', item, query_item)
           fts[:path] = (item.uri || "").path_sim(query_item.uri || "")
+          fts[:type] = (item.itype == query_item.itype)? 0.5 : 0
+          fts[:concept] = get_concept_feature(item.id, query_item.id) / 3
         end
         #puts fts.inspect
       rescue Exception => e

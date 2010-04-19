@@ -1,7 +1,7 @@
 class Searcher
   attr_reader :clf
   CON_FEATURES = [:title, :content, :tag, :time, :topic, :string, :cooc, :occur]
-  DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :concept, :concept2]
+  DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :type, :concept]
     
   # @param [Array<IR::Index>] cols : target collections
   def initialize(o = {})
