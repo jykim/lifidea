@@ -118,7 +118,7 @@ namespace :export do
     searcher.open_index()
     
     History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
-      next if $user != 'all' && $user != h.user.uid
+      next if $user != 'all' && (h.user && $user != h.user.uid)
       puts "Exporting #{h.id}"
       result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
