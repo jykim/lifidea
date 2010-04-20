@@ -128,6 +128,7 @@ namespace :export do
         raise DataError, "Source Item not found!"  if !result_raw
         result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
         #puts result.size
+        raise Exception, "Top item clicked!" if skipped_items.size < 2 
         raise DataError, "Record not found!" if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0]}.size == 0
         result_str = result.map{|r|
           #debugger
@@ -151,8 +152,11 @@ namespace :export do
         raise DataError, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
       rescue Interrupt
         break
-      rescue Exception => e
+      rescue DataError => e
         error "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result).inspect} not found!" if skipped_items && result
+        next
+      rescue Exception => e
+        error "[export:sim_features] other exceptions.."
         #debugger
         next
       end
