@@ -4,8 +4,8 @@ require 'yard'
 namespace :evaluate do
   task(:sim_search => :environment) do
     set_type = ENV['set_type'] || 'test'
-    input = ENV['input'] || get_learner_input_file()+".#{set_type}"
-    output = ENV['output'] || get_evaluation_file($type)
+    input = (ENV['input'] || get_learner_input_file())+".#{set_type}"
+    output = ENV['output'] || get_evaluation_file(ENV['eval_type'] || $type)
     searcher = SolrSearcher.new
     features = case $type
     when 'con' : Searcher::CON_FEATURES
@@ -145,6 +145,28 @@ namespace :evaluate do
         result_csel << evaluate_features(input_data, cur_features)
       end
       write_csv output, [result_csel], :header=>['all', features].flatten
+    end
+    
+    desc "Varying the amount training data"
+    task :vary_amt_clicks => :environment do
+      Rake::Task['export:sim_features'].execute if !ENV['skip_export']
+      ENV['feature_file'] ||= get_feature_file($method)
+      [0.8,0.6,0.4,0.2].each do |train_ratio|
+        ENV['train_ratio'] = train_ratio.to_s
+        ENV['input'] = ENV['feature_file']
+        #debugger
+        Rake::Task['etc:split_file'].execute
+        ENV['input'] = ENV['feature_file'] + ENV['train_ratio']
+        ['ranksvm','grid'].each do |method|
+          $method = method
+          Rake::Task['run:learner'].execute
+        end
+        $method = 'ranksvm'
+        $remark = train_ratio
+        ENV['eval_type'] = 'vary_amt_clicks'
+        #ENV['input'] = ENV['feature_file'] + ENV['train_ratio']
+        Rake::Task['evaluate:sim_search'].execute
+      end
     end
 
     desc "User-specific feature weights"

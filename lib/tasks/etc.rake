@@ -56,15 +56,15 @@ namespace :etc do
     result_train, result_test = [o[:header]], [o[:header]]
     data.each_with_index do |e,i|
       #puts rand(), train_ratio
-      if (o[:train_ratio] && rand() < o[:train_ratio]) ||
+      if (o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) < o[:train_ratio]) ||
          (o[:test_set] && !o[:test_set].include?(i))
         result_train << e
       else
         result_test << e
       end
     end
-    File.open(filename+'.train','w'){|f|f.puts result_train.find_valid.join}
-    File.open(filename+'.test' ,'w'){|f|f.puts result_test.find_valid.join}
+    File.open(filename+"#{o[:train_ratio]}.train",'w'){|f|f.puts result_train.find_valid.join}
+    File.open(filename+"#{o[:train_ratio]}.test" ,'w'){|f|f.puts result_test.find_valid.join}
   end
   
   def conv_file(filename, method)
@@ -113,7 +113,7 @@ namespace :etc do
       1.upto(ENV['folds'].to_i) do |i|
         puts "#{test_sets[i-1].size} / #{data.size}"
         $fold = "-k#{ENV['folds']}-#{i}"
-        split_file(get_learner_input_file(), data, :header=>header, :test_set=>test_sets[i-1])
+        split_file(get_learner_input_file(), data, :random=>true, :header=>header, :test_set=>test_sets[i-1])
         if $type == 'csel' && $method == 'grid'
           conv_file(get_learner_input_file()+'.train', 'ranksvm')
           conv_file(get_learner_input_file()+'.test', 'ranksvm')

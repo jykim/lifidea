@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password 
   has_many :game
   has_many :query
+  has_many :history
   #validate :password_non_blank 
 
   def admin?

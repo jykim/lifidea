@@ -77,7 +77,7 @@ namespace :run do
     when 'libsvm' : learner.learn_by_libsvm(input, weights, :ls_type=>ENV['ls_type'])
     when 'grid'
       input_data = case $type
-      when /con|doc/ : WeightLearner.parse_ranksvm_input(get_learner_input_file('ranksvm')+'.train')
+      when /con|doc/ : WeightLearner.parse_ranksvm_input((ENV['input'] || get_learner_input_file('ranksvm'))+'.train')
       when "csel" : read_csv(input+'.train')
       end
       #debugger

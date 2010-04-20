@@ -98,7 +98,7 @@ namespace :export do
   
   desc "Export Learner Input from Click Histories"
   task :sim_features => :environment do
-    $method ||= ENV['method']
+    #$method ||= ENV['method']
     filename = ENV['input'] || get_feature_file($method)
     File.unlink(filename) if File.exists?(filename)
     $f_li = File.open(filename,'w')
@@ -118,6 +118,7 @@ namespace :export do
     searcher.open_index()
     
     History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
+      next if $user != 'all' && $user != h.user.uid
       puts "Exporting #{h.id}"
       result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}

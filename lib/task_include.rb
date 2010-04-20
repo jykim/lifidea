@@ -14,26 +14,27 @@ $end_at = ENV['end_at']   || (Date.tomorrow+1).to_s
 $today = ENV['today'] || Time.now.ymd
 $cols = ['calendar','webpage','news','file','email'] #Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'csel'
-#$method = ENV['method'] || 'grid'
+$user = ENV['user'] || 'all'
+$method = ENV['method'] || 'ranksvm'
 $remark = ENV['remark'] if ENV['remark']
 
 def get_feature_file(method = nil)
   method ||= ENV['method']
-  "data/feature-#$renv-#$today-#$type-#{method}-#$remark.csv"
+  "data/feature-#$renv-#$today-#$type-#{method}-#$user-#$remark.csv"
 end
 
 def get_learner_input_file(method = nil)
   method ||= ENV['method']
-  "data/learner_input/learner_input-#$renv-#$today-#$type-#{method}-#$remark#$fold.csv"
+  "data/learner_input/learner_input-#$renv-#$today-#$type-#{method}-#$user-#$remark#$fold.csv"
 end
 
 def get_learner_output_file(method = nil)
   method ||= ENV['method']
-  "data/learner_output/learner_output_#$renv-#$today-#$type-#{method}-#$remark#$fold.csv"
+  "data/learner_output/learner_output_#$renv-#$today-#$type-#{method}-#$user-#$remark#$fold.csv"
 end
 
 def get_evaluation_file(eval_type)
-  "data/evaluation_#$renv-#$today-#$type-#{eval_type}-#$remark#$fold.csv"
+  "data/evaluation_#$renv-#$today-#$type-#{eval_type}-#$user-#$remark#$fold.csv"
 end
 
 #LEARNER_INPUT = 
