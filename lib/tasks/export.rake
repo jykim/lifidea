@@ -128,8 +128,8 @@ namespace :export do
         raise DataError, "Source Item not found!"  if !result_raw
         result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
         #puts result.size
-        raise Exception, "Top item clicked!" if skipped_items.size < 2 
-        raise DataError, "Record not found!" if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0]}.size == 0
+        #raise Exception, "Top item clicked!" if skipped_items.size < 2 
+        raise DataError, "Record not found!" if result.find_all{|r|r[:id]==skipped_items[0]}.size == 0 #result.size < 2 || 
         result_str = result.map{|r|
           #debugger
           preference = (r[:id]==skipped_items[0])? 2 : 1
@@ -149,7 +149,7 @@ namespace :export do
           end
         }.find_all{|e|e}.sort_by{|e|e[0..0].to_i}.reverse
         #puts result_str
-        raise Exception, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
+        #raise Exception, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
       rescue Interrupt
         break
       rescue DataError => e
