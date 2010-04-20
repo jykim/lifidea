@@ -42,7 +42,7 @@ class SolrSearcher < Searcher
     final_result = result.sort_by{|fts| 
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
     }.reverse
-    puts "[search_by_item] #{item} - #{final_result[0][:id]} : #{final_result[0][:score]} * #{weights.inspect}"
+    #puts "[search_by_item] #{item} - #{final_result[0][:id]} : #{final_result[0][:score]} * #{weights.inspect}"
     final_result
   end
   

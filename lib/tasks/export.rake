@@ -149,14 +149,14 @@ namespace :export do
           end
         }.find_all{|e|e}.sort_by{|e|e[0..0].to_i}.reverse
         #puts result_str
-        raise DataError, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
+        raise Exception, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
       rescue Interrupt
         break
       rescue DataError => e
-        error "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result).inspect} not found!" if skipped_items && result
+        error "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result.map{|r|r[:id]}).inspect} not found!" if skipped_items && result
         next
       rescue Exception => e
-        error "[export:sim_features] other exceptions.."
+        error "[export:sim_features] other exceptions.. #{e.inspect}"
         #debugger
         next
       end
