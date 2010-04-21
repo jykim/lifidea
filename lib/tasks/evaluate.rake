@@ -131,7 +131,8 @@ namespace :evaluate do
     desc "Leave one feature out"
     task :leave_one_out => :environment do
       ENV['method'] = 'grid'
-      input = ENV['input'] || get_feature_file()
+      Rake::Task['export:sim_features'].execute if !ENV['skip_export']
+      input = ENV['feature_file'] || get_feature_file($method)
       output = ENV['output'] || get_evaluation_file('leave_one_out')
       features = get_features_by_type($type)
       Rake::Task['etc:split_file'].execute
@@ -152,6 +153,7 @@ namespace :evaluate do
       Rake::Task['export:sim_features'].execute if !ENV['skip_export']
       ENV['feature_file'] ||= get_feature_file($method)
       [0.8,0.6,0.4,0.2].each do |train_ratio|
+        puts "======= TrainRatio : #{train_ratio} ======="
         ENV['train_ratio'] = train_ratio.to_s
         ENV['input'] = ENV['feature_file']
         #debugger
@@ -162,7 +164,8 @@ namespace :evaluate do
           Rake::Task['run:learner'].execute
         end
         $method = 'ranksvm'
-        $remark = train_ratio
+        #$remark = train_ratio
+        ENV['input'] = ENV['feature_file'] + 0.8.to_s
         ENV['eval_type'] = 'vary_amt_clicks'
         #ENV['input'] = ENV['feature_file'] + ENV['train_ratio']
         Rake::Task['evaluate:sim_search'].execute
