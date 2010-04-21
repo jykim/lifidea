@@ -132,11 +132,12 @@ namespace :evaluate do
     task :leave_one_out => :environment do
       ENV['method'] = 'grid'
       Rake::Task['export:sim_features'].execute if !ENV['skip_export']
-      input = ENV['feature_file'] || get_feature_file($method)
+      input = ENV['input'] ||= get_feature_file('ranksvm')
       output = ENV['output'] || get_evaluation_file('leave_one_out')
+      train_ratio = ENV['train_ratio'] || '0.5'
       features = get_features_by_type($type)
       Rake::Task['etc:split_file'].execute
-      input_data = [get_input_data(input+'.train'), get_input_data(input+'.test')]
+      input_data = [get_input_data(input+"#{train_ratio}.train"), get_input_data(input+"#{train_ratio}.test")]
       #puts input_data.inspect
       result_csel = [evaluate_features(input_data, features)]
       puts "result(all) : #{result_csel}"
