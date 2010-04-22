@@ -210,10 +210,11 @@ namespace :export do
   end
   
   # Traverse link graph and return relevant concept set
-  def get_relevant_concepts(concept_id, threshold, level = 1)
-    result = $clf.read_links('k', concept_id).find_all{|k,v|v >= threshold}.map{|e|e[0]}
+  def get_relevant_concepts(concept_id, threshold, level = 1, degree = 5)
+    puts "[get_relevant_concepts:#{level}] for #{concept_id}"
+    result = $clf.read_links('k', concept_id).find_all{|k,v|v >= threshold}.sort_by{|e|e[1]}.reverse.map{|e|e[0]}[0..(degree-1)]
     if level > 0
-      result.concat result.map{|e|get_relevant_concepts(e, threshold, level-1)}.flatten
+      result.concat result.map{|e|get_relevant_concepts(e, threshold, level-1, degree)}.flatten
     end
     puts result.inspect
     result.uniq
@@ -226,9 +227,10 @@ namespace :export do
     threshold = ENV['threshold'] || 1
     ltype = ENV['ltype'] || 'k'
     level = ENV['level'] || 1
-    filename = ENV['filename'] || "data/concept_links_#{$renv}_#{ENV['concept']}_#{ltype}#{threshold}.dot"
+    degree = ENV['degree'] || 5
+    filename = ENV['filename'] || "data/concept_links_#{$renv}_#{ENV['concept']}_#{ltype}#{threshold}-#{level}-#{degree}.dot"
     conditions = if ENV['concept']
-      rel_concepts = get_relevant_concepts(ENV['concept'].to_i, threshold.to_f, level.to_i)
+      rel_concepts = get_relevant_concepts(ENV['concept'].to_i, threshold.to_f, level.to_i, degree.to_i)
       ['ltype = ? and weight >= ? and (in_id in (?) or out_id in (?))', ltype, threshold.to_f, rel_concepts, rel_concepts]
     else
       ['ltype = ? and weight >= ?', ltype, threshold.to_f]
