@@ -9,7 +9,7 @@ class RSSCollector < Collector
   def read_from_source(o = {})
     feed_text = if ENV['RAILS_ENV'] == 'test'
       IO.read("#{RAILS_ROOT}/test/fixtures/sources/#{@src.itype}.xml")
-    else read_uri(@src)
+    else read_uri(@src, (o[:postfix]||''))
     end
     #puts feed_text
     feed_text.gsub!(/prism:category/,"category") if @src.uri =~ /citeulike/
@@ -35,6 +35,17 @@ class RSSCollector < Collector
     end
   end
   
+  def read_batch_from_source(o = {})
+    result = []
+    item_per_page = 50
+    0.upto(o[:times].to_i) do |i|
+      result_current = read_from_source(o.merge(:postfix=>"start-index=#{i*item_per_page+1}&max-results=#{item_per_page}"))
+      result.concat result_current
+      break if result_current.size < item_per_page
+    end
+    result
+  end
+  
   # Parse feed_text using FeedNormalizer
   # @deprecated by parse_by_feedzirra 
   def parse_by_feednormalizer(feed_text)
@@ -56,6 +67,7 @@ class RSSCollector < Collector
       Feedzirra::Feed.add_common_feed_entry_element('prism:publicationYear', :as => :pub_year)
     end
     feed_data = Feedzirra::Feed.parse feed_text
+    #debugger
     feed_data.entries.map do|e|
       metadata = {}
       metadata[:author] =  e.author if e.author

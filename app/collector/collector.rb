@@ -17,7 +17,11 @@ class Collector #< ApplicationController
     return 0 if !@src.sync_now? && !o[:force]
     error "[run_collector] Working on #{@src.title}"
     open_source()
-    count = save_docs(read_from_source(o), o)
+    if o[:times]
+      count = save_docs(read_batch_from_source(o), o)
+    else
+      count = save_docs(read_from_source(o), o)
+    end
     close_source()
     @src.last_sync_at = Time.now
     count
@@ -83,6 +87,10 @@ class Collector #< ApplicationController
     []
   end
   
+  def read_batch_from_source(o = {})
+    []
+  end
+  
   def open_source()
     
   end
@@ -91,14 +99,14 @@ class Collector #< ApplicationController
     nil
   end
     
-  def read_uri(src)
+  def read_uri(src, postfix = "")
     uri = case src.uri
     when /^webcal/
-      src.uri.gsub("webcal://","http://")
+      src.uri.gsub("webcal://","http://") + postfix
     else
-      src.uri
+      src.uri + postfix
     end
-    
+    puts uri
     if src.o[:id]
       open_opt = {:ssl_verify => false,  :http_basic_authentication=>[src.o[:id], src.o[:password]]}
     else
