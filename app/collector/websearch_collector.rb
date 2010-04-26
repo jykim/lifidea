@@ -29,7 +29,7 @@ class WebSearchCollector < Collector
           case @search_type
           when "web"
             tags = [] ; e.elements.each('*/*/term'){|e2|tags << e2.text}
-            result << {:title=>e.elements["title"].text, :content=>e.elements["abstract"].text, :itype=>@src.itype,
+            result << {:title=>e.elements["title"].text.clear_tags, :content=>e.elements["abstract"].text, :itype=>@src.itype,
               :did=>e.elements["url"].text, :uri=>e.elements["url"].text, :basetime=>Time.parse(e.elements["date"].text), :metadata=>{:tags=>tags.join(",")} }
           when "images"
             result << {:title=>e.elements["filename"].text, :content=>((e.elements["abstract"].text || '')+"<br><br><img src='#{e.elements["url"].text}'>"), :itype=>@src.itype,

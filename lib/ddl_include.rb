@@ -9,6 +9,8 @@ require 'fastercsv'
 require 'ri_cal'#'icalendar'
 require 'icalendar'#'icalendar'
 require 'memcache'
+#require 'sunspot'
+#require 'sunspot/rails'
 
 require "searcher/pd_lib.rb"
 require 'ddl_extensions'

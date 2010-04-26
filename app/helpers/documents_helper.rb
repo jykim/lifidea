@@ -25,8 +25,10 @@ module DocumentsHelper
     when /^http/
       if item.uri =~ /wikipedia/
         item.uri + "?printable=true"
-      else
+      elsif item.source.o[:show_url]
         item.uri
+      else
+        url_for :action=>:show_content, :id=>@item.id
       end
     else
       url_for :action=>:show_content, :id=>@item.id

@@ -14,7 +14,7 @@ common:
   
 development:
   searcher_port: 3200
-  solr_server: http://localhost:8982/solr
+  solr_server: http://localhost:8882/solr
   
 test:
   searcher_port: 3201
