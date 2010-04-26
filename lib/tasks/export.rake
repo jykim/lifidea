@@ -27,11 +27,17 @@ namespace :export do
     Item.valid.documents.between($start_at, $end_at).all(:conditions=>{:itype=>Item.itype_lists}).each_with_index do |d,i|
       next if ENV['id'] && ENV['id'].to_i != d.id
       puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      str = "#{d.title}\n"
-      str += "#{d.m.values.join("\t")}\n"if d.m
-      str += clear_webpage(d.content)
-      ch.replace_concepts(str) if annotation
-      File.open("#{path}/doc_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
+      case ENV['format']
+      when 'indri'
+        template = ERB.new(IO.read("lib/tasks/doc_indri.erb"))
+        str = template.result(binding)
+      else
+        str = "#{d.title}\n"
+        str += "#{d.m.values.join("\t")}\n"if d.m
+        str += clear_webpage(d.content)
+        ch.replace_concepts(str) if annotation
+      end
+      File.open("#{path}/doc_#{d.itype}_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
       puts str if ENV['id']
     end
   end

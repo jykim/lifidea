@@ -1,0 +1,5 @@
+<DOC> 
+<DOCNO> <%= "#{d.itype}_#{d.id}" %> </DOCNO>
+<% d.index_fields.each do |k,v|%>
+<%= "<#{d.itype}_#{k}> #{v} </#{d.itype}_#{k}>" %><% end %>
+</DOC>
