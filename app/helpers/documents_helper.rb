@@ -13,7 +13,7 @@ module DocumentsHelper
   end
   
   def select_for_itype(default)
-    options = ['all','calendar','file','email','webpage','news','blog'] #'paper',
+    options = ['all','calendar','file','email','webpage','news','blog','concept'] #'paper',
     select_tag(:itype, options_for_select(options.map{|e|[e,e]},default), 
       :multiple=>true, :onchange => 'this.form.submit()')
   end
