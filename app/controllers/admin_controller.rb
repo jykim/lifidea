@@ -7,7 +7,10 @@ class AdminController < ApplicationController
         session[:user_id] = user.id 
         session[:user_uid] = user.uid
         session[:admin_flag] = user.admin?
-        redirect_to(:controller=>:items, :action => "index") 
+        
+        uri = session[:original_uri] 
+        session[:original_uri] = nil 
+        redirect_to(uri || {:controller=>:items, :action => "index" })
       else 
         flash.now[:notice] = "Invalid user/password combination" 
       end 

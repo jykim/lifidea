@@ -1,5 +1,6 @@
 require 'ddl_include'
 class ItemsController < ApplicationController
+  before_filter :authorize, :except => [:login, :index, :show, :search, :click]
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :search
   sidebar :concept_cloud, :if=>:source_given?

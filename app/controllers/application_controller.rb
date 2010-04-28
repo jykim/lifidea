@@ -20,6 +20,7 @@ class ApplicationController < ActionController::Base
 protected 
   def authorize
     return true if User.all().size == 0 #|| ENV['RAILS_ENV'] != 'production'
+    session[:original_uri] = request.request_uri
     unless User.find_by_id(session[:user_id]) 
       flash[:notice] = "Please log in" 
       redirect_to :controller => 'admin', :action => 'login' 
