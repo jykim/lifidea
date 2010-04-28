@@ -27,9 +27,9 @@
 <% @rank_list[0..(@display_topk_result-1)].sort_by{|e|e[1]}.reverse.each_with_index do |e,i| %>
   <tr>
     <td><%= i+1 %></td>
-    <td><%= @docs[e[0]].itype %></td>
-    <td><%= link_to @docs[e[0]].title, {:controller=>'documents', :action=>'click', :htype=>'qry_doc', :id=>@docs[e[0]].id, :src_item_id=>@query_doc.id} %></td>
-    <td><%= "<font color='#ff0000'>target document!</font>" if @docs[e[0]].id == @rel_item_id %></td>
+    <td><%= e[0].itype %></td>
+    <td><%= link_to e[0].title, {:controller=>'documents', :action=>'click', :htype=>'qry_doc', :id=>e[0].id, :src_item_id=>@query_doc.id} %></td>
+    <td><%= "<font color='#ff0000'>target document!</font>" if e[0].id == @rel_item_id %></td>
   </tr>
 <% end %>
 </table>

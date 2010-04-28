@@ -13,7 +13,7 @@ module DocumentsHelper
   end
   
   def select_for_itype(default)
-    options = ['all','calendar','file','email','webpage','news','blog'] #'paper',
+    options = ['all','calendar','file','email','webpage','news','blog','concept'] #'paper',
     select_tag(:itype, options_for_select(options.map{|e|[e,e]},default), 
       :multiple=>true, :onchange => 'this.form.submit()')
   end
@@ -28,10 +28,10 @@ module DocumentsHelper
       elsif item.source.o[:show_url]
         item.uri
       else
-        url_for :action=>:show_content, :id=>@item.id
+        url_for :action=>:show_content, :id=>item.id
       end
     else
-      url_for :action=>:show_content, :id=>@item.id
+      url_for :action=>:show_content, :id=>item.id
     end
   end
   
