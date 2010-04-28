@@ -33,8 +33,8 @@
 
 <p>
   <b>Content:</b> <br>
-		(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
 		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="780" style="border: none;"></iframe>
+		(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
 </p>
 <%= link_to 'Edit', edit_item_path(@item) %> |
 <%= link_to 'Back', items_path %>
@@ -43,7 +43,9 @@
 	<h2>Relevant Documents</h2>
 	<table class="sortable" id="sortabletable">
 	<tr>
-		<%= ['time','type','title','score'].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
+		<% header = ['time','type','title'] %>
+		<% (header << 'score').concat(Searcher::DOC_FEATURES) if Conf.debug %>
+		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
 		<% item = cache_data("item_#{e[:id]}") %>
@@ -62,7 +64,7 @@
 <% if @link_docs %>
 	<h2>Linked Documents</h2>
 	<table>
-	<% @link_docs.each do |item| %>
+	<% @link_docs[0..14].each do |item| %>
 	  <tr>
 	    <td width='80'><%= item.basetime.to_date %></td>
 	    <td><%= item.itype %></td>

@@ -15,8 +15,9 @@ def get_collector(src)
       FileCollector.new(src)
     end
   when /^imap/ : IMAPCollector.new(src)
+  when /^(web|img)search/ : WebSearchCollector.new(src)
   else
-    WebSearchCollector.new(src)
+    
   end
 end
 

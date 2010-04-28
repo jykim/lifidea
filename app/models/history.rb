@@ -1,5 +1,6 @@
 class History < ActiveRecord::Base
   serialize :metadata, Hash
+  belongs_to :user
   alias_attribute :m, :metadata
   
   named_scope :between, lambda{|start_at, end_at| {:conditions=>

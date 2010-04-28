@@ -39,10 +39,32 @@ class SolrSearcher < Searcher
       cache_data([item, type, 'result'].join("_"), calc_sim_features(query_item, type, filter_qry, o))
     end
     #weights.map!{|e|Math.max(e,0.0)}
-    #puts result.inspect
-    result.sort_by{|fts| 
+    final_result = result.sort_by{|fts| 
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
     }.reverse
+    #puts "[search_by_item] #{item} - #{final_result[0][:id]} : #{final_result[0][:score]} * #{weights.inspect}"
+    final_result
+  end
+  
+  # Calculate Indirect Concept Similarity
+  def get_concept_feature(doc1, doc2)
+    result = []
+    @clf.read_links('e',doc1).each do |k,v|
+      @clf.read_links('e',doc2).each do |k2,v2|
+        if k == k2 
+          result << 3 * v * v2
+        else
+          result << @clf.read('k',k,k2) * v * v2
+        end
+      end
+    end
+    #p result
+    result.mean
+  end
+  
+  # Get tag or concept overlap feature
+  def get_overlap_feature(ltype, item1, item2)
+    @clf.read_links(ltype, item1.id).keys.overlap(@clf.read_links(ltype, item2.id).keys)
   end
   
   def calc_sim_features(query_item, type, filter_qry, o={})
@@ -51,11 +73,16 @@ class SolrSearcher < Searcher
     result = []
     # Initial Solr Query
     solr = RSolr.connect :url=>Conf.solr_server
-    solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
-      "mlt.fl" => "title_text,content_text,uri_text,itype_text", "mlt.mintf" => 1, "rows" => (o[:rows] || 50)
-    Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
-      each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}
-
+    begin
+      solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
+        "mlt.fl" => "title_text,content_text,uri_text,itype_text", "mlt.mintf" => 1, "rows" => (o[:rows] || 50)
+      Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
+        each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}  
+    rescue Exception => e
+      error "[search_by_item] Error in Calling Solr", e
+      return result
+    end
+    
     # Feature Vector generation
     solr_result['response']['docs'].each do |e|
       #debugger
@@ -65,22 +92,26 @@ class SolrSearcher < Searcher
         item = $items[e["id"].to_i]
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
         fts = {:id=>item.id, :content=>(e["score"]/2)}
-        fts[:tag] = item.tags.overlap(query_item.tags)
-        fts[:time] = (item.basetime - query_item.basetime ).normalize_time
+        fts[:tag]   = get_overlap_feature('s', item, query_item)
+        fts[:title] = (item.title || "").word_sim(query_item.title || "")
+        fts[:time]  = (item.basetime - query_item.basetime ).normalize_time
         case type
         when 'con'
           fts[:string] = item.did.str_sim(query_item.did)
           fts[:topic] = @clf.read('t', item.id, query_item.id)
-          fts[:cooc] = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
+          fts[:cooc]  = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
           fts[:occur] = @clf.read_sum('o', item.id).normalize(Item.count_docs)
         when 'doc'
           if item.remark && query_item.remark
             arr1, arr2 = item.remark.split(",").map{|e|e.to_f}, query_item.remark.split(",").map{|e|e.to_f}
             fts[:topic] = arr1.map_with_index{|e,i|e*arr2[i]}.sum
           end
-          fts[:concept] =  item.link_cons.overlap(query_item.link_cons)
+          #fts[:concept] =  get_overlap_feature('e', item, query_item)
+          fts[:path] = (item.uri || "").path_sim(query_item.uri || "")
+          fts[:type] = (item.itype == query_item.itype)? 0.5 : 0
+          fts[:concept] = get_concept_feature(item.id, query_item.id) / 3
         end
-        #puts fts.inspect        
+        #puts fts.inspect
       rescue Exception => e
         error "[search_by_item] Error in #{query_item} -> #{item}", e
         next
@@ -91,7 +122,7 @@ class SolrSearcher < Searcher
   end
   
   def log_preference(query_item, type, click_position, o={})
-    $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.to_ymd}.txt", 'a')
+    $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt", 'a')
     
     result = search_by_item(query_item, type)
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i

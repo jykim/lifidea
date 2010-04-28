@@ -1,7 +1,7 @@
 class Searcher
   attr_reader :clf
-  CON_FEATURES = [:content, :tag, :time, :topic, :string, :cooc, :occur]
-  DOC_FEATURES = [:content, :tag, :time, :topic, :concept]
+  CON_FEATURES = [:title, :content, :tag, :time, :topic, :string, :cooc, :occur]
+  DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :type, :concept]
     
   # @param [Array<IR::Index>] cols : target collections
   def initialize(o = {})
@@ -22,8 +22,8 @@ class Searcher
   # Implement this
   def open_index(o={})
     @clf = cache_data('clf', Searcher.load_features())
-    @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con'))
-    @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc'))
+    @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con', Conf.weight_con))
+    @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc', Conf.weight_doc))
   end
   
   def process_request(qtype, query)
@@ -67,9 +67,11 @@ class Searcher
     result
   end
   
+  # Load link & occurrence table to memory
   def self.load_features()
     clf = LinkFeatures.new
     clf.load Link.all.map{|l|[l.ltype, l.out_id.to_i, l.in_id.to_i, l.weight]}
+    clf.load Occurrence.all.map{|l|['s', l.tag_id.to_i, l.item_id.to_i, 1]}, :force=>true
     info "[load_features] done!"
     clf
   end

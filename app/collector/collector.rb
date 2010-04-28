@@ -1,9 +1,12 @@
 #require 'ddl_include' CHANGED : avoid including reference to the file which includes this file
 # Abstract collector framework
-# - 
-class Collector < ApplicationController
-  include CollectorHelper
+require 'timeout.rb'
+require 'hpricot'
+
+class Collector #< ApplicationController
+  #include CollectorHelper
   attr_accessor :src
+  TIMEOUT = 5
   
   def initialize(source)
     @src = source
@@ -14,7 +17,11 @@ class Collector < ApplicationController
     return 0 if !@src.sync_now? && !o[:force]
     error "[run_collector] Working on #{@src.title}"
     open_source()
-    count = save_docs(read_from_source(o), o)
+    if o[:times]
+      count = save_docs(read_batch_from_source(o), o)
+    else
+      count = save_docs(read_from_source(o), o)
+    end
     close_source()
     @src.last_sync_at = Time.now
     count
@@ -80,11 +87,31 @@ class Collector < ApplicationController
     []
   end
   
+  def read_batch_from_source(o = {})
+    []
+  end
+  
   def open_source()
     
   end
   
   def close_source()
     nil
+  end
+    
+  def read_uri(src, postfix = "")
+    uri = case src.uri
+    when /^webcal/
+      src.uri.gsub("webcal://","http://") + postfix
+    else
+      src.uri + postfix
+    end
+    puts uri
+    if src.o[:id]
+      open_opt = {:ssl_verify => false,  :http_basic_authentication=>[src.o[:id], src.o[:password]]}
+    else
+      open_opt = {}
+    end
+    open(uri, open_opt){|f|return f.read}
   end
 end

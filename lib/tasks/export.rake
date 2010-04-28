@@ -1,6 +1,6 @@
 require 'ddl_include'
 require 'extractor/stat_extractor'
-include CollectorHelper
+#include CollectorHelper
 
 def extract_fixture_from(table_name, o = {})
   i = "000"
@@ -27,11 +27,17 @@ namespace :export do
     Item.valid.documents.between($start_at, $end_at).all(:conditions=>{:itype=>Item.itype_lists}).each_with_index do |d,i|
       next if ENV['id'] && ENV['id'].to_i != d.id
       puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      str = "#{d.title}\n"
-      str += "#{d.m.values.join("\t")}\n"if d.m
-      str += clear_webpage(d.content)
-      ch.replace_concepts(str) if annotation
-      File.open("#{path}/doc_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
+      case ENV['format']
+      when 'indri'
+        template = ERB.new(IO.read("lib/tasks/doc_indri.erb"))
+        str = template.result(binding)
+      else
+        str = "#{d.title}\n"
+        str += "#{d.m.values.join("\t")}\n"if d.m
+        str += clear_webpage(d.content)
+        ch.replace_concepts(str) if annotation
+      end
+      File.open("#{path}/doc_#{d.itype}_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
       puts str if ENV['id']
     end
   end
@@ -46,6 +52,22 @@ namespace :export do
       result << [e.id, e.basetime, e.itype, e.title, e.did, e.uri, e.hidden_flag_before_type_cast, e.tag_titles.sort.join(",")]
     end
     write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'tags']
+  end
+  
+  desc "Export Top-K Concept Features"
+  task :topk_concept_features => :environment do
+    topk = (ENV['topk'] && ENV['topk'].to_i) || 3
+    weights = Searcher::load_weights(Searcher::CON_FEATURES, 'con', ENV['method'] || 'grid')
+    searcher = SolrSearcher.new
+    searcher.open_index()
+    Link.find_all_by_ltype(['k']).each{|e|e.destroy}
+    Item.valid.itype('concept').each_with_index do |c,i|
+      #puts "== Working on #{c.title} =="
+      result = searcher.search_by_item(c.id, 'con', :weights=>weights)
+      result[0..topk].each_with_index do |e,i|
+        Link.find_or_create(c.id, e[:id], 'k', :add=>(topk-i)/topk.to_f/2)
+      end
+    end
   end
   
   desc "Export Top K relevant items"
@@ -69,42 +91,20 @@ namespace :export do
     queries.each do |q|
       query_item = Item.find(q)
       result = searcher.search_by_item(q, type)
-      result_total.concat result[0..topk].map{|e|[query_item, Item.find(e[:id]) , e[:score], features.map{|f|e[f]}].flatten}
+      result_total.concat result[0..topk].map{|e|
+        [query_item, Item.find(e[:id]) , e[:score], 
+        features.map{|f|e[f]},
+        #query_item.tag_titles.join(','), Item.find(e[:id]).tag_titles.join(',')
+        query_item.con_titles.join(','), Item.find(e[:id]).con_titles.join(',')
+        ].flatten}
     end
     write_csv filename, result_total, 
       :header=>['query','target','score'].concat(features)
   end
   
-  # @deprecated
-  #desc "Export Top K relevant concepts into CSV"
-  #task :rel_concepts => :environment do
-  #  result_total = []
-  #  filename = ENV['filename'] || "data/rel_concepts_#$renv.csv"
-  #  topk = (ENV['topk'] && ENV['topk'].to_i) || 10
-  #  queries = (ENV['queries'] && ENV['queries'].split(",").map{|e|e.to_i}) || Item.valid.concepts.map{|c|c.id}.sample(10).uniq
-  #  $searcher = Searcher.new
-  #  $searcher.load_concepts() ; index = $searcher.cons
-  #  queries.each do |q|
-  #    result = [] ; query = index.dh[q]
-  #    if !query
-  #      puts "Query #{q} not found!" ; next
-  #    end
-  #    puts "[export:rel_concepts] Scoring #{query}"
-  #    index.docs.sample(topk).each_with_index do |d,i|
-  #      next if d.dno == query.dno
-  #      result << [query, d, d.feature_vector(query).to_a].flatten
-  #      #break if i >= topk
-  #    end
-  #    #p result[0..topk].map{|e|e[2..-1]}
-  #    result_total.concat result[0..topk].sort_by{|e|e[2..-1].sum}.reverse
-  #  end
-  #  write_csv filename, result_total, 
-  #    :header=>['query','target'].concat(Searcher::CON_FEATURES)
-  #end
-  
   desc "Export Learner Input from Click Histories"
   task :sim_features => :environment do
-    $method ||= ENV['method']
+    #$method ||= ENV['method']
     filename = ENV['input'] || get_feature_file($method)
     File.unlink(filename) if File.exists?(filename)
     $f_li = File.open(filename,'w')
@@ -116,12 +116,15 @@ namespace :export do
       features = Searcher::CON_FEATURES
     when 'doc'
       features = Searcher::DOC_FEATURES
+    else
+      error "No parameter [type]"
     end
     $f_li.puts ['pref','basetime','src_id','target_id','src','target','sum'].concat(features).join(",") if $method=='grid'
     searcher = SolrSearcher.new
     searcher.open_index()
     
     History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
+      next if $user != 'all' && (h.user && $user != h.user.uid)
       puts "Exporting #{h.id}"
       result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
@@ -131,7 +134,8 @@ namespace :export do
         raise DataError, "Source Item not found!"  if !result_raw
         result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
         #puts result.size
-        raise DataError, "Record not found!" if result.size < 2 || result.find_all{|r|r[:id]==skipped_items[0]}.size == 0
+        #raise Exception, "Top item clicked!" if skipped_items.size < 2 
+        raise DataError, "Record not found!" if result.find_all{|r|r[:id]==skipped_items[0]}.size == 0 #result.size < 2 || 
         result_str = result.map{|r|
           #debugger
           preference = (r[:id]==skipped_items[0])? 2 : 1
@@ -151,11 +155,14 @@ namespace :export do
           end
         }.find_all{|e|e}.sort_by{|e|e[0..0].to_i}.reverse
         #puts result_str
-        raise DataError, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
+        #raise Exception, "Incorrect Pair" if result_str.size < 2 || result_str[0][0..0] != '2'
       rescue Interrupt
         break
+      rescue DataError => e
+        error "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result.map{|r|r[:id]}).inspect} not found!" if skipped_items && result
+        next
       rescue Exception => e
-        error "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result).inspect} not found!" if skipped_items && result
+        error "[export:sim_features] other exceptions.. #{e.inspect}"
         #debugger
         next
       end
@@ -166,39 +173,11 @@ namespace :export do
     puts "#$last_query_no items exported..."
     $f_li.flush
   end
-  
-  #desc "Export Learner Input from Click Histories"
-  #task :learner_input => :environment do
-  #  filename = ENV['input'] || get_learner_input_file()
-  #  File.unlink(filename) if File.exists?(filename)
-  #  $f_li = File.open(filename, 'a')
-  #  $last_query_no = 0
-  #  $searcher = Searcher.new
-  #  $searcher.load_concepts() ; index = $searcher.cons
-  #  History.between($start_at, $end_at).find_all_by_htype("con").each do |h|
-  #    puts "Exporting #{h.id}"
-  #    params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
-  #    skipped_items = params["skipped_items"].split("|")
-  #    if ENV['random_items']
-  #      skipped_items = [skipped_items[0], index.docs.map{|e|e.dno}.sample(ENV['random_items'].to_i)]
-  #    end
-  #    index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
-  #  end
-  #  puts "Splitting #{filename}..."
-  #  Rake::Task['etc:split_file'].execute
-  #end
     
   desc "Export Stat table into CSV"
   task(:stats => :environment) do
     ["day","week","month"].each{|unit|export_stat_for(unit, $start_at, $end_at)}
   end
-  
-  #desc "Export Concept table into CSV"
-  #task :concepts => :environment do
-  #  filename = ENV['filename'] || "data/concepts_#$renv.csv"
-  #  write_csv filename, Item.concepts.all.map{|c|[c.id, c.title, c.itype, c.synonym_id, c.hidden_flag_before_type_cast, c.modified_flag_before_type_cast]}, 
-  #    :header=>['id','title','itype','synonym_id','hidden_flag','modified_flag']
-  #end
   
   desc "Export Training Data for Collection Selection"
   task :csel_features => :environment do
@@ -235,18 +214,40 @@ namespace :export do
     write_csv filename, result_all, :normalize=>[[nil]*7, [:minmax]*RubySearcher::CS_TYPES.size*$searcher.cols.size].flatten, 
       :header=>["qid","query","user","date","position", "did", "itype", header_features].flatten
   end
+  
+  # Traverse link graph and return relevant concept set
+  def get_relevant_concepts(concept_id, threshold, level = 1, degree = 5)
+    puts "[get_relevant_concepts:#{level}] for #{concept_id}"
+    result = $clf.read_links('k', concept_id).find_all{|k,v|v >= threshold}.sort_by{|e|e[1]}.reverse.map{|e|e[0]}[0..(degree-1)]
+    if level > 0
+      result.concat result.map{|e|get_relevant_concepts(e, threshold, level-1, degree)}.flatten
+    end
+    puts result.inspect
+    result.uniq
+  end
 
   desc "Export Concept Links into dot file"
   task :concept_links => :environment do
     template = ERB.new(IO.read('lib/tasks/graph_neato.erb'))
-    filename = ENV['filename'] || "data/concept_links_#{ENV['ltype']}#{ENV['threshold']}.dot"
-    conditions = (ENV['ltype'])? ['ltype = ?', ENV['ltype']] : []
-    #conditions = (ENV['threshold'])? ['ltype = ? and weight > ?', ENV['ltype'], ENV['threshold'].to_f] : []
-    nodes = Link.all(:conditions=>conditions).find_all{|l| (l.initem && l.initem.concept? && l.outitem && l.outitem.concept?)}.
-      map{|l|{:from=>l.outitem.title, :to=>l.initem.title, :weight=>l.weight, :label=>l.ltype}}
+    $clf = cache_data('clf', Searcher.load_features())
+    threshold = ENV['threshold'] || 1
+    ltype = ENV['ltype'] || 'k'
+    level = ENV['level'] || 1
+    degree = ENV['degree'] || 5
+    filename = ENV['filename'] || "data/concept_links_#{$renv}_#{ENV['concept']}_#{ltype}#{threshold}-#{level}-#{degree}.dot"
+    conditions = if ENV['concept']
+      rel_concepts = get_relevant_concepts(ENV['concept'].to_i, threshold.to_f, level.to_i, degree.to_i)
+      ['ltype = ? and weight >= ? and (in_id in (?) or out_id in (?))', ltype, threshold.to_f, rel_concepts, rel_concepts]
+    else
+      ['ltype = ? and weight >= ?', ltype, threshold.to_f]
+    end
+    nodes = Link.all(:conditions=>conditions).
+      find_all{|l| (l.initem && l.initem.concept? && l.outitem && l.outitem.concept?)}.
+      map{|l|{:from=>l.outitem.title, :to=>l.initem.title, :weight=>l.weight}} #, :label=>l.ltype
     File.open(filename , "w"){|f| f.puts template.result(binding) }
     puts 'created dot file...'
-    `neato -T png -o #{filename}.png #{filename}`
+    puts cmd = "neato -T png -o #{filename}.png #{filename}"
+    `#{cmd}`
   end
 
   desc 'Create YAML fixtures from data in an existing database. Defaults to development database. Set RAILS_ENV to override.' 

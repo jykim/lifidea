@@ -13,3 +13,5 @@ doc/*
 log/*.pid
 solr/data
 *.old
+log/*
+backup/*

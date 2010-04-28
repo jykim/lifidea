@@ -6,14 +6,13 @@ TIMEZONE = 'Eastern Time (US & Canada)'
 APP_ROOT = ""
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
-require 'memcache'
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
   # -- all .rb files in that directory are automatically loaded.
 
   # Add additional load paths for your own custom dirs
-   config.load_paths += %W( #{RAILS_ROOT}/test #{RAILS_ROOT}/rubylib)
+   config.load_paths += %W( #{RAILS_ROOT}/test)
    config.logger = Logger.new(config.log_path, 10, 10 * (2 ** 20)) 
    $lgr = config.logger
   # Specify gems that this application depends on and have them installed with rake gems:install
@@ -22,17 +21,11 @@ Rails::Initializer.run do |config|
   # config.gem "sqlite3-ruby", :lib => "sqlite3"
   # config.gem "aws-s3", :lib => "aws/s3"
   #config.gem "daemon-spawn"
-  config.gem 'rcov'
+  #config.gem 'rcov'
   config.gem 'daemons'
-  config.gem 'feed-normalizer'
   #config.gem 'pauldix-feedzirra'
   #config.gem 'yard'
-  config.gem 'tmail'
   #config.gem 'openrain-action_mailer_tls'
-  config.gem 'ruby-debug'
-  config.gem 'fastercsv'
-  config.gem 'ri_cal'#'icalendar'
-  config.gem 'icalendar'#'icalendar'
   config.gem 'thoughtbot-shoulda', :lib => "shoulda", :source => "http://gems.github.com"
   #config.gem 'mislav-will_paginate', :version => '~> 2.3.11', :lib => 'will_paginate', 
   #  :source => 'http://gems.github.com'
@@ -66,5 +59,5 @@ end
 #TagList.delimiter = " "
 #ActiveRecord::Base.logger.level = :error
 #$lgr = ActiveRecord::Base.logger
-CACHE = MemCache.new('127.0.0.1')
+ActiveRecord::Base.logger.level = Logger::WARN if ENV['RAILS_ENV'] == 'production'
 require 'ddl_include'

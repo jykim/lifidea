@@ -1,3 +1,5 @@
+# Standalone Ruby Library
+
 require 'rubygems'
 require 'ruby-debug'
 require 'jcode'
@@ -8,7 +10,7 @@ $KCODE = "u"
 require 'extensions/extensions.rb'
 require 'extensions/exceptions.rb'
 require 'extensions/table.rb'
-require 'globals/global.rb'
+require 'globals/globals.rb'
 require 'ir/language_model.rb'
 require 'ir/inference_network.rb'
 require 'ir/stemmer.rb'

@@ -2,6 +2,11 @@ ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 require 'ddl_include'
+$lgr.level = if ARGV[0] == 'verbose' || ENV['verbose']
+  Logger::DEBUG
+else
+  Logger::WARN
+end
 
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
@@ -20,7 +25,7 @@ class ActiveSupport::TestCase
   # The only drawback to using transactional fixtures is when you actually 
   # need to test transactions.  Since your test is bracketed by a transaction,
   # any transactions started in your code will be automatically rolled back.
-  self.use_transactional_fixtures = false
+  self.use_transactional_fixtures = true
 
   # Instantiated fixtures are slow, but give you @david where otherwise you
   # would need people(:david).  If you don't want to migrate your existing

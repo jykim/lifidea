@@ -1,5 +1,46 @@
 require 'find'
 
+# Read from CSV
+# - assume more than two lines of file, with the header in the first line
+# @return [Array<Hash<Symbol,String>>] : 
+def read_csv(filename, o = {})
+  #header = o[:header] || true
+  content = FasterCSV.parse(IO.read(filename).to_lf, :row_sep => "\n")
+  if o[:output] == :array
+    content[1..-1]
+  else
+    content[1..-1].map{|c|content[0].map_hash_with_index{|h,i|[h.downcase.to_sym, c[i]]}}
+  end
+end
+
+def write_csv(filename, content, o = {})
+  mode = o[:mode] || 'w'
+  if o[:summary]
+    content << o[:summary].map_with_index{|e,i|
+      case e.class.to_s
+      when "String"
+        e
+      when "Symbol"
+        content.map{|l|l[i]}.find_all{|e2|e2.respond_to?(:abs)}.send(e) if e
+      end
+    }
+  end
+  if o[:normalize]
+    o[:normalize].each_with_index{|e,i|
+      next if !e
+      case e
+      when :minmax
+        max, min = content.map{|l|l[i]}.max, content.map{|l|l[i]}.min
+        next if max == min
+        content.each{|l|l[i] = (l[i] - min) / (max - min)}
+      end
+    }
+  end
+  content = [o[:header]].concat(content) if o[:header]
+  File.open(filename, mode){|f|f.puts content.map{|e|e.to_csv}.join("")}
+end
+
+
 def file_write(file_name , var , o = {})
   path = o[:path] || PATH_DATA
   fullpath = File.join(path,file_name)
@@ -90,19 +131,5 @@ def batch_edit(path , o = {})
     end
   rescue SystemCallError
     $stderr.print "[batch_edit] IO failed: " + $! + "\n"
-  end
-end
-
-def str2time(str)
-  if str.class == Time then return str end
-  Time.mktime(*ParseDate::parsedate(str,true))
-end
-
-def fp(obj)
-  case obj.class.to_s
-  when "Float"
-    obj.r3
-  else
-    obj
   end
 end

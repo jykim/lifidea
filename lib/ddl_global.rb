@@ -26,19 +26,32 @@ def get_features_by_type(type)
   end
 end
 
+def clear_webpage(html)
+  return "" if !html
+  hpricot = Hpricot(html)
+  hpricot.search("script").remove
+  hpricot.search("link").remove
+  hpricot.search("meta").remove
+  hpricot.search("style").remove
+  hpricot.inner_text.gsub(/\s{5,}/,"\n")
+end
+
+# - Do not use cached data when executing a task
 def cache_data(key, value = "none")
   #error "[cache_data] #{key}=#{value}"
   trial = 0
   if value == "none"
-    begin
-      trial += 1
+    if $task_flag
+      $cache[ENV['RAILS_ENV']+'_'+key]
+    else
       CACHE.get(ENV['RAILS_ENV']+'_'+key)
-    rescue Exception => e
-      error "[cache_data]", e
-      retry if trial < 3
     end
   else
-    CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+    if $task_flag
+      $cache[ENV['RAILS_ENV']+'_'+key] = value
+    else
+      CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+    end
     value
   end
 end
@@ -58,47 +71,8 @@ def read_recent_file_in(path, o = {})
   file[0]
 end
 
-# Read from CSV
-# - assume more than two lines of file, with the header in the first line
-# @return [Array<Hash<Symbol,String>>] : 
-def read_csv(filename, o = {})
-  #header = o[:header] || true
-  content = FasterCSV.parse(IO.read(filename).to_lf, :row_sep => "\n")
-  if o[:output] == :array
-    content[1..-1]
-  else
-    content[1..-1].map{|c|content[0].map_hash_with_index{|h,i|[h.downcase.to_sym, c[i]]}}
-  end
-end
-
-def write_csv(filename, content, o = {})
-  mode = o[:mode] || 'w'
-  if o[:summary]
-    content << o[:summary].map_with_index{|e,i|
-      case e.class.to_s
-      when "String"
-        e
-      when "Symbol"
-        content.map{|l|l[i]}.find_all{|e2|e2.respond_to?(:abs)}.send(e) if e
-      end
-    }
-  end
-  if o[:normalize]
-    o[:normalize].each_with_index{|e,i|
-      next if !e
-      case e
-      when :minmax
-        max, min = content.map{|l|l[i]}.max, content.map{|l|l[i]}.min
-        next if max == min
-        content.each{|l|l[i] = (l[i] - min) / (max - min)}
-      end
-    }
-  end
-  content = [o[:header]].concat(content) if o[:header]
-  File.open(filename, mode){|f|f.puts content.map{|e|e.to_csv}.join("")}
-end
-
 def info(str)
+  return if $lgr.level > Logger::INFO
   puts str
   $lgr.info str if $lgr
 end
@@ -111,6 +85,7 @@ def error(str, e = nil)
 end
 
 def debug(str, header = "")
+  return if $lgr.level > Logger::DEBUG
   puts str if header == ""
   $lgr.debug header + str if $lgr
 end

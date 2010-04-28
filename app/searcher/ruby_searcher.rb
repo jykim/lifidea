@@ -100,7 +100,6 @@ class RubySearcher < Searcher
   
   # Log pairwise preference training data into file
   # @param[String] query : query_id|clicked_item_id|skipped_item_id|...
-  # @FIXIT
   def log_preference(dnos, o={})
     dnos = dnos.split("|").map{|e|e.to_i}
     #puts "[log_preference] dnos=#{dnos.inspect}"

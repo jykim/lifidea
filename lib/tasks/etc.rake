@@ -23,26 +23,48 @@ namespace :etc do
   end
   
   desc "Re-build Index & Links"
-  task :rebuild => :environment do
+  task :rebuild_all => :environment do
     $start_at = "20010101"
-    Link.find_all_by_ltype(['o','e']).each{|e|e.destroy}
+    Link.find_all_by_ltype(['o','e','k']).each{|e|e.destroy}
     Rake::Task['run:indexer'].execute
     Rake::Task['sunspot:solr:reindex'].execute
+    #Rake::Task['export:topk_concept_features'].execute
+  end
+  
+  desc "Re-calculate Weights using all clicks"
+  task :recalc_weights => :environment do
+    $start_at = "20010101"
+    $method = 'ranksvm'
+    Rake::Task['export:sim_features'].execute
+    $method = ENV['method']
+    ENV['input'] = get_feature_file($method)
+    ENV['train_ratio'] = "0.9"
+    Rake::Task['etc:split_file'].execute
+    Rake::Task['run:learner'].execute
+  end
+  
+  desc "Collection Statistics"
+  task :col_stat => :environment do
+    $searcher = Searcher.new(:debug=>ENV['debug'])
+    $searcher.load_documents()
+    $searcher.cols.each do |c|
+      puts [c.cid, c.docs.map{|d|d.lm.size}.mean].join("\t")
+    end
   end
   
   def split_file(filename, data, o={})
     result_train, result_test = [o[:header]], [o[:header]]
     data.each_with_index do |e,i|
       #puts rand(), train_ratio
-      if (o[:train_ratio] && rand() < o[:train_ratio]) ||
+      if (o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) < o[:train_ratio]) ||
          (o[:test_set] && !o[:test_set].include?(i))
         result_train << e
       else
         result_test << e
       end
     end
-    File.open(filename+'.train','w'){|f|f.puts result_train.find_valid.join}
-    File.open(filename+'.test' ,'w'){|f|f.puts result_test.find_valid.join}
+    File.open(filename+"#{o[:train_ratio]}.train",'w'){|f|f.puts result_train.find_valid.join}
+    File.open(filename+"#{o[:train_ratio]}.test" ,'w'){|f|f.puts result_test.find_valid.join}
   end
   
   def conv_file(filename, method)
@@ -64,17 +86,9 @@ namespace :etc do
     File.open(filename.gsub(/grid/,method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
   end
   
-  desc "Collection Statistics"
-  task :col_stat => :environment do
-    $searcher = Searcher.new(:debug=>ENV['debug'])
-    $searcher.load_documents()
-    $searcher.cols.each do |c|
-      puts [c.cid, c.docs.map{|d|d.lm.size}.mean].join("\t")
-    end
-  end
-  
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
+    total_ratio = ENV['total_ratio'] || 1
     filename = ENV['input'] || get_feature_file()
     puts "Splitting #{filename}... (#{ENV['method']})"
     header = nil
@@ -99,7 +113,7 @@ namespace :etc do
       1.upto(ENV['folds'].to_i) do |i|
         puts "#{test_sets[i-1].size} / #{data.size}"
         $fold = "-k#{ENV['folds']}-#{i}"
-        split_file(get_learner_input_file(), data, :header=>header, :test_set=>test_sets[i-1])
+        split_file(get_learner_input_file(), data, :random=>true, :header=>header, :test_set=>test_sets[i-1])
         if $type == 'csel' && $method == 'grid'
           conv_file(get_learner_input_file()+'.train', 'ranksvm')
           conv_file(get_learner_input_file()+'.test', 'ranksvm')

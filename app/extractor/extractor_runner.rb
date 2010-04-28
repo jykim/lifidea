@@ -24,7 +24,7 @@ def export_stat_for(unit, start_at, end_at)
     #debugger
     f.puts((['basedate'].concat rids).join("\t")+"\n")
     f.puts Stat.all(:conditions=>cond).group_by(&:basedate). # group by date
-      map{|basedate,stats|[unit,basedate.to_ymd, rids.to_val(stats.map_hash{|e|[e.rid,e.content.to_f]}, :def_val=>nil)].flatten}. # turn into feature vector
+      map{|basedate,stats|[unit,basedate.ymd, rids.to_val(stats.map_hash{|e|[e.rid,e.content.to_f]}, :def_val=>nil)].flatten}. # turn into feature vector
         sort_by{|e|e[0]}.map{|e|e.join("\t")}.join("\n")
   end
 end

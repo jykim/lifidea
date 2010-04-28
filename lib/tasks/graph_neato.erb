@@ -1,5 +1,7 @@
 graph G {
-	overlap=false; orientation=landscape;
+	edge [color=grey];
+	<%= "\"#{Item.find(ENV['concept']).title}\" [ color=black, style=filled, fontcolor=white ];" if ENV['concept']%>
+	overlap=false;
   <% nodes.each do |e| %>
-    "<%=e[:from]%>" -- "<%=e[:to]%>" [len=<%=(ENV['threshold'].to_f||1) / e[:weight] %>, label="<%=e[:label]%>"];<% end %>
+    "<%=e[:from]%>" -- "<%=e[:to]%>" [len=<%=threshold.to_f / e[:weight] %>, label="<%=e[:label]%>"];<% end %>
 }

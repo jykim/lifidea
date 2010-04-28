@@ -1,6 +1,6 @@
 module IndexHelper
   def index_fields
-    {:title=>title, :uri=>uri, :content=>content, :tag=>tag_titles.join(",")}.
+    {:title=>title, :uri=>uri, :content=>content}. #, :tag=>tag_titles.join(",")
       merge(metadata).find_all{|k,v|v}.to_hash
   end
   
