@@ -86,7 +86,7 @@ class DocumentsController < ApplicationController
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
     session[:query_count] += 1 if session[:query_count]
-    @rank_list = search_remote('k', @query)
+    @rank_list = search_local('k', @query)#search_remote('k', @query)
     if !@rank_list
       flash[:notice] = "Invalid query!"
       if !during_game?
@@ -99,9 +99,9 @@ class DocumentsController < ApplicationController
       return
     end
     #debugger
-    @docs = Item.find_by_dids(@rank_list.map{|e|e[0]}).map_hash{|d|[d.did, d]}
+    #@docs = Item.find_by_dids(@rank_list.map{|e|e[0]}).map_hash{|d|[d.did, d]}
     @query_doc = Item.find_or_create(@query, 'query', :did=>@query_did, 
-      :uri=>request.url, :content=>@docs.values.map(&:title).join("\n"))
+      :uri=>request.url, :content=>@rank_list.map{|e|e[0].title}.join("\n"))
     if during_game?
       #debug @rank_list
       #debug session[:display_docs]
@@ -109,7 +109,7 @@ class DocumentsController < ApplicationController
       @rel_item_id = session[:display_docs][session[:document_index]].to_i
       @relevant_position = -1
       @rank_list.each_with_index do |e,i|
-        @relevant_position = i+1 if Item.find(@rel_item_id).did == e[0]
+        @relevant_position = i+1 if Item.find(@rel_item_id).did == e[0].did
       end
 
       Query.create(:query_text=>@query, :query_id=>@query_doc.id, :position=>@relevant_position, :query_count=>session[:query_count],
@@ -142,6 +142,16 @@ class DocumentsController < ApplicationController
       #debug "#{session[:display_page_cur]} < #{@display_page_total} (#{session[:display_docs].inspect})"
     end
     @document = Item.find(params[:id])
+    @link_docs, @link_cons = [], []
+    $items = {}
+    begin
+      @rel_docs = (search_local('d', @document.id) || [])[0..9]
+      #info "Ranklist(doc) : #{@rel_docs.inspect}"
+      #debugger
+    rescue Exception => e
+      error "Failed to get Ranklist!", e
+      @rel_docs = []
+    end
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @document }
@@ -163,7 +173,7 @@ class DocumentsController < ApplicationController
     #debug(params)
     src_item, tgt_item = params[:src_item_id].to_i, params[:id].to_i
     History.create(:htype=>params[:htype], :basetime=>Time.now, :src_item_id=>src_item, :item_id=>tgt_item, :user_id=>get_user_id(),
-      :metadata=>{:position=>params[:position], :url=>request.url})
+      :game_id=>session[:game_id], :metadata=>{:position=>params[:position], :url=>request.url})
     Link.find_or_create(src_item, tgt_item, 'c', :add=>1)
     redirect_to :action=>:show
   end
@@ -265,6 +275,7 @@ private
   end
   
   def finish_game()
+    session[:game_id] = nil
     session[:query_count] = nil
   end
   

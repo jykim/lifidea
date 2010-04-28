@@ -2,7 +2,7 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  include AdminHelper
+  include AdminHelper, ItemsHelper
   layout "default"
   before_filter :init_controller
   helper :all # include all helpers, all the time

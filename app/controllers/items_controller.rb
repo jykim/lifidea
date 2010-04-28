@@ -1,6 +1,6 @@
 require 'ddl_include'
 class ItemsController < ApplicationController
-  before_filter :authorize, :except => [:login, :index, :show, :search, :click]
+  before_filter :authorize, :except => [:login, :index, :show_content, :search, :click]
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :search
   sidebar :concept_cloud, :if=>:source_given?
@@ -208,11 +208,5 @@ class ItemsController < ApplicationController
       Link.find(e[0]).update_attributes!(:remark=>e[1])
     end
     redirect_to :action=>:links
-  end
-  
-protected  
-  def search_local(qtype, query, o={})
-    $searcher = SolrSearcher.new
-    @rank_list = $searcher.process_request(qtype, query)
   end
 end

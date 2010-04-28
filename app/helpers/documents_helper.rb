@@ -28,10 +28,10 @@ module DocumentsHelper
       elsif item.source.o[:show_url]
         item.uri
       else
-        url_for :action=>:show_content, :id=>@item.id
+        url_for :action=>:show_content, :id=>item.id
       end
     else
-      url_for :action=>:show_content, :id=>@item.id
+      url_for :action=>:show_content, :id=>item.id
     end
   end
   

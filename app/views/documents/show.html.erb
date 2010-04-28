@@ -7,7 +7,7 @@
 	<% end%>
 	)</h2>
 <% end %>
-<%= @document.did if session[:admin_flag] %>
+<%= "<b>Did: </b>" + @document.did if session[:admin_flag] && @document.did %>
 
 <p>
   <b>Type:</b>
@@ -31,13 +31,34 @@
   <%= @document.metadata.find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
 	</table>
 </p>
-
 <b>Content:</b> <br>
 <% if @document.uri =~ /^http/ %>
 	(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
-	<iframe name='iframe_doc' src="<%= display_url(@document.uri) %>" width="750" height="780" style="border: none;"></iframe>
+	<iframe name='iframe_doc' src="<%= display_url(@document) %>" width="750" height="780" style="border: none;"></iframe>
 <% else %>
 	<%= @document.content.gsub("\n","<br/>") if @document.content %>
+<% end %>
+
+<% if @document.document? %>
+	<h2>Relevant Documents</h2>
+	<table class="sortable" id="sortabletable">
+	<tr>
+		<% header = ['time','type','title'] %>
+		<% (header << 'score').concat(Searcher::DOC_FEATURES) if Conf.debug %>
+		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
+	</tr>
+	<% @rel_docs.each_with_index do |e,i| %>
+		<% item = cache_data("item_#{e[:id]}") %>
+		<tr>
+		  <td width='80'><%= item.basetime.to_date %></td>
+		  <td><%= item.itype %></td>
+		  <td><%= link_to item.title, {:controller=>'documents', :action=>'click', :htype=>'doc_doc', :id=>e[:id], :src_item_id=>@document.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
+		<% if Conf.debug %>
+			<%=[:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
+		<% end %>
+		</tr>
+	<% end %>
+	</table>
 <% end %>
 
 <%= link_to 'Edit', edit_document_path(@document) %> |

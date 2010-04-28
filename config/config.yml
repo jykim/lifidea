@@ -7,7 +7,7 @@ common:
   collector_sync_interval: 30
   hour_daybreak: 4
   rule_searcher: "method:jm,lambda:0.1"
-  debug: true
+  debug: false
   weight_con: uniform
   weight_doc: uniform
 #  rule_searcher: "method:dirichlet,mu:100"
