@@ -1,22 +1,9 @@
-module DocumentsHelper
-  
-  # Create concepts & occurrences
-  # @param otype [String] type of occurrences
-  def add_concepts(titles, otype, o={})
-    #debug "[add_concepts] titles = [#{titles}] otype = #{otype} (#{@concept_titles})"
-    titles = titles.split(",").find_all{|e|!e.blank?} if titles.class == String
-    #debugger
-    concepts = titles.map{|t|Concept.find_or_create(t.strip, :ctype=>o[:ctype])}
-    concepts.each{|c|Occurrence.find_or_create(self.did, c.cid, otype, o[:weight])}
-    #@concept_titles = concept_titles | titles
-    #update_attributes!(:concept_titles=>@concept_titles)
-  end
-  
-  def select_for_itype(default)
-    options = ['all','calendar','file','email','webpage','news','blog','concept'] #'paper',
-    select_tag(:itype, options_for_select(options.map{|e|[e,e]},default), 
-      :multiple=>true, :onchange => 'this.form.submit()')
-  end
+module DocumentsHelper  
+  #def select_for_itype(default)
+  #  options = ['all','calendar','file','email','webpage','news','blog','concept'] #'paper',
+  #  select_tag(:itype, options_for_select(options.map{|e|[e,e]},default), 
+  #    :multiple=>true, :onchange => 'this.form.submit()')
+  #end
   
   def display_url(item)
     case item.uri
@@ -35,20 +22,51 @@ module DocumentsHelper
     end
   end
   
+  def display_link(item)
+    if session[:game_type] == :sb
+      link_to item.title, {:controller=>'documents', :action=>'click', :htype=>'qry_doc', :id=>item.id, :src_item_id=>@query_doc.id}
+    else
+      item.title
+    end
+  end
+  
   def redirect_to_after(url , second)
     "<meta http-equiv='refresh' content='#{second};url=#{url}'>"
   end
-  #<% if params[:random] && @display_page_total <= session[:display_page_cur] %>
-  #	<%= redirect_to_after(url_for(:action=>:start_search), @time_per_page)  %>
-  #<% elsif params[:random] %>
-  #	<%= redirect_to_after(url_for(:action=>:show, :random=>true), @time_per_page)   %>
-  #<% end %>
+    
+  # Initialize per-game variable
+  def init_game(game_id)
+    session[:game_id] = game_id
+    session[:total_query_count] = 0 # #queries in overall
+    session[:seen_doc_count] = -1
+    session[:score] = 0
+    session[:query_count] = 0
+    session[:display_page_cur] = 0
+    #init_target_document()
+  end
+  
+  def finish_game()
+    session[:game_id] = nil
+  end
+  
+  # Initialize per-document variable
+  def init_target_document()
+    session[:query_count] = 0
+    session[:display_page_cur] = 0
+    session[:seen_doc_count] += 1
+    
+    session[:display_docs] = []
+    session[:document_index] = nil
+    
+    session[:game_type] = @ratio_game_type.dice[0]
+  end
   
   def during_game?
-    session[:query_count]
+    session[:game_id]
   end
   
   def page_found?
+    puts "#@relevant_position <= #@display_topk_result"
     @relevant_position <= @display_topk_result && @relevant_position > 0
   end
   
@@ -58,5 +76,9 @@ module DocumentsHelper
   
   def game_finished?
     session[:seen_doc_count] && session[:seen_doc_count] >= @pages_per_game
+  end
+  
+  def source_given?
+    params && params[:source]
   end
 end

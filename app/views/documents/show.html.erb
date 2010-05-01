@@ -6,7 +6,10 @@
 	 <%= link_to("skip to next", :action=>:show, :random=>true)%> 
 	<% end%>
 	)</h2>
+<% else %>
+	<%= render :partial => "search_result" %>
 <% end %>
+<% debug session%>
 <%= "<b>Did: </b>" + @document.did if session[:admin_flag] && @document.did %>
 
 <p>
@@ -25,41 +28,41 @@
   <%= link_to @document.uri, @document.uri %>
 </p>
 <% end %>
+<% if @document.metadata %>
 <p>
   <b>Metadata:</b> <br>
 	<table border='1' cellspacing=0 cellpadding=2>
   <%= @document.metadata.find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
 	</table>
 </p>
-<b>Content:</b> <br>
-<% if @document.uri =~ /^http/ %>
-	(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
-	<iframe name='iframe_doc' src="<%= display_url(@document) %>" width="750" height="780" style="border: none;"></iframe>
-<% else %>
-	<%= @document.content.gsub("\n","<br/>") if @document.content %>
 <% end %>
 
-<% if @document.document? %>
-	<h2>Relevant Documents</h2>
-	<table class="sortable" id="sortabletable">
+<% if @rel_docs %>
+	<b>Relevant Items:</b>
+	<table class="sortable" id="sortabletable" border=1 cellpadding=2 cellspacing=0>
 	<tr>
-		<% header = ['time','type','title'] %>
-		<% (header << 'score').concat(Searcher::DOC_FEATURES) if Conf.debug %>
+		<% header = ['rank','type','title','target?'] %>
+		<% (header << 'score').concat(@feature_type) if Conf.debug %>
 		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
 		<% item = cache_data("item_#{e[:id]}") %>
 		<tr>
-		  <td width='80'><%= item.basetime.to_date %></td>
+		  <td><%= i+1 %></td>
 		  <td><%= item.itype %></td>
-		  <td><%= link_to item.title, {:controller=>'documents', :action=>'click', :htype=>'doc_doc', :id=>e[:id], :src_item_id=>@document.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
+		  <td><%= link_to item.title, {:controller=>'documents', :action=>'click', :htype=>@htype, :id=>e[:id], :src_item_id=>@document.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
 		<% if Conf.debug %>
-			<%=[:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
+			<%=[:score].concat(@feature_type).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 		<% end %>
+		<td><%= "<font color='#ff0000'>target item!</font>" if item.id == @rel_item_id %></td>
 		</tr>
 	<% end %>
 	</table>
 <% end %>
 
-<%= link_to 'Edit', edit_document_path(@document) %> |
-<%= link_to 'Back', documents_path %>
+<p>
+  <b>Content:</b> <br>
+		<iframe name='iframe_doc' src="<%= display_url(@document) %>" width="700" height="780" style="border: none;"></iframe>
+		(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
+</p>
+
