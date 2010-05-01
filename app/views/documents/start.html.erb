@@ -5,7 +5,7 @@ Your goal is to find the documents you're shown using the search engine provided
 
 Your score is determined by where in the Top <%= @display_topk_result %> rank list you can locate the target document. For instance, if the target document was found at the first rank, you can get 10 points.<br><br>
 
-Up to this point, you have found <%=  @query_docs_found.size %> out of <%= @query_docs_total.size %> target documents provided by the system. Since there's no limit in playing this game, you're free to play as much as possible until you find all the target documents.
+Up to this point, you have found <%=  @query_docs_found.size %>. 
 
 <h2>Rules</h2>
 - You'll be finding <%= @pages_per_game %> documents per game, each of which will be provided with <%= @display_page_total-1 %> other documents. <br>
@@ -18,8 +18,4 @@ Up to this point, you have found <%=  @query_docs_found.size %> out of <%= @quer
 
 - The search engine handles only simple keyword queries without fancy features. (e.g. phrase, spell correction, etc.)
 
-<% if @query_docs_total.size - @query_docs_found.size <= @pages_per_game %>
-	<h3>You have found all the documents available!</h3>
-<% else %>
-	<h3><%= link_to("Click here", :action=>:request_document)%> if you want to start now!</h3>
-<% end %>
+<h3><%= link_to("Click here", :action=>:request_document)%> if you want to start now!</h3>

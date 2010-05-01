@@ -1,24 +1,6 @@
 <h1>Search Result ( <%= @query %>)</h1>
-<% if during_game? %>
-<h3>
-	<% if game_finished? %>
-		<%= "Game Finished! #{link_to 'Click here', :action=>:request_document, :finish=>true} to see the score." %>
-	<% elsif page_found? %>
-		<%= "Document Found! #{link_to 'Click here', :action=>:request_document} to see the next document." %>
-	<% elsif query_limit_reached? %>
-		<%= "Query limit reached! #{link_to 'Click here', :action=>:request_document} to see the next document." %>
-	<% else %>
-		<%= "Document Not Found! You have #{@queries_per_page - session[:query_count]} trials left." %><br><br>
-		
-		<% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
-			<%= text_field_tag(:query, @query, :onpaste=>'return false;', :size=>60) %>
-			<%= submit_tag('Search') %>
-		<% end -%>
-		
-		<br>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next document.
-	<% end %>
-</h3>
-<% end %>
+<%= render :partial => "search_result" %>
+
 <% debug(session)%>
 <table>
   <tr>
@@ -28,7 +10,7 @@
   <tr>
     <td><%= i+1 %></td>
     <td><%= e[0].itype %></td>
-    <td><%= link_to e[0].title, {:controller=>'documents', :action=>'click', :htype=>'qry_doc', :id=>e[0].id, :src_item_id=>@query_doc.id} %></td>
+    <td><%= display_link(e[0]) %></td>
     <td><%= "<font color='#ff0000'>target document!</font>" if e[0].id == @rel_item_id %></td>
   </tr>
 <% end %>

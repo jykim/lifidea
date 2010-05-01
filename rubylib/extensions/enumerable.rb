@@ -55,7 +55,7 @@ end
 
 
 class Array
-  include Statistics, Table
+  include Statistics, Table, ProbabilityOperator
   include ValueArray, ProbabilityDistributionArray
   # Collapse the outermost array
   # [[1].[2],[[3]]].collapse -> [1,2,[3]]

@@ -1,6 +1,7 @@
-<h1>Start Search</h1>
+<h1>Start Search<%=" / Browsing" if session[:game_type] == :sb %></h1>
 <h2>Your job is to find the <%= (session[:document_index]+1).to_i.ordinalize %> document.</h2>
 <h3>Use search box here to find it! <%= "You have #{@queries_per_page - session[:query_count]} trials left." %></h3><br>
+<% debug session%>
 
 <% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
 <%= text_field_tag(:query, @query, :onpaste=>'return false;', :size=>60) %>

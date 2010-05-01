@@ -5,7 +5,7 @@ class DocumentsController < ApplicationController
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :pagehunt_search, :only=>[:index, :search]
   sidebar :menu, :only=>[:index]
-  sidebar :pagehunt_status, :only=>[:start, :show, :start_search, :search, :request_document]
+  sidebar :pagehunt_status, :only=>[:show, :start_search, :search, :request_document]
   sidebar :pagehunt_scoreboard
   layout "doctrack"
   
@@ -15,10 +15,14 @@ class DocumentsController < ApplicationController
   
   def initialize
     @display_topk_result = 10   #get_config("DISPLAY_TOPK_RESULT").to_i
-    @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
+    @pages_per_game =       5   #get_config("PAGES_PER_GAME").to_i
     @queries_per_page =     5   #get_config("QUERIES_PER_PAGE").to_i
+    @no_entry_concept =     3
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
     @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i
+    @ratio_game_type = {:s=>0.33, :sb=>0.33, :b=>0.33}
+    $document_list ||= Item.valid.documents.all.map{|e|e.id}
+    $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
   end
   
   # GET /documents
@@ -42,50 +46,50 @@ class DocumentsController < ApplicationController
   def start
     @game = Game.create(:gid=>"#{session[:user_uid]}_#{Time.now.to_s(:db)}", 
       :user_id=>session[:user_id], :start_at=>Time.now)
-    session[:game_id] = @game.id
-    init_game()
-    @query_docs_total = Item.find_all_by_query_flag(true).map{|d|d.id}
+    init_game(@game.id)
+    #@query_docs_total = Item.find_all_by_query_flag(true).map{|d|d.id}
     @query_docs_found = Query.find_all_by_user_id(session[:user_id]).map{|e|e.item_id}.uniq
-    session[:query_docs] = @query_docs_total -  @query_docs_found
+    #session[:query_docs] = @query_docs_total -  @query_docs_found
   end
   
+  # FInalize current game
+  # - store game data
   def finish
-    #debug session
-    #debugger
     @game = Game.find(session[:game_id])
     @game.update_attributes(:score=>session[:score], 
       :query_count=>session[:total_query_count], :finish_at=>Time.now, :comment=>params[:comment])
     session[:query_count] = nil
+    finish_game()
     redirect_to :controller=>:games if params[:comment]
-      
   end
   
   # User request a new document
   def request_document
     session[:total_query_count] += session[:query_count]
-    session[:query_count] = 0    
-    if params[:skip]
-      init_target_document()
-      session[:seen_doc_count] += 1
-    end
     if game_finished? || params[:finish]
       redirect_to :action=>:finish
       return
+    else
+      init_target_document()
     end
   end
   
   # User start searching
+  # - determine which document to find
   def start_search
     session[:document_index]  = rand(@display_page_total) if !session[:document_index]
+    if session[:game_type] == :b
+      @concepts = Item.find ($concept_list.sample(@no_entry_concept).uniq - session[:display_docs])
+      render :start_browse
+    end
   end
-    
+      
   # Process search action
   # - add query as document
   def search
     @query = params[:query]
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
-    session[:query_count] += 1 if session[:query_count]
     @rank_list = search_local('k', @query)#search_remote('k', @query)
     if !@rank_list
       flash[:notice] = "Invalid query!"
@@ -103,25 +107,25 @@ class DocumentsController < ApplicationController
     @query_doc = Item.find_or_create(@query, 'query', :did=>@query_did, 
       :uri=>request.url, :content=>@rank_list.map{|e|e[0].title}.join("\n"))
     if during_game?
-      #debug @rank_list
-      #debug session[:display_docs]
-      #debug session[:document_index]
-      @rel_item_id = session[:display_docs][session[:document_index]].to_i
-      @relevant_position = -1
-      @rank_list.each_with_index do |e,i|
-        @relevant_position = i+1 if Item.find(@rel_item_id).did == e[0].did
-      end
-
-      Query.create(:query_text=>@query, :query_id=>@query_doc.id, :position=>@relevant_position, :query_count=>session[:query_count],
-        :item_id=>@rel_item_id, :user_id=>session[:user_id], :game_id=>session[:game_id])
-
-      if page_found? || query_limit_reached?
-        init_target_document()
-        session[:seen_doc_count] += 1
-        if page_found?
-          session[:score] += (@display_topk_result.to_f / @relevant_position ).to_i
-          session[:query_docs] = session[:query_docs] - [@rel_item_id]
-        end
+      process_search_result(@rank_list.map{|e|e[0].id}, @query_doc.id, @query)
+    end
+  end
+  
+  # Judge rank list and change status
+  # @arg rank_list : ranked list of document ids
+  def process_search_result(rank_list, query_id, query_text = nil)
+    session[:query_count] += 1 if session[:query_count]
+    @rel_item_id = session[:display_docs][session[:document_index]].to_i
+    @relevant_position = -1
+    rank_list.each_with_index do |e,i|
+      @relevant_position = i+1 if @rel_item_id == e
+    end
+    Query.create(:query_text=>query_text, :query_id=>query_id, :position=>@relevant_position, :query_count=>session[:query_count],
+      :item_id=>@rel_item_id, :user_id=>session[:user_id], :game_id=>session[:game_id])
+    if page_found? || query_limit_reached?
+      if page_found?
+        session[:score] += (@display_topk_result.to_f / @relevant_position ).to_i
+        #session[:query_docs] = session[:query_docs] - [@rel_item_id]
       end
     end
   end
@@ -134,24 +138,39 @@ class DocumentsController < ApplicationController
         redirect_to :action=>:start_search
         return
       end
-      params[:id] = session[:query_docs][rand(session[:query_docs].size)]
+      params[:id] = if session[:game_type] == :b
+        $concept_list.sample[0]
+      else
+        $document_list.sample[0]
+        #session[:query_docs][rand(session[:query_docs].size)]
+      end
       session[:display_page_cur] += 1
       session[:display_docs] << params[:id].to_i
       History.create(:htype=>"show", :basetime=>Time.now, :src_item_id=>session[:game_id], :item_id=>params[:id], :user_id=>get_user_id(),
         :metadata=>{:url=>request.url})
       #debug "#{session[:display_page_cur]} < #{@display_page_total} (#{session[:display_docs].inspect})"
+    else
+      @link_docs, @link_cons = [], []
+      $items = {}
+      if session[:game_type] == :b
+        @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con_con'
+      else
+        @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc_doc'        
+      end
+      begin
+        @rel_docs = (search_local(@search_type, params[:id]) || [])[0..9]
+        #info "Ranklist(doc) : #{@rel_docs.inspect}"
+        #debugger
+      rescue Exception => e
+        error "Failed to get Ranklist!", e
+        @rel_docs = []
+      end
+      if during_game?
+        process_search_result(@rel_docs.map{|e|e[:id]}, params[:id])
+      end
     end
+    
     @document = Item.find(params[:id])
-    @link_docs, @link_cons = [], []
-    $items = {}
-    begin
-      @rel_docs = (search_local('d', @document.id) || [])[0..9]
-      #info "Ranklist(doc) : #{@rel_docs.inspect}"
-      #debugger
-    rescue Exception => e
-      error "Failed to get Ranklist!", e
-      @rel_docs = []
-    end
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @document }
@@ -259,29 +278,5 @@ class DocumentsController < ApplicationController
   
   def concepts
     @occurrences = Occurrence.paginate(:order=>"weight desc", :page=>params[:page], :per_page=>50)
-  end
-  
-private
-  def source_given?
-    params && params[:source]
-  end
-
-  def init_game()
-    session[:seen_doc_count] = 0
-    session[:query_count] = 0
-    session[:total_query_count] = 0
-    session[:score] = 0
-    init_target_document()
-  end
-  
-  def finish_game()
-    session[:game_id] = nil
-    session[:query_count] = nil
-  end
-  
-  def init_target_document()
-    session[:display_page_cur] = 0
-    session[:display_docs] = []
-    session[:document_index] = nil
   end
 end
