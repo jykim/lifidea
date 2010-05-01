@@ -1,0 +1,18 @@
+<h1>Start Browsing</h1>
+<h2>Your job is to find the <%= (session[:document_index]+1).to_i.ordinalize %> concept.</h2>
+<h3>Start from one of given concepts! <%= "You have #{@queries_per_page - session[:query_count]} trials left." %></h3>
+<br>
+
+<table>
+	<% @concepts.each do |c|%>
+  <tr>
+		<td><%= link_to c.title, :action=>:show, :id=>c.id %></td>
+		<td><%= c.tag_titles %></td>
+  </tr>
+	<% end %>
+</table>
+
+<br>
+
+<h3>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next item.</h3>
+<% debug(session)%>
