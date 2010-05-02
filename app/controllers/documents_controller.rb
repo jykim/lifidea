@@ -16,7 +16,7 @@ class DocumentsController < ApplicationController
   def initialize
     @display_topk_result = 10   #get_config("DISPLAY_TOPK_RESULT").to_i
     @pages_per_game =       5   #get_config("PAGES_PER_GAME").to_i
-    @queries_per_page =     5   #get_config("QUERIES_PER_PAGE").to_i
+    @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
     @no_entry_concept =     3
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
     @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i

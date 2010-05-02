@@ -62,7 +62,7 @@
 
 <p>
   <b>Content:</b> <br>
+	(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
 		<iframe name='iframe_doc' src="<%= display_url(@document) %>" width="700" height="780" style="border: none;"></iframe>
-		(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
 </p>
 
