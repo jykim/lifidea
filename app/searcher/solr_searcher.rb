@@ -14,7 +14,11 @@ class SolrSearcher < Searcher
   def search_by_keyword(query, o={})
     result = Sunspot.search(Item) do
       keywords query
-      without :itype_str, 'query'
+      if o[:doc_only]
+        without :itype_str, ['query','concept']
+      else
+        without :itype_str, 'query'
+      end
       without :hidden_flag, '1'
     end
     result.hits.map{|e|[e.instance, e.score]}

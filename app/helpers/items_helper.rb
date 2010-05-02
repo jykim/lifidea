@@ -14,6 +14,6 @@ module ItemsHelper
   
   def search_local(qtype, query, o={})
     $searcher = SolrSearcher.new
-    @rank_list = $searcher.process_request(qtype, query)
+    @rank_list = $searcher.process_request(qtype, query, o)
   end
 end

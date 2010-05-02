@@ -11,7 +11,7 @@
     <td><%= i+1 %></td>
     <td><%= e[0].itype %></td>
     <td><%= display_link(e[0]) %></td>
-    <td><%= "<font color='#ff0000'>target document!</font>" if e[0].id == @rel_item_id %></td>
+    <td><%= "<font color='#ff0000'>target document!</font>" if e[0].id == session[:target_document].to_i %></td>
   </tr>
 <% end %>
 </table>
