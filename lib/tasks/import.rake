@@ -20,9 +20,9 @@ namespace :import do
       begin
         did = case e[:itype]
         when 'concept'
-          did = e[:title].to_id
+          e[:title].to_id
         else
-          did = e[:did]
+          e[:did]
         end
         item = Item.find_or_create(did, e[:itype])
         item.replace_tags([e[:tags],e[:more_tags]].join(","))
