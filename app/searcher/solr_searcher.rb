@@ -97,7 +97,7 @@ class SolrSearcher < Searcher
         item = $items[e["id"].to_i]
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
         fts = {:id=>item.id, :content=>(e["score"]/2)}
-        fts[:tag]   = get_overlap_feature('s', item, query_item)
+        fts[:tag]   = item.tag_titles.overlap(query_item.tag_titles) #get_overlap_feature('s', item, query_item)
         fts[:title] = (item.title || "").word_sim(query_item.title || "")
         fts[:time]  = (item.basetime - query_item.basetime ).normalize_time
         case type

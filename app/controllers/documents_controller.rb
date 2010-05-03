@@ -153,10 +153,12 @@ class DocumentsController < ApplicationController
       #History.create(:htype=>"show", :basetime=>Time.now, :src_item_id=>session[:game_id], :item_id=>params[:id], :user_id=>get_user_id(),
       #  :metadata=>{:url=>request.url})
       #debug "#{session[:display_page_cur]} < #{@display_page_total} (#{session[:display_docs].inspect})"
+      @document = Item.find(params[:id])
     else
       @link_docs, @link_cons = [], []
+      @document = Item.find(params[:id])
       $items = {}
-      if session[:game_type] == :b
+      if @document.itype == 'concept'
         @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con_con'
       else
         @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc_doc'        
@@ -174,7 +176,6 @@ class DocumentsController < ApplicationController
       end
     end
     
-    @document = Item.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @document }
