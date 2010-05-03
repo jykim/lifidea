@@ -14,7 +14,11 @@ class SolrSearcher < Searcher
   def search_by_keyword(query, o={})
     result = Sunspot.search(Item) do
       keywords query
-      without :itype_str, 'query'
+      if o[:doc_only]
+        without :itype_str, ['query','concept']
+      else
+        without :itype_str, 'query'
+      end
       without :hidden_flag, '1'
     end
     result.hits.map{|e|[e.instance, e.score]}
@@ -93,7 +97,7 @@ class SolrSearcher < Searcher
         item = $items[e["id"].to_i]
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
         fts = {:id=>item.id, :content=>(e["score"]/2)}
-        fts[:tag]   = get_overlap_feature('s', item, query_item)
+        fts[:tag]   = item.tag_titles.overlap(query_item.tag_titles) #get_overlap_feature('s', item, query_item)
         fts[:title] = (item.title || "").word_sim(query_item.title || "")
         fts[:time]  = (item.basetime - query_item.basetime ).normalize_time
         case type

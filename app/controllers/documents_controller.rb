@@ -15,7 +15,7 @@ class DocumentsController < ApplicationController
   
   def initialize
     @display_topk_result = 10   #get_config("DISPLAY_TOPK_RESULT").to_i
-    @pages_per_game =       5   #get_config("PAGES_PER_GAME").to_i
+    @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
     @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
     @no_entry_concept =     3
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
@@ -34,7 +34,7 @@ class DocumentsController < ApplicationController
     conditions = {}
     conditions.merge!({:itype=>params[:itype]}) if params[:itype] && !params[:itype].include?("all")
     conditions.merge!({:query_flag=>true}) if params[:query_only]
-    @documents = Item.valid.documents.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
+    @documents = Item.valid.searchables.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
     
     respond_to do |format|
       format.html # index.html.erb
@@ -59,8 +59,10 @@ class DocumentsController < ApplicationController
     @game.update_attributes(:score=>session[:score], 
       :query_count=>session[:total_query_count], :finish_at=>Time.now, :comment=>params[:comment])
     session[:query_count] = nil
-    finish_game()
-    redirect_to :controller=>:games if params[:comment]
+    if params[:comment]
+      finish_game()
+      redirect_to :controller=>:games 
+    end
   end
   
   # User request a new document
@@ -90,7 +92,7 @@ class DocumentsController < ApplicationController
     @query = params[:query]
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
-    @rank_list = search_local('k', @query)#search_remote('k', @query)
+    @rank_list = search_local('k', @query, :doc_only=>true)#search_remote('k', @query)
     if !@rank_list
       flash[:notice] = "Invalid query!"
       if !during_game?
@@ -115,17 +117,19 @@ class DocumentsController < ApplicationController
   # @arg rank_list : ranked list of document ids
   def process_search_result(rank_list, query_id, query_text = nil)
     session[:query_count] += 1 if session[:query_count]
-    @rel_item_id = session[:display_docs][session[:document_index]].to_i
+    session[:target_document] = session[:display_docs][session[:document_index]].to_i
     @relevant_position = -1
     rank_list.each_with_index do |e,i|
-      @relevant_position = i+1 if @rel_item_id == e
+      @relevant_position = i+1 if session[:target_document].to_i == e
     end
-    Query.create(:query_text=>query_text, :query_id=>query_id, :position=>@relevant_position, :query_count=>session[:query_count],
-      :item_id=>@rel_item_id, :user_id=>session[:user_id], :game_id=>session[:game_id])
+    if query_text
+      Query.create(:query_text=>query_text, :query_id=>query_id, :position=>@relevant_position, :query_count=>session[:query_count],
+        :item_id=>session[:target_document], :user_id=>session[:user_id], :game_id=>session[:game_id])
+    end
     if page_found? || query_limit_reached?
       if page_found?
         session[:score] += (@display_topk_result.to_f / @relevant_position ).to_i
-        #session[:query_docs] = session[:query_docs] - [@rel_item_id]
+        #session[:query_docs] = session[:query_docs] - [session[:target_document]]
       end
     end
   end
@@ -146,13 +150,15 @@ class DocumentsController < ApplicationController
       end
       session[:display_page_cur] += 1
       session[:display_docs] << params[:id].to_i
-      History.create(:htype=>"show", :basetime=>Time.now, :src_item_id=>session[:game_id], :item_id=>params[:id], :user_id=>get_user_id(),
-        :metadata=>{:url=>request.url})
+      #History.create(:htype=>"show", :basetime=>Time.now, :src_item_id=>session[:game_id], :item_id=>params[:id], :user_id=>get_user_id(),
+      #  :metadata=>{:url=>request.url})
       #debug "#{session[:display_page_cur]} < #{@display_page_total} (#{session[:display_docs].inspect})"
+      @document = Item.find(params[:id])
     else
       @link_docs, @link_cons = [], []
+      @document = Item.find(params[:id])
       $items = {}
-      if session[:game_type] == :b
+      if @document.itype == 'concept'
         @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con_con'
       else
         @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc_doc'        
@@ -170,7 +176,6 @@ class DocumentsController < ApplicationController
       end
     end
     
-    @document = Item.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @document }
@@ -191,8 +196,8 @@ class DocumentsController < ApplicationController
   def click
     #debug(params)
     src_item, tgt_item = params[:src_item_id].to_i, params[:id].to_i
-    History.create(:htype=>params[:htype], :basetime=>Time.now, :src_item_id=>src_item, :item_id=>tgt_item, :user_id=>get_user_id(),
-      :game_id=>session[:game_id], :metadata=>{:position=>params[:position], :url=>request.url})
+    History.create(:htype=>params[:htype], :basetime=>Time.now, :src_item_id=>session[:target_document], :item_id=>tgt_item, :user_id=>get_user_id(),
+      :game_id=>session[:game_id], :metadata=>{:real_src_item_id=>src_item, :position=>params[:position], :url=>request.url})
     Link.find_or_create(src_item, tgt_item, 'c', :add=>1)
     redirect_to :action=>:show
   end

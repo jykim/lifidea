@@ -44,7 +44,7 @@
 	<table class="sortable" id="sortabletable">
 	<tr>
 		<% header = ['time','type','title'] %>
-		<% (header << 'score').concat(Searcher::DOC_FEATURES) if Conf.debug %>
+		<% (header << 'score').concat(Searcher::DOC_FEATURES) if (Conf.debug || params[:debug]) %>
 		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
@@ -53,7 +53,7 @@
 		  <td width='80'><%= item.basetime.to_date %></td>
 		  <td><%= item.itype %></td>
 		  <td><%= link_to item.title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
-		<% if Conf.debug %>
+		<% if Conf.debug || params[:debug] %>
 			<%=[:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 		<% end %>
 		</tr>

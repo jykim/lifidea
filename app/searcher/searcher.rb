@@ -26,11 +26,11 @@ class Searcher
     @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc', Conf.weight_doc))
   end
   
-  def process_request(qtype, query)
+  def process_request(qtype, query, o = {})
     result = case qtype
-    when 'k' : search_by_keyword(query)
-    when 'c' : search_by_item(query, 'con')
-    when 'd' : search_by_item(query, 'doc')
+    when 'k' : search_by_keyword(query, o)
+    when 'c' : search_by_item(query, 'con', o)
+    when 'd' : search_by_item(query, 'doc', o)
     end
     #puts result.inspect
     #debugger
@@ -71,7 +71,7 @@ class Searcher
   def self.load_features()
     clf = LinkFeatures.new
     clf.load Link.all.map{|l|[l.ltype, l.out_id.to_i, l.in_id.to_i, l.weight]}
-    clf.load Occurrence.all.map{|l|['s', l.tag_id.to_i, l.item_id.to_i, 1]}, :force=>true
+    #clf.load Occurrence.all.map{|l|['s', l.tag_id.to_i, l.item_id.to_i, 1]}, :force=>true
     info "[load_features] done!"
     clf
   end

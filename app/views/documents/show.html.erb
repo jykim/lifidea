@@ -22,6 +22,11 @@
   <%=h @document.title %> <%=h @document.query_flag ? "(query)" : "" %>
 </p>
 
+<p>
+  <b>Tags:</b>
+	<%=  @document.tags.map{|e|e.title}.join(",") if @document.tags %>
+</p>
+
 <% if @document.uri =~ /^http:/ %>
 <p>
   <b>URL:</b>
@@ -39,22 +44,23 @@
 
 <% if @rel_docs %>
 	<b>Relevant Items:</b>
-	<table class="sortable" id="sortabletable" border=1 cellpadding=2 cellspacing=0>
+	<table class="sortable" id="sortabletable" border=0 cellpadding=2 cellspacing=0>
 	<tr>
-		<% header = ['rank','type','title','target?'] %>
-		<% (header << 'score').concat(@feature_type) if Conf.debug %>
+		<% header = ['rank','type','title'] %>
+		<% (header << 'score').concat(@feature_type) if Conf.debug || params[:debug] %>
 		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
 		<% item = cache_data("item_#{e[:id]}") %>
+		<%= error "#%%%%% : "+item.did %>
 		<tr>
 		  <td><%= i+1 %></td>
 		  <td><%= item.itype %></td>
 		  <td><%= link_to item.title, {:controller=>'documents', :action=>'click', :htype=>@htype, :id=>e[:id], :src_item_id=>@document.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
-		<% if Conf.debug %>
+		<% if Conf.debug || params[:debug] %>
 			<%=[:score].concat(@feature_type).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 		<% end %>
-		<td><%= "<font color='#ff0000'>target item!</font>" if item.id == @rel_item_id %></td>
+		<td><%= "<font color='#ff0000'>target item!</font>" if item.id == session[:target_document].to_i %></td>
 		</tr>
 	<% end %>
 	</table>
