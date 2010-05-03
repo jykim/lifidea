@@ -24,7 +24,7 @@
 
 <p>
   <b>Tags:</b>
-	<%=  @document.tags.map{|e|e.title}.join(",") if @document.tags %>
+	<%= @document.tag_titles.join(",") %>
 </p>
 
 <% if @document.uri =~ /^http:/ %>
@@ -46,17 +46,18 @@
 	<b>Relevant Items:</b>
 	<table class="sortable" id="sortabletable" border=0 cellpadding=2 cellspacing=0>
 	<tr>
-		<% header = ['rank','type','title'] %>
+		<% header = ['rank','type','title','tags'] %>
 		<% (header << 'score').concat(@feature_type) if Conf.debug || params[:debug] %>
 		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
 		<% item = cache_data("item_#{e[:id]}") %>
-		<%= error "#%%%%% : "+item.did %>
+		<% error "#%%%%% : "+item.did %>
 		<tr>
 		  <td><%= i+1 %></td>
 		  <td><%= item.itype %></td>
 		  <td><%= link_to item.title, {:controller=>'documents', :action=>'click', :htype=>@htype, :id=>e[:id], :src_item_id=>@document.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
+		  <td><%= item.tag_titles.join(",") %></td>
 		<% if Conf.debug || params[:debug] %>
 			<%=[:score].concat(@feature_type).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 		<% end %>

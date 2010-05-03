@@ -9,12 +9,10 @@
 	<% else %>
 		<%= "Document Not Found! You have #{@queries_per_page - session[:query_count]} trials left." %>
 		<br>
-		<% if controller.action_name == 'search' %>
 			<% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
 				<%= text_field_tag(:query, @query, :onpaste=>'return false;', :size=>60) %>
 				<%= submit_tag('Search') %>
 			<% end -%>
-		<% end %>
 		<br>
 		<br>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next document.
 	<% end %>

@@ -7,7 +7,7 @@
 	<% @concepts.each do |c|%>
   <tr>
 		<td><%= link_to c.title, :action=>:show, :id=>c.id %></td>
-		<td><%= c.tag_titles %></td>
+		<td><%= c.tag_titles.join(",") %></td>
   </tr>
 	<% end %>
 </table>
