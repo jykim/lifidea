@@ -1,5 +1,5 @@
 <% if params[:random] %>
-	<h2>Here's the <%= session[:display_page_cur].to_i.ordinalize %> document (
+	<h2>Here's the <%= session[:display_page_cur].to_i.ordinalize %> item (
 	<% if @display_page_total <= session[:display_page_cur] %>
 		 <%= link_to("skip to search", :action=>:start_search)%> 
 	<% else %>
