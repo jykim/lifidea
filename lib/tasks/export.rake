@@ -49,9 +49,9 @@ namespace :export do
     itype = ENV['itype'] || 'all'
     Item.valid.between($start_at, $end_at).itype(itype).each_with_index do |e,i|
       puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      result << [e.id, e.basetime, e.itype, e.title, e.did, e.uri, e.hidden_flag_before_type_cast, e.tag_titles.sort.join(",")]
+      result << [e.id, e.basetime, e.itype, e.title, e.did, e.uri, e.hidden_flag_before_type_cast, e.query_flag_before_type_cast, e.tag_titles.sort.join(",")]
     end
-    write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'tags']
+    write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'query_flag' ,'tags']
   end
   
   desc "Export Top-K Concept Features"

@@ -5,6 +5,14 @@ module DocumentsHelper
   #    :multiple=>true, :onchange => 'this.form.submit()')
   #end
   
+  def display_game_type()
+    case session[:game_type]
+    when :s : "Searching"
+    when :sb : "Searching+Browsing"
+    when :b : "Browsing"      
+    end
+  end
+  
   def display_url(item)
     case item.uri
     when /\.(#{FileCollector::FILE_FORMAT_BINARY})$/
@@ -38,7 +46,7 @@ module DocumentsHelper
   def init_game(game_id)
     session[:game_id] = game_id
     session[:total_query_count] = 0 # #queries in overall
-    session[:seen_doc_count] = -1
+    session[:seen_doc_count] = 0
     session[:score] = 0
     session[:query_count] = 0
     session[:display_page_cur] = 0
@@ -53,7 +61,6 @@ module DocumentsHelper
   def init_target_document()
     session[:query_count] = 0
     session[:display_page_cur] = 0
-    session[:seen_doc_count] += 1
     
     session[:display_docs] = []
     session[:document_index] = nil

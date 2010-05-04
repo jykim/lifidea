@@ -7,12 +7,12 @@
 	<% @concepts.each do |c|%>
   <tr>
 		<td><%= link_to c.title, :action=>:show, :id=>c.id %></td>
-		<td><%= c.tag_titles %></td>
+		<td><%= c.tag_titles.join(",") %></td>
   </tr>
 	<% end %>
 </table>
 
 <br>
 
-<h3>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next item.</h3>
+<h3>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next item without penality.</h3>
 <% debug(session)%>

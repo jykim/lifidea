@@ -1,21 +1,28 @@
 <h1>Start a New Game</h1>
 
 <h2>Goal</h2>
-Your goal is to find the documents you're shown using the search engine provided. Since finding the document you've just seen is too easy, we show <%= @display_page_total %> documents in a row and tell you which document to find in the end. <br><br>
+Your goal is to find the item (document / concept) you're shown using the search and browsing capability of the system. Since finding the item you've just seen is too easy, we show <%= @display_page_total %> items in a row and tell you which item to find in the end. <br><br>
 
-Your score is determined by where in the Top <%= @display_topk_result %> rank list you can locate the target document. For instance, if the target document was found at the first rank, you can get 10 points.<br><br>
+There are three different scenarios of finding in this game, which is decided by the system at random for each target item. 
+
+<ul>
+	<li>Searching only</li> You're asked to find the target document using only search 
+	<li>Searching + browsing</li> In addition to searching, you can browse to related document by clicking the search results
+	<li>Browsing only</li> You're asked to find the target concept by clicking the search results starting from one of entry concept
+</ul>
+
+Your score is determined by where in the Top <%= @display_topk_result %> rank list you can locate the target item. For instance, if the target item was found at the first rank, you can get 10 points.<br><br>
 
 Up to this point, you have found <%=  @query_docs_found.size %>. 
 
 <h2>Rules</h2>
-- You'll be finding <%= @pages_per_game %> documents per game, each of which will be provided with <%= @display_page_total-1 %> other documents. <br>
+- You'll be finding <%= @pages_per_game %> items per game, each of which will be provided with <%= @display_page_total-1 %> other items. <br>
 
-- You'll be given <%= @time_per_page %> seconds to skim each document after it's loaded.<br>
+- You'll be given <%= @time_per_page %> seconds to skim each item after it's loaded.<br>
 
-- Please do not copy and paste document text. (pasting to search box is disabled) <br>
+- Before your first query or click for each item, you can skip to the next item without penalty.<br>
 
-- The search engine used for this game indexes everything (type, title, uri, metadata and content) shown in the document page.
+- Please do not copy and paste item text. (pasting to search box is disabled) <br>
 
-- The search engine handles only simple keyword queries without fancy features. (e.g. phrase, spell correction, etc.)
 
 <h3><%= link_to("Click here", :action=>:request_document)%> if you want to start now!</h3>

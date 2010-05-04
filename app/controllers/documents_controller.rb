@@ -47,9 +47,9 @@ class DocumentsController < ApplicationController
     @game = Game.create(:gid=>"#{session[:user_uid]}_#{Time.now.to_s(:db)}", 
       :user_id=>session[:user_id], :start_at=>Time.now)
     init_game(@game.id)
-    #@query_docs_total = Item.find_all_by_query_flag(true).map{|d|d.id}
+    @query_cons_total = Item.concepts.find_all_by_query_flag(true).map{|d|d.id}
     @query_docs_found = Query.find_all_by_user_id(session[:user_id]).map{|e|e.item_id}.uniq
-    #session[:query_docs] = @query_docs_total -  @query_docs_found
+    session[:query_cons] = @query_cons_total -  @query_docs_found
   end
   
   # FInalize current game
@@ -68,6 +68,9 @@ class DocumentsController < ApplicationController
   # User request a new document
   def request_document
     session[:total_query_count] += session[:query_count]
+    if params[:skip] && session[:query_count] > 0
+      session[:seen_doc_count] += 1
+    end
     if game_finished? || params[:finish]
       redirect_to :action=>:finish
       return
@@ -89,7 +92,7 @@ class DocumentsController < ApplicationController
   # Process search action
   # - add query as document
   def search
-    @query = params[:query]
+    @query = params[:query].gsub(/[\'\"]/, "")
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
     @rank_list = search_local('k', @query, :doc_only=>true)#search_remote('k', @query)
@@ -127,6 +130,7 @@ class DocumentsController < ApplicationController
         :item_id=>session[:target_document], :user_id=>session[:user_id], :game_id=>session[:game_id])
     end
     if page_found? || query_limit_reached?
+      session[:seen_doc_count] += 1
       if page_found?
         session[:score] += (@display_topk_result.to_f / @relevant_position ).to_i
         #session[:query_docs] = session[:query_docs] - [session[:target_document]]
@@ -143,10 +147,12 @@ class DocumentsController < ApplicationController
         return
       end
       params[:id] = if session[:game_type] == :b
-        $concept_list.sample[0]
+        #$concept_list.sample[0]
+        query_id = session[:query_cons][rand(session[:query_cons].size)]
+        session[:query_cons] -= [query_id]
+        query_id
       else
         $document_list.sample[0]
-        #session[:query_docs][rand(session[:query_docs].size)]
       end
       session[:display_page_cur] += 1
       session[:display_docs] << params[:id].to_i

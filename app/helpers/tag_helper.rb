@@ -32,10 +32,18 @@ module TagHelper
   #  Tag.all(:joins=>{:occurrences=>:tag}, :conditions=>{:occurrences=>{:item_id=>id}}).map(&:title)
   #end
   
+  # Read tag titles & update cache
   def tag_titles(otype = nil)
     #read_attribute(:concept_titles)|| []
-    cond = otype ? {:occurrences=>{:otype=>otype, :item_id=>id}} : {:occurrences=>{:item_id=>id}}
-    Tag.all(:joins=>{:occurrences=>:tag}, :conditions=>cond).map(&:title)
+    if tags_saved
+      tags_saved.split(",")
+    else
+      cond = otype ? {:occurrences=>{:otype=>otype, :item_id=>id}} : {:occurrences=>{:item_id=>id}}
+      result = Tag.all(:joins=>{:occurrences=>:tag}, :conditions=>cond).map(&:title)
+      update_attributes!(:tags_saved=>result.join(","))
+      result
+    end
+      
   end
   
   def tagged_with?(tag)
