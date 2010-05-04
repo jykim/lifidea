@@ -27,8 +27,17 @@ namespace :import do
         item = Item.find_or_create(did, e[:itype])
         item.replace_tags([e[:tags],e[:more_tags]].join(","))
         e.delete(:tags) ; e.delete(:more_tags)
-        item.update_attributes! e.merge(:did=>did, :modified_flag=>true)
+        case e[:itype]
+        when 'concept' 
+          item.update_attributes! e.merge(:did=>did, :modified_flag=>true)
+        else
+          e.delete(:did)
+          item.update_attributes! e.merge(:modified_flag=>true)
+        end
         puts "#{i}th item processed..." if i % 50 == 0 && i > 0
+      rescue Interrupt => e
+        puts 'Break by user'
+        exit
       rescue Exception => e
         error "Error occured in #{e.inspect}"
       end
