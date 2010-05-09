@@ -6,6 +6,7 @@
 <% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
 <%= text_field_tag(:query, @query, :onpaste=>'return false;', :size=>60) %>
 <%= submit_tag('Search') %>
+<br>(Each <u>keyword</u> is counted as one trial.)
 <% end -%>
 
 <h3>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next document without penality.</h3>
