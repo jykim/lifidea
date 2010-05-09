@@ -61,7 +61,7 @@ class DocumentsController < ApplicationController
     @game.update_attributes(:score=>session[:score], 
       :query_count=>session[:total_query_count], :finish_at=>Time.now, :comment=>params[:comment])
     session[:query_count] = nil
-    @comment = "Did you find browsing helps you find items better?\n\n"
+    @comment = ""#"Did you find browsing helps you find items better?\n\n"
     if params[:comment]
       finish_game()
       redirect_to :controller=>:games 
