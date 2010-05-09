@@ -4,7 +4,7 @@
 <h2>Time Spent : <%= (@game.finish_at - @game.start_at).round %> seconds</h2>
 
 
-<h3>Do you feel that browsing to related item was helpful in finding things? In what way? If not, why?  </h3>
+<h3>Do you feel that browsing to related item was helpful in finding things? <br> In what way? If not, why?  </h3>
 
 <% form_tag({:controller=>'documents',:action => 'finish'}, :method => :post) do -%>
 <%= text_area_tag(:comment, @comment, :cols=>80, :rows=>10, :value=>@comment) %><br>
