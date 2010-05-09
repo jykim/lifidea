@@ -56,8 +56,8 @@
 		<tr>
 		  <td><%= i+1 %></td>
 		  <td><%= item.itype %></td>
-		  <td><%= link_to item.title, {:controller=>'documents', :action=>'click', :htype=>@htype, :id=>e[:id], :src_item_id=>@document.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
-		  <td><%= item.tag_titles.join(",") %></td>
+		  <td><%= display_link(item, @rel_docs.map{|e2|e2[:id]}, @htype, i) %></td>
+		  <td><%= item.tag_titles[0..3].join(",") %></td>
 		<% if Conf.debug || params[:debug] %>
 			<%=[:score].concat(@feature_type).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 		<% end %>

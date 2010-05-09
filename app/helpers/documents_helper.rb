@@ -30,11 +30,17 @@ module DocumentsHelper
     end
   end
   
-  def display_link(item)
-    if session[:game_type] == :sb
-      link_to item.title, {:controller=>'documents', :action=>'click', :htype=>'qry_doc', :id=>item.id, :src_item_id=>@query_doc.id}
+  # Display link URL for clickthrough recording
+  def display_link(item, rank_list, htype, position)
+    if during_game?
+      if session[:game_type] != :s && !page_found? && !query_limit_reached?
+        link_to item.title, {:action=>'click', :htype=>htype, :id=>item.id, :src_item_id=>session[:target_document], 
+          :position=>(position+1), :skipped_items=>rank_list[0..position].reverse.join("|")}
+      else
+        item.title
+      end
     else
-      item.title
+      link_to item.title, {:action=>'show', :id=>item.id}
     end
   end
   
@@ -60,6 +66,7 @@ module DocumentsHelper
   # Initialize per-document variable
   def init_target_document()
     session[:query_count] = 0
+    #session[:refresh_count] = 3
     session[:display_page_cur] = 0
     
     session[:display_docs] = []

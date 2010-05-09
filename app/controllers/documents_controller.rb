@@ -20,7 +20,7 @@ class DocumentsController < ApplicationController
     @no_entry_concept =     7
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
     @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i
-    @ratio_game_type = {:s=>0.33, :sb=>0.33, :b=>0.33}
+    @ratio_game_type = {:sb=>0.75, :b=>0.25}
     $document_list ||= Item.valid.documents.all.map{|e|e.id}
     $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
   end
@@ -47,9 +47,11 @@ class DocumentsController < ApplicationController
     @game = Game.create(:gid=>"#{session[:user_uid]}_#{Time.now.to_s(:db)}", 
       :user_id=>session[:user_id], :start_at=>Time.now)
     init_game(@game.id)
+    @query_docs_total = Item.documents.find_all_by_query_flag(true).map{|d|d.id}
     @query_cons_total = Item.concepts.find_all_by_query_flag(true).map{|d|d.id}
-    @query_docs_found = Query.find_all_by_user_id(session[:user_id]).map{|e|e.item_id}.uniq
-    session[:query_cons] = @query_cons_total -  @query_docs_found
+    @query_items_found = Query.find_all_by_user_id(session[:user_id]).map{|e|e.item_id}.uniq
+    session[:query_cons] = @query_cons_total -  @query_items_found
+    session[:query_docs] = @query_docs_total -  @query_items_found
   end
   
   # FInalize current game
@@ -59,6 +61,7 @@ class DocumentsController < ApplicationController
     @game.update_attributes(:score=>session[:score], 
       :query_count=>session[:total_query_count], :finish_at=>Time.now, :comment=>params[:comment])
     session[:query_count] = nil
+    @comment = "Did you find browsing helps you find items better?\n\n"
     if params[:comment]
       finish_game()
       redirect_to :controller=>:games 
@@ -119,16 +122,14 @@ class DocumentsController < ApplicationController
   # Judge rank list and change status
   # @arg rank_list : ranked list of document ids
   def process_search_result(rank_list, query_id, query_text = nil)
-    session[:query_count] += 1 if session[:query_count]
+    session[:query_count] += (query_text ? query_text.split(/\s+/).size : 1 ) if session[:query_count]
     session[:target_document] = session[:display_docs][session[:document_index]].to_i
     @relevant_position = -1
     rank_list.each_with_index do |e,i|
       @relevant_position = i+1 if session[:target_document].to_i == e
     end
-    if query_text
-      Query.create(:query_text=>query_text, :query_id=>query_id, :position=>@relevant_position, :query_count=>session[:query_count],
-        :item_id=>session[:target_document], :user_id=>session[:user_id], :game_id=>session[:game_id])
-    end
+    Query.create(:query_text=>query_text, :query_id=>query_id, :position=>@relevant_position, :query_count=>session[:query_count],
+      :item_id=>session[:target_document], :user_id=>session[:user_id], :game_id=>session[:game_id])
     if page_found? || query_limit_reached?
       session[:seen_doc_count] += 1
       if page_found?
@@ -146,13 +147,13 @@ class DocumentsController < ApplicationController
         redirect_to :action=>:start_search
         return
       end
-      params[:id] = if session[:game_type] == :b
+      if session[:game_type] == :b
         #$concept_list.sample[0]
-        query_id = session[:query_cons][rand(session[:query_cons].size)]
-        session[:query_cons] -= [query_id]
-        query_id
+        params[:id] = session[:query_cons].sample[0]
+        session[:query_cons] -= [params[:id]]
       else
-        $document_list.sample[0]
+        params[:id] = session[:query_docs].sample[0]
+        session[:query_docs] -= [params[:id]]
       end
       session[:display_page_cur] += 1
       session[:display_docs] << params[:id].to_i
