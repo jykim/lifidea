@@ -1,10 +1,16 @@
 <h1>Game Statistics </h1>
-<h2>Score : <%= session[:score] %></h2>
+<% score = session[:score].to_i %>
+<h2>Score : <%= score %></h2>
 <h2>Queries Issued : <%= session[:total_query_count] %></h2>
 <h2>Time Spent : <%= (@game.finish_at - @game.start_at).round %> seconds</h2>
+<% if user_level < user_level_new(score) %>
+<br>
+<h3>Congratulations! You moved to level <%= user_level_new(score) %>!  </h3>
+<br>
+<% update_user_level(score) %>
+<% end %>
 
-
-<h3>Do you feel that browsing to related item was helpful in finding things? <br> In what way? If not, why?  </h3>
+<h3>Do you feel that browsing to related item was helpful in finding things? <br> In what way? If not, why?  (any other feedback will be appreciated.)</h3>
 
 <% form_tag({:controller=>'documents',:action => 'finish'}, :method => :post) do -%>
 <%= text_area_tag(:comment, @comment, :cols=>80, :rows=>10, :value=>@comment) %><br>
