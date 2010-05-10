@@ -5,6 +5,35 @@ module DocumentsHelper
   #    :multiple=>true, :onchange => 'this.form.submit()')
   #end
   
+  def user_level()
+    session ? session[:user_level].to_i : 0
+  end
+  
+  def user_level_new(score)
+    if score >= 75 : 2
+    elsif score >= 50 : 1
+    else
+      0
+    end
+  end
+  
+  def apply_user_level
+    return if @user_level_applied
+    @queries_per_page -= user_level * 2
+    @no_entry_concept -= user_level * 2
+    @display_page_total += user_level
+    @user_level_applied = true
+  end
+  
+  def update_user_level(score)
+    session[:user_level] = user_level_new(score)
+    User.find(session[:user_id]).update_attributes!(:level=>user_level_new(score))
+  end
+  
+  def display_user_list(level)
+    User.find_all_by_level(level).map{|e|(e.id == session[:user_id])? "<b>#{e.uid}</b>" : e.uid}.join(" ")
+  end
+  
   def display_game_type()
     case session[:game_type]
     when :s : "Searching"

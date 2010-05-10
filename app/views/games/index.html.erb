@@ -13,6 +13,7 @@
     <td><%=(game.user)? ((game.user_id==session[:user_id])? "<b>#{game.user.uid}</b>" : game.user.uid) : game.user_id %></td>
     <td><%=h game.score %></td>
     <td><%=h game.query_count %></td>
+    <td><%=h game.level %></td>
     <td><%=h game.start_at.to_date %></td>
 <% if session[:admin_flag]%>
     <td><%= link_to 'Show', game %></td>

@@ -2,6 +2,7 @@ require 'ddl_include'
 class DocumentsController < ApplicationController
   include AdminHelper, DocumentsHelper
   before_filter :authorize, :except => [:login, :index, :show, :search, :click]
+  before_filter :apply_user_level
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :pagehunt_search, :only=>[:index, :search]
   sidebar :menu, :only=>[:index]
@@ -14,13 +15,15 @@ class DocumentsController < ApplicationController
   #sidebar :linked_documents, :only=>:show
   
   def initialize
-    @display_topk_result = 10   #get_config("DISPLAY_TOPK_RESULT").to_i
-    @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
-    @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
+    puts "user level : #{user_level} / #{session.inspect}"    
+    @display_topk_result = 10   
+    @pages_per_game =      10   
+    @queries_per_page =    10
     @no_entry_concept =    10
-    @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
-    @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i
+    @display_page_total =   2
+    @time_per_page =       15
     @ratio_game_type = {:sb=>0.75, :b=>0.25}
+    @user_level_applied = false
     $document_list ||= Item.valid.documents.all.map{|e|e.id}
     $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
   end
@@ -45,7 +48,7 @@ class DocumentsController < ApplicationController
   # Start a new game
   def start
     @game = Game.create(:gid=>"#{session[:user_uid]}_#{Time.now.to_s(:db)}", 
-      :user_id=>session[:user_id], :start_at=>Time.now)
+      :user_id=>session[:user_id], :level=>session[:user_level], :start_at=>Time.now)
     init_game(@game.id)
     @query_docs_total = Item.documents.find_all_by_query_flag(true).map{|d|d.id}
     @query_cons_total = Item.concepts.find_all_by_query_flag(true).map{|d|d.id}
