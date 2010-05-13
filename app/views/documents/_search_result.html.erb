@@ -5,7 +5,7 @@
 	<% elsif page_found? %>
 		<%= "Item Found! #{link_to 'Click here', :action=>:request_document} to see the next item." %>
 	<% elsif query_limit_reached? %>
-		<%= "Query limit reached! #{link_to 'Click here', :action=>:request_document} to see the next document." %>
+		<%= "Query limit reached! #{link_to 'Click here', :action=>:request_document} to see the next item." %>
 	<% else %>
 		<%= "Item Not Found! You have #{@queries_per_page - session[:query_count]} trials left." %>
 		<br>
@@ -15,9 +15,11 @@
 				<%= submit_tag('Search') %>
 			<% end -%>
 		<% end %>
+		<br>You can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip  to the next item.
+		<% if controller.action_name == 'show' %>
+		 Or <a href="javascript: history.go(-1)">move back</a> to the previous page.
+		<% end %>
 		<br>
-		<br>Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip  to the next document.
 	<% end %>
 </h3>
-<br>
 <% end %>
