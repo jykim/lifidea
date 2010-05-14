@@ -13,20 +13,9 @@
 <%= "<b>Did: </b>" + @document.did if session[:admin_flag] && @document.did %>
 
 <p>
-  <b>Type:</b>
-  <%=h @document.itype %>
-</p>
-
-<p>
   <b>Title:</b>
   <%=h @document.title %> <%=h @document.query_flag ? "(query)" : "" %>
 </p>
-
-<p>
-  <b>Tags:</b>
-	<%= @document.tag_titles.join(",") %>
-</p>
-
 <% if @document.uri =~ /^http:/ %>
 <p>
   <b>URL:</b>
@@ -44,12 +33,8 @@
 
 <% if @rel_docs %>
 	<b>Relevant Items:</b>
+	<br>(click a link below to <b>browse</b> into other item!)
 	<table class="sortable" id="sortabletable" border=0 cellpadding=2 cellspacing=0>
-	<tr>
-		<% header = ['rank','type','title','tags'] %>
-		<% (header << 'score').concat(@feature_type) if Conf.debug || params[:debug] %>
-		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
-	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
 		<% item = cache_data("item_#{e[:id]}") %>
 		<% error "#%%%%% : "+item.did %>

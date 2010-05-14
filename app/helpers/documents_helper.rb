@@ -65,7 +65,7 @@ module DocumentsHelper
     if during_game?
       if session[:game_type] != :s && !page_found? && !query_limit_reached?
         link_to item.title, {:action=>'click', :htype=>htype, :id=>item.id, :src_item_id=>session[:target_document], 
-          :position=>(position+1), :skipped_items=>rank_list[0..position].reverse.join("|")}
+          :position=>(position+1), :skipped_items=>rank_list[0..position].reverse.join("|")}, :title=>'Click to see more items like this!'
       else
         item.title
       end

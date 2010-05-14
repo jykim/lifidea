@@ -15,9 +15,10 @@
 				<%= submit_tag('Search') %>
 			<% end -%>
 		<% end %>
-		<br>You can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip  to the next item.
 		<% if controller.action_name == 'show' %>
-		 Or <a href="javascript: history.go(-1)">move back</a> to the previous page.
+		<br>You can <%= link_to "skip", :action=>:request_document, :skip=>true%>  to the next item or <a href="javascript: history.go(-1)">move back</a> to the previous page.
+		<% else %>
+		<br>You can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip  to the next item.
 		<% end %>
 	<% end %>
 </h3>
