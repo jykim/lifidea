@@ -125,7 +125,6 @@ class DocumentsController < ApplicationController
   # Judge rank list and change status
   # @arg rank_list : ranked list of document ids
   def process_search_result(rank_list, query_id, query_text = nil)
-    session[:query_count] += (query_text ? query_text.split(/\s+/).size : 1 ) if session[:query_count]
     session[:target_document] = session[:display_docs][session[:document_index]].to_i
     @relevant_position = -1
     rank_list.each_with_index do |e,i|
@@ -133,6 +132,7 @@ class DocumentsController < ApplicationController
     end
     Query.create(:query_text=>query_text, :query_id=>query_id, :position=>@relevant_position, :query_count=>session[:query_count],
       :item_id=>session[:target_document], :user_id=>session[:user_id], :game_id=>session[:game_id])
+    session[:query_count] += (query_text ? query_text.split(/\s+/).size : 1 ) if session[:query_count]
     if page_found? || query_limit_reached?
       session[:seen_doc_count] += 1
       if page_found?
@@ -169,9 +169,9 @@ class DocumentsController < ApplicationController
       @document = Item.find(params[:id])
       $items = {}
       if @document.itype == 'concept'
-        @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con_con'
+        @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con'
       else
-        @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc_doc'        
+        @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
       end
       begin
         @rel_docs = (search_local(@search_type, params[:id]) || [])[0..9]
