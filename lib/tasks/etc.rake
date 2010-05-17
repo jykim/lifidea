@@ -56,9 +56,12 @@ namespace :etc do
     result_train, result_test = [o[:header]], [o[:header]]
     data.each_with_index do |e,i|
       #puts rand(), train_ratio
-      if (o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) < o[:train_ratio]) ||
-         (o[:test_set] && !o[:test_set].include?(i))
-        result_train << e
+      if o[:test_set] && !o[:test_set].include?(i)
+        if o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) > o[:train_ratio].to_f
+          next
+        else
+          result_train << e
+        end
       else
         result_test << e
       end
@@ -104,16 +107,16 @@ namespace :etc do
     end
     #debugger
     error "[split_file] Data is blank!" if data.blank?
-    if ENV['train_ratio'] 
-      train_ratio = ENV['train_ratio'].to_f
-      split_file(filename, data, :train_ratio=>train_ratio)
-    elsif ENV['folds']
+    if !ENV['folds']
+      split_file(filename, data, :train_ratio=>ENV['train_ratio'])
+    else
       test_sets=(0..data.size).to_a.shuffle.in_groups_of((data.size.to_f / ENV['folds'].to_f).ceil)
       #p test_sets
       1.upto(ENV['folds'].to_i) do |i|
         puts "#{test_sets[i-1].size} / #{data.size}"
         $fold = "-k#{ENV['folds']}-#{i}"
-        split_file(get_learner_input_file(), data, :random=>true, :header=>header, :test_set=>test_sets[i-1])
+        split_file(get_learner_input_file(), data, 
+          :random=>true, :header=>header, :train_ratio=>ENV['train_ratio'], :test_set=>test_sets[i-1])
         if $type == 'csel' && $method == 'grid'
           conv_file(get_learner_input_file()+'.train', 'ranksvm')
           conv_file(get_learner_input_file()+'.test', 'ranksvm')
@@ -121,8 +124,6 @@ namespace :etc do
           conv_file(get_learner_input_file()+'.test', 'liblinear')
         end
       end
-    else
-      error "[split_file] No parameter specified!"
     end
   end
   

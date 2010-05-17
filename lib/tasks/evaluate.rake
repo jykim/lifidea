@@ -4,7 +4,7 @@ require 'yard'
 namespace :evaluate do
   task(:sim_search => :environment) do
     set_type = ENV['set_type'] || 'test'
-    input = (ENV['input'] || get_learner_input_file())+".#{set_type}"
+    input = (ENV['input'] || get_learner_input_file())+"#{ENV['train_ratio']}.#{set_type}"
     output = ENV['output'] || get_evaluation_file(ENV['eval_type'] || $type)
     searcher = SolrSearcher.new
     features = case $type
@@ -82,8 +82,8 @@ namespace :evaluate do
         when 'csel': Rake::Task['export:csel_features'].execute
         when /con|doc/ : Rake::Task['export:sim_features'].execute
         end
-        Rake::Task['etc:split_file'].execute
       end
+      Rake::Task['etc:split_file'].execute
       1.upto(ENV['folds'].to_i) do |i|
         puts "====== Starting #{i}th fold ======="
         ENV['fold'] = i.to_s

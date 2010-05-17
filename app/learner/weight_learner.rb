@@ -60,7 +60,7 @@ class WeightLearner
   end
   
   def learn_by_ranksvm(input, output)
-    cmd = "python anton/SVMWrapper.py -d anton/ -t #{input}.train -a #{input}.test -w #{output} -e 1"
+    cmd = "python anton/SVMWrapper.py -d anton/ -t #{input}#{ENV['train_ratio']}.train -a #{input}#{ENV['train_ratio']}.test -w #{output} -e 1"
     puts "[learner] running: #{cmd}"
     system(cmd)
   end
