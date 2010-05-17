@@ -95,7 +95,7 @@ namespace :export do
         [query_item, Item.find(e[:id]) , e[:score], 
         features.map{|f|e[f]},
         #query_item.tag_titles.join(','), Item.find(e[:id]).tag_titles.join(',')
-        query_item.con_titles.join(','), Item.find(e[:id]).con_titles.join(',')
+        #query_item.con_titles.join(','), Item.find(e[:id]).con_titles.join(',')
         ].flatten}
     end
     write_csv filename, result_total, 
@@ -130,7 +130,7 @@ namespace :export do
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
       skipped_items = params["skipped_items"].split("|").map{|e|e.to_i}
       begin
-        result_raw = searcher.search_by_item(h.src_item_id, h.htype, :rows=>200)
+        result_raw = searcher.search_by_item(h.src_item_id, h.htype, :rows=>500)
         raise DataError, "Source Item not found!"  if !result_raw
         result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
         #puts result.size
