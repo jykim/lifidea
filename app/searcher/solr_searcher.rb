@@ -21,7 +21,7 @@ class SolrSearcher < Searcher
       end
       without :hidden_flag, '1'
     end
-    result.hits.map{|e|[e.instance, e.score]}
+    result.hits.map{|e|{:item=>e.instance, :id=>e.instance.id, :score=>e.score}}
   end
   
   # Search based on similarity
@@ -35,13 +35,10 @@ class SolrSearcher < Searcher
     when 'con' : features, weights, filter_qry = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights), "itype_text:concept -itype_text:query"
     when 'doc' : features, weights, filter_qry = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights), "-itype_text:concept -itype_text:query"
     end
+    filter_qry = o[:working_set].map{|e|"id_text:#{e}"}.join(" || ") if o[:working_set]
     #debugger
     #puts "[search_by_item] features/weights = #{features.inspect}/#{weights.inspect}"
-    result = if cache_data([item, type, 'result'].join("_"))
-      cache_data([item, type, 'result'].join("_"))
-    else
-      cache_data([item, type, 'result'].join("_"), calc_sim_features(query_item, type, filter_qry, o))
-    end
+    result = calc_sim_features(query_item, type, filter_qry, o)
     #weights.map!{|e|Math.max(e,0.0)}
     final_result = result.sort_by{|fts|
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
@@ -73,20 +70,21 @@ class SolrSearcher < Searcher
   end
   
   def calc_sim_features(query_item, type, filter_qry, o={})
-    #puts "[calc_sim_features] query_item = #{query_item} "
+    #puts "[calc_sim_features] query_item = #{query_item} #{filter_qry}"
     #debugger
     result = []
     # Initial Solr Query
     solr = RSolr.connect :url=>Conf.solr_server
     begin
       solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
-        "mlt.fl" => "title_text,content_text,uri_text,itype_text", "mlt.mintf" => 1, "rows" => (o[:rows] || 50)
+        "mlt.fl" => "title_text,content_text,metadata_text,uri_text,itype_text", "mlt.mintf" => 1, "mlt.mindf" => 5, "mlt.boost"=>true, "rows" => (o[:rows] || 50)
       Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
         each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}  
     rescue Exception => e
       error "[search_by_item] Error in Calling Solr", e
       return result
     end
+    #puts "Solr Result for : #{solr_result['response']['docs'].map{|e|e["id"]}.inspect}"
     
     # Feature Vector generation
     solr_result['response']['docs'].each do |e|

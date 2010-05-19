@@ -1,18 +1,22 @@
 <h1>Start Browsing</h1>
-<h2>Your job is to find the <%= (session[:document_index]+1).to_i.ordinalize %> concept.</h2>
-<h3>Start from one of given concepts! <%= "You have #{@queries_per_page - session[:query_count]} trials left." %></h3>
+<h2>Your job is to find the <%= (session[:document_index]+1).to_i.ordinalize %> item.</h2>
+<h3>Start from one of the given items! <%= "You have #{@queries_per_page - session[:query_count]} trials left." %></h3>
 <br>
 
-<table>
-	<% @concepts.each do |c|%>
+<table border=1 cellspacing=0 cellpadding=2>
   <tr>
-		<td><%= link_to c.title, :action=>:show, :id=>c.id %></td>
-		<td><%= c.tag_titles.join(",") %></td>
+		<td><strong>Title</strong></td>
+		<td><strong>Linked Concepts</strong></td>
+  </tr>
+	<% @items.each_with_index do |c,i|%>
+  <tr>
+		<td><%= display_link(c, @items.map{|e|e.id}, "doc", i) %></td>
+		<td><%= c.link_cons[0..2].map{|e|link_to e.title, :action=>:show, :id=>e.id}.join(" ") %></td>
   </tr>
 	<% end %>
 </table>
 
 <br>
 
-<h3>You can refresh the browser if you don't like these concepts. <br> Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next item without penality.</h3>
+<h3>You can refresh the browser if you don't like these items. <br> Or you can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip to the next item without penality.</h3>
 <% debug(session)%>

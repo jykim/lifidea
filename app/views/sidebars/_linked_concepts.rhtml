@@ -2,7 +2,7 @@
 	<div class="title">Linked Concepts</div>
 	<ul>
 	<% @link_cons[0..9].each do |c| %>
-		<li> <%= link_to c.title[0..50], item_path(c) %> </li>
+		<li> <%= link_to c.title[0..50], :action=>:show, :id=>c.id %> </li>
 	<% end %>
 	</ul>
 </div>

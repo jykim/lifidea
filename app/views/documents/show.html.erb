@@ -10,51 +10,60 @@
 	<%= render :partial => "search_result" %>
 <% end %>
 <% debug session%>
-<%= "<b>Did: </b>" + @document.did if session[:admin_flag] && @document.did %>
+<%= "<b>Did: </b>" + @item.did if session[:admin_flag] && @item.did %>
 
 <p>
   <b>Title:</b>
-  <%=h @document.title %> <%=h @document.query_flag ? "(query)" : "" %>
+  <%=h @item.title %> <%=h @item.query_flag ? "(query)" : "" %>
 </p>
-<% if @document.uri =~ /^http:/ %>
+<% if @item.uri =~ /^http:/ %>
 <p>
   <b>URL:</b>
-  <%= link_to @document.uri, @document.uri %>
+  <%= link_to @item.uri, @item.uri %>
 </p>
 <% end %>
-<% if @document.metadata %>
+<% if @item.metadata %>
 <p>
   <b>Metadata:</b> <br>
 	<table border='1' cellspacing=0 cellpadding=2>
-  <%= @document.metadata.find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
+  <%= @item.metadata.find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
 	</table>
 </p>
 <% end %>
-
 <% if @rel_docs %>
 	<b>Relevant Items:</b>
 	<br>(click a link below to <b>browse</b> into other item!)
-	<table class="sortable" id="sortabletable" border=0 cellpadding=2 cellspacing=0>
-	<% @rel_docs.each_with_index do |e,i| %>
-		<% item = cache_data("item_#{e[:id]}") %>
-		<% error "#%%%%% : "+item.did %>
-		<tr>
-		  <td><%= i+1 %></td>
-		  <td><%= item.itype %></td>
-		  <td><%= display_link(item, @rel_docs.map{|e2|e2[:id]}, @htype, i) %></td>
-		  <td><%= item.tag_titles[0..3].join(",") %></td>
-		<% if Conf.debug || params[:debug] %>
-			<%=[:score].concat(@feature_type).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
+	<table border=0 cellpadding=2 cellspacing=0>
+	<% if @item.itype != 'concept' %>
+		<% @rel_docs[0..(@display_topk_result-1)].each_with_index do |e,i| %>
+			<% item = cache_data("item_#{e[:id]}") %>
+			<% error "#%%%%% : "+item.did %>
+			<tr>
+			  <td><%= i+1 %></td>
+			  <td><%= item.itype %></td>
+			  <td><%= display_link(item, @rel_docs.map{|e2|e2[:id]}, @htype, i) %></td>
+			  <td><%= item.tag_titles[0..3].join(",") %></td>
+			<% if Conf.debug || params[:debug] %>
+				<%=[:score].concat(@feature_type).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
+			<% end %>
+			<td><%= "<font color='#ff0000'>target item!</font>" if item.id == session[:target_document].to_i %></td>
+			</tr>
 		<% end %>
-		<td><%= "<font color='#ff0000'>target item!</font>" if item.id == session[:target_document].to_i %></td>
-		</tr>
+	<% else %>
+		<% @rel_docs.each_with_index do |e,i| %>
+		  <tr>
+		    <td><%= i+1 %></td>
+		    <td><%= e[:item].itype %></td>
+		    <td><%= link_to e[:item].title, :controller=>:documents, :action=>:show, :id=>e[:id] %></td>
+		    <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
+		  </tr>
+		<% end %>
 	<% end %>
 	</table>
 <% end %>
-
 <p>
   <b>Content:</b> <br>
-	(click <%= link_to "here", {:action=>:show_content, :id=>@document.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
-		<iframe name='iframe_doc' src="<%= display_url(@document) %>" width="700" height="780" style="border: none;"></iframe>
+	(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
+		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="780" style="border: none;"></iframe>
 </p>
 
