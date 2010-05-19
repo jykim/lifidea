@@ -6,11 +6,11 @@
   <tr>
   </tr>
 
-<% @rank_list[0..(@display_topk_result-1)].each_with_index do |e,i| %>
+<% @rank_list.each_with_index do |e,i| %>
   <tr>
     <td><%= i+1 %></td>
     <td><%= e[:item].itype %></td>
-    <td><%= display_link(e[:item], @rank_list.map{|e2|e2[:id]}, 'doc' , i) %></td>
+    <td><%= link_to(e[:item].title, {:action=>'show', :id=>e[:id]}) %></td>
     <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
   </tr>
 <% end %>

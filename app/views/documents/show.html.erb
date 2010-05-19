@@ -35,7 +35,7 @@
 	<br>(click a link below to <b>browse</b> into other item!)
 	<table border=0 cellpadding=2 cellspacing=0>
 	<% if @item.itype != 'concept' %>
-		<% @rel_docs[0..(@display_topk_result-1)].each_with_index do |e,i| %>
+		<% @rel_docs[0..(@display_topk-1)].each_with_index do |e,i| %>
 			<% item = cache_data("item_#{e[:id]}") %>
 			<% error "#%%%%% : "+item.did %>
 			<tr>

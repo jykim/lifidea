@@ -60,6 +60,11 @@ module DocumentsHelper
     end
   end
   
+  def display_range(param_page)
+    page = (param_page || 1).to_i
+    ((page-1) * @display_topk)..(page * @display_topk-1)
+  end
+  
   # Display link URL for clickthrough recording
   def display_link(item, rank_list, htype, position)
     if during_game?
@@ -110,8 +115,8 @@ module DocumentsHelper
   end
   
   def page_found?
-    puts "#@relevant_position <= #@display_topk_result"
-    @relevant_position <= @display_topk_result && @relevant_position > 0
+    puts "#@relevant_position <= #@display_topk"
+    @relevant_position <= @display_topk && @relevant_position > 0
   end
   
   def query_limit_reached?
