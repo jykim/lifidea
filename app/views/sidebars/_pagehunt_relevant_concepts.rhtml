@@ -1,0 +1,8 @@
+<div id="tagcloud" class="sidebar">
+	<div class="title">Relevant Concepts</div>
+	<ul>
+	<% @rel_cons[0..9].each_with_index do |e,i| %>
+	  <li><%= link_to cache_data("item_#{e[:id]}").title, {:controller=>'documents', :action=>'show', :id=>e[:id] }%></li>
+	<% end %>
+	</ul>
+</div>

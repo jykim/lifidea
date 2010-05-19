@@ -26,6 +26,10 @@ protected
       redirect_to :controller => 'admin', :action => 'login' 
     end 
   end
+
+  def item_concept?
+    Item.find(params[:id]).concept?
+  end
   
   def init_controller
     #error "[init_controller] initializing... #{cache_data("exists")}"

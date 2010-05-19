@@ -12,10 +12,6 @@ class ItemsController < ApplicationController
     params && params[:source]
   end
   
-  def item_concept?
-    Item.find(params[:id]).concept?
-  end
-  
   # GET /items
   # GET /items.xml
   def index

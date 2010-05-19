@@ -6,12 +6,3 @@
 	<% end %>
 	</ul>
 </div>
-
-<div id="tagcloud" class="sidebar">
-	<div class="title">Frequent Players</div>
-	<ul>
-	<% Game.valid.displayable.find_all{|e|e.score && e.score >= 25}.group_by{|e|e.user}.sort_by{|k,v|v.size}.reverse.each do |e| %>
-		<li> <%=  "#{e[0].uid} : #{e[1].size} times (avg: #{e[1].map(&:score).avg.round})" %> </li>
-	<% end %>
-	</ul>
-</div>

@@ -7,6 +7,8 @@ class DocumentsController < ApplicationController
   sidebar :pagehunt_search, :only=>[:index, :search]
   sidebar :menu, :only=>[:index]
   sidebar :pagehunt_status, :only=>[:show, :start_search, :search, :request_document]
+  sidebar :pagehunt_relevant_concepts, :only=>:show, :if=>:item_concept?
+  sidebar :linked_concepts, :only=>[:show], :unless=>:item_concept?
   sidebar :pagehunt_scoreboard
   layout "doctrack"
   
@@ -19,12 +21,12 @@ class DocumentsController < ApplicationController
     @display_topk_result = 10   
     @pages_per_game =      10   
     @queries_per_page =    10
-    @no_entry_concept =    10
+    @no_entry_item =    10
     @display_page_total =   2
     @time_per_page =       15
-    @ratio_game_type = {:sb=>0.75, :b=>0.25}
+    @ratio_game_type = {:sb=>0.5, :bd=>0.5}#{:sb=>0.75, :b=>0.25}
     @user_level_applied = false
-    $document_list ||= Item.valid.documents.all.map{|e|e.id}
+    $document_list ||= Item.valid.documents.all.group_by{|e|e.itype}.map_hash{|k,v|[k,v.map{|e|e.id}]}
     $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
   end
   
@@ -89,9 +91,16 @@ class DocumentsController < ApplicationController
   # - determine which document to find
   def start_search
     session[:document_index]  = rand(@display_page_total) if !session[:document_index]
-    if session[:game_type] == :b
-      @concepts = Item.find ($concept_list.sample(@no_entry_concept).uniq - session[:display_docs])
-      render :start_browse
+    session[:target_document] = session[:display_docs][session[:document_index]].to_i
+    itype_target_document = Item.find(session[:target_document]).itype
+    @relevant_position = -1
+    case session[:game_type]
+      when:bc
+        @items = Item.find ($concept_list.sample(@no_entry_item).uniq - session[:display_docs])
+        render :start_browse
+      when:bd
+        @items = Item.find ($document_list[itype_target_document].sample(@no_entry_item).uniq - session[:display_docs])
+        render :start_browse
     end
   end
       
@@ -101,7 +110,7 @@ class DocumentsController < ApplicationController
     @query = params[:query].gsub(/[\'\"]/, "")
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
-    @rank_list = search_local('k', @query, :doc_only=>true)#search_remote('k', @query)
+    @rank_list = search_local('k', @query)#search_remote('k', @query)
     if !@rank_list
       flash[:notice] = "Invalid query!"
       if !during_game?
@@ -116,16 +125,15 @@ class DocumentsController < ApplicationController
     #debugger
     #@docs = Item.find_by_dids(@rank_list.map{|e|e[0]}).map_hash{|d|[d.did, d]}
     @query_doc = Item.find_or_create(@query, 'query', :did=>@query_did, 
-      :uri=>request.url, :content=>@rank_list.map{|e|e[0].title}.join("\n"))
+      :uri=>request.url, :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
     if during_game?
-      process_search_result(@rank_list.map{|e|e[0].id}, @query_doc.id, @query)
+      process_search_result(@rank_list.map{|e|e[:id]}, @query_doc.id, @query)
     end
   end
   
   # Judge rank list and change status
   # @arg rank_list : ranked list of document ids
   def process_search_result(rank_list, query_id, query_text = nil)
-    session[:target_document] = session[:display_docs][session[:document_index]].to_i
     @relevant_position = -1
     rank_list.each_with_index do |e,i|
       @relevant_position = i+1 if session[:target_document].to_i == e
@@ -163,32 +171,38 @@ class DocumentsController < ApplicationController
       #History.create(:htype=>"show", :basetime=>Time.now, :src_item_id=>session[:game_id], :item_id=>params[:id], :user_id=>get_user_id(),
       #  :metadata=>{:url=>request.url})
       #debug "#{session[:display_page_cur]} < #{@display_page_total} (#{session[:display_docs].inspect})"
-      @document = Item.find(params[:id])
+      @item = Item.find(params[:id])
     else
-      @link_docs, @link_cons = [], []
-      @document = Item.find(params[:id])
+      @item = Item.find(params[:id])
       $items = {}
-      if @document.itype == 'concept'
-        @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con'
-      else
-        @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
-      end
       begin
-        @rel_docs = (search_local(@search_type, params[:id]) || [])[0..9]
+        if @item.itype == 'concept'
+          @rel_docs = (search_local('k', "\"#{@item.title}\"", :doc_only=>true) || [])[0..(@display_topk_result-1)]
+          @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con'
+          @rel_cons = (search_local(@search_type, params[:id]) || [])[0..(@display_topk_result-1)]
+        else
+          @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
+          @rel_docs = (search_local(@search_type, params[:id]) || [])[0..(@display_topk_result-1)]
+        end
         #info "Ranklist(doc) : #{@rel_docs.inspect}"
         #debugger
       rescue Exception => e
         error "Failed to get Ranklist!", e
-        @rel_docs = []
+        @rel_docs = @rel_cons = []
       end
       if during_game?
         process_search_result(@rel_docs.map{|e|e[:id]}, params[:id])
       end
     end
     
+    @link_docs, @link_cons = [], []
+    @item.link_items.uniq.each do |e|
+      (e.concept?)? (@link_cons << e) : (@link_docs << e)
+    end
+    
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @document }
+      format.xml  { render :xml => @item }
     end
   end
   

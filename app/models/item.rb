@@ -46,7 +46,7 @@ class Item < ActiveRecord::Base
   
   # Sunspot/Solr search indexing  
   searchable do
-    text :title, :content, :uri, :itype
+    text :title, :content, :uri, :itype, :metadata, :id
     string :hidden_flag
     string :itype_str do
       itype.to_s.squeeze.downcase

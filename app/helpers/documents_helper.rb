@@ -20,7 +20,7 @@ module DocumentsHelper
   def apply_user_level
     return if @user_level_applied
     @queries_per_page -= user_level * 2
-    @no_entry_concept -= user_level * 2
+    @no_entry_item -= user_level * 2
     @display_page_total += user_level
     @user_level_applied = true
   end

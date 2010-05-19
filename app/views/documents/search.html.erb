@@ -9,13 +9,13 @@
 <% @rank_list[0..(@display_topk_result-1)].each_with_index do |e,i| %>
   <tr>
     <td><%= i+1 %></td>
-    <td><%= e[0].itype %></td>
-    <td><%= display_link(e[0], @rank_list.map{|e2|e2[0].id}, 'doc' , i) %></td>
-    <td><%= "<font color='#ff0000'>target document!</font>" if e[0].id == session[:target_document].to_i %></td>
+    <td><%= e[:item].itype %></td>
+    <td><%= display_link(e[:item], @rank_list.map{|e2|e2[:id]}, 'doc' , i) %></td>
+    <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
   </tr>
 <% end %>
 </table>
-<% if !page_found? && !query_limit_reached? %>
+<% if during_game? && !page_found? && !query_limit_reached? %>
 <h3> Click each document to browse into related document!</h3>
 <% end %>
 <br />

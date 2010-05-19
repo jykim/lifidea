@@ -124,16 +124,18 @@ namespace :export do
     searcher.open_index()
     
     History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
-      next if $user != 'all' && (h.user && $user != h.user.uid) && 
+      next if ENV['id'] && h.id != ENV['id'].to_i
+      next if $user != 'all' && ($user != 'top5' && h.user && $user != h.user.uid) && 
         ($user == 'top5' && !['ylim','yhkim','rshorey''sjh','uysal'].include?(h.user.uid))
-      puts "Exporting #{h.id}"
+      puts "Exporting #{h.id} (#{h.src_item_id})"
       result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
       skipped_items = params["skipped_items"].split("|").map{|e|e.to_i}
       begin
-        result_raw = searcher.search_by_item(h.src_item_id, h.htype, :rows=>200)
-        raise DataError, "Source Item not found!"  if !result_raw
-        result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
+        result = searcher.search_by_item(h.src_item_id, h.htype, :working_set=>skipped_items)
+        #puts "#{skipped_items.inspect} => #{result.map{|e|e[:id]}.inspect}"
+        raise DataError, "Source Item not found!"  if !result
+        #result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
         #puts result.size
         #raise Exception, "Top item clicked!" if skipped_items.size < 2 
         raise DataError, "Record not found!" if result.find_all{|r|r[:id]==skipped_items[0]}.size == 0 #result.size < 2 || 
