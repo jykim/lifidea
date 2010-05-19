@@ -143,7 +143,7 @@ class DocumentsController < ApplicationController
     if page_found? || query_limit_reached?
       session[:seen_doc_count] += 1
       if page_found?
-        session[:score] += (@display_topk.to_f / @relevant_position ).to_i
+        session[:score] += (@display_topk.to_f / @relevant_position ).to_i #+ (@queries_per_page - session[:query_count])
         #session[:query_docs] = session[:query_docs] - [session[:target_document]]
       end
     end
