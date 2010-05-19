@@ -17,7 +17,7 @@ class DocumentsController < ApplicationController
   #sidebar :linked_documents, :only=>:show
   
   def initialize
-    @display_topk_result = 10   #get_config("DISPLAY_TOPK_RESULT").to_i
+    @display_topk_result = 15   #get_config("DISPLAY_TOPK_RESULT").to_i
     @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
     @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
     @no_entry_item    =    10
