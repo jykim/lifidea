@@ -109,7 +109,7 @@ class DocumentsController < ApplicationController
     @query = params[:query].gsub(/[\'\"]/, "")
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
-    @rank_list = search_local('k', @query)#search_remote('k', @query)
+    @rank_list = search_local('k', @query)[display_range(params[:page])]#search_remote('k', @query)
     if !@rank_list
       flash[:notice] = "Invalid query!"
       if !during_game?
@@ -143,7 +143,7 @@ class DocumentsController < ApplicationController
     if page_found? || query_limit_reached?
       session[:seen_doc_count] += 1
       if page_found?
-        session[:score] += (@display_topk_result.to_f / @relevant_position ).to_i
+        session[:score] += (@display_topk.to_f / @relevant_position ).to_i
         #session[:query_docs] = session[:query_docs] - [session[:target_document]]
       end
     end
@@ -176,12 +176,12 @@ class DocumentsController < ApplicationController
       $items = {}
       begin
         if @item.itype == 'concept'
-          @rel_docs = (search_local('k', "\"#{@item.title}\"", :doc_only=>true) || [])[0..(@display_topk_result-1)]
+          @rel_docs = (search_local('k', "\"#{@item.title}\"", :doc_only=>true) || [])[display_range(params[:page])]
           @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con'
-          @rel_cons = (search_local(@search_type, params[:id]) || [])[0..(@display_topk_result-1)]
+          @rel_cons = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
         else
           @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
-          @rel_docs = (search_local(@search_type, params[:id]) || [])[0..(@display_topk_result-1)]
+          @rel_docs = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
         end
         #info "Ranklist(doc) : #{@rel_docs.inspect}"
         #debugger
