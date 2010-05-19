@@ -20,10 +20,10 @@ class DocumentsController < ApplicationController
     @display_topk_result = 10   #get_config("DISPLAY_TOPK_RESULT").to_i
     @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
     @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
-    @no_entry_concept =     7
+    @no_entry_item    =    10
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
     @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i
-    @ratio_game_type = {:sb=>0.75, :b=>0.25}
+    @ratio_game_type = {:sb=>0.5, :bd=>0.5}
     @user_level_applied = false
     $document_list ||= Item.valid.documents.all.group_by{|e|e.itype}.map_hash{|k,v|[k,v.map{|e|e.id}]}
     $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
