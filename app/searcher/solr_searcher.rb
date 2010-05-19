@@ -38,8 +38,13 @@ class SolrSearcher < Searcher
     filter_qry = o[:working_set].map{|e|"id_text:#{e}"}.join(" || ") if o[:working_set]
     #debugger
     #puts "[search_by_item] features/weights = #{features.inspect}/#{weights.inspect}"
-    result = calc_sim_features(query_item, type, filter_qry, o)
-    #weights.map!{|e|Math.max(e,0.0)}
+    result = if o[:no_cache]
+      calc_sim_features(query_item, type, filter_qry, o)
+    elsif cache_data([item, type, 'result'].join("_"))
+      cache_data([item, type, 'result'].join("_"))
+    else
+      cache_data([item, type, 'result'].join("_"), calc_sim_features(query_item, type, filter_qry, o))
+    end    #weights.map!{|e|Math.max(e,0.0)}
     final_result = result.sort_by{|fts|
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
       #fts[0], fts[1] = fts[:id], fts[:score]

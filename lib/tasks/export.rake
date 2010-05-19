@@ -132,7 +132,7 @@ namespace :export do
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}
       skipped_items = params["skipped_items"].split("|").map{|e|e.to_i}
       begin
-        result = searcher.search_by_item(h.src_item_id, h.htype, :working_set=>skipped_items)
+        result = searcher.search_by_item(h.src_item_id, h.htype, :working_set=>skipped_items, :no_cache=>true)
         #puts "#{skipped_items.inspect} => #{result.map{|e|e[:id]}.inspect}"
         raise DataError, "Source Item not found!"  if !result
         #result = result_raw.find_all{|r|skipped_items.include?(r[:id])}
