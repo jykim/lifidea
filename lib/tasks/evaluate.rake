@@ -27,7 +27,7 @@ namespace :evaluate do
       result_all << [query, result].flatten
     end
     result_all << ["summary(#$type/#{set_type})", (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}].flatten
-    write_csv(output, result_all, :mode=>'a', :header=>["query", methods].flatten)
+    write_csv(output, result_all,  :header=>["query", methods].flatten) #:mode=>'a',
   end
   
   desc "Calculate Single-feature Result"
@@ -95,8 +95,8 @@ namespace :evaluate do
         end
         case $type
         when /con|doc/
-          ENV['set_type'] = 'train'
-          Rake::Task['evaluate:sim_search'].execute # evaluate at test set
+          #ENV['set_type'] = 'train'
+          #Rake::Task['evaluate:sim_search'].execute # evaluate at test set
           ENV['set_type'] = 'test'
           Rake::Task['evaluate:sim_search'].execute # evaluate at test set
         when 'csel'
