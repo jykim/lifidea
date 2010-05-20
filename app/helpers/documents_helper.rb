@@ -38,7 +38,8 @@ module DocumentsHelper
     case session[:game_type]
     when :s : "Searching"
     when :sb : "Searching+Browsing"
-    when :b : "Browsing"      
+    when :bc : "Browsing"      
+    when :bd : "Browsing"      
     end
   end
   
