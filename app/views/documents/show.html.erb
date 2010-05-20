@@ -54,7 +54,7 @@
 		  <tr>
 		    <td><%= i+1 %></td>
 		    <td><%= e[:item].itype %></td>
-		    <td><%= link_to e[:item].title, :controller=>:documents, :action=>:show, :id=>e[:id] %></td>
+		    <td><%= display_link(e[:item], @rel_docs.map{|e2|e2[:id]}, @htype, i) %></td>
 		    <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
 		  </tr>
 		<% end %>
