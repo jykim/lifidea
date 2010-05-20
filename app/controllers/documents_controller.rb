@@ -2,7 +2,7 @@ require 'ddl_include'
 class DocumentsController < ApplicationController
   include AdminHelper, DocumentsHelper
   before_filter :authorize, :except => [:login, :index, :show, :search, :click]
-  before_filter :apply_user_level
+  #before_filter :apply_user_level
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :pagehunt_search, :only=>[:index, :search]
   sidebar :menu, :only=>[:index]
@@ -143,7 +143,7 @@ class DocumentsController < ApplicationController
     if page_found? || query_limit_reached?
       session[:seen_doc_count] += 1
       if page_found?
-        session[:score] += (@display_topk.to_f / @relevant_position ).to_i #+ (@queries_per_page - session[:query_count])
+        session[:score] += (@display_topk.to_f / @relevant_position / 1.5 ).to_i #+ (@queries_per_page - session[:query_count])
         #session[:query_docs] = session[:query_docs] - [session[:target_document]]
       end
     end
