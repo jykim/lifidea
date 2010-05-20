@@ -9,7 +9,7 @@
 	<% else %>
 		<%= "Item Not Found! You have #{@queries_per_page - session[:query_count]} trials left." %>
 		<br>
-		<% if session[:game_type] != :bc || session[:game_type] != :bd %>
+		<% if session[:game_type] != :bc && session[:game_type] != :bd %>
 			<% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
 				<%= text_field_tag(:query, @query, :onpaste=>'return false;', :size=>60) %>
 				<%= submit_tag('Search') %>
