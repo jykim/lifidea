@@ -112,7 +112,8 @@ namespace :evaluate do
     def get_input_data(input_file)
       case $type
       when :csel : read_csv(input_file)
-      when /con|doc/ : WeightLearner.parse_ranksvm_input(input_file)
+      when /con|doc/ : IO.read(input_file).map{|e|e.split(",")}.
+        find_all{|l|l[0] == "2"}.map{|e|e[2..3]}#WeightLearner.parse_ranksvm_input(input_file)
       end
     end
     
@@ -132,15 +133,15 @@ namespace :evaluate do
     
     desc "Leave one feature out"
     task :leave_one_out => :environment do
-      ENV['method'] = 'grid'
+      #ENV['method'] = 'grid'
       Rake::Task['export:sim_features'].execute if !ENV['skip_export']
-      input = ENV['input'] ||= get_feature_file('ranksvm')
+      input = ENV['input'] ||= get_feature_file($method)
       output = ENV['output'] || get_evaluation_file('leave_one_out')
       train_ratio = ENV['train_ratio'] || '0.5'
       features = get_features_by_type($type)
       Rake::Task['etc:split_file'].execute
       input_data = [get_input_data(input+"#{train_ratio}.train"), get_input_data(input+"#{train_ratio}.test")]
-      #puts input_data.inspect
+      puts input_data.inspect
       result_csel = [evaluate_features(input_data, features)]
       puts "result(all) : #{result_csel}"
       features.each_with_index do |e,i|

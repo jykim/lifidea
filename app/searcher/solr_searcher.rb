@@ -120,6 +120,8 @@ class SolrSearcher < Searcher
           fts[:concept] = get_concept_feature(item.id, query_item.id) / 3
         end
         #puts fts.inspect
+      rescue Interrupt
+        break
       rescue Exception => e
         error "[search_by_item] Error in #{query_item} -> #{item}", e
         next

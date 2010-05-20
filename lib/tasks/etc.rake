@@ -56,14 +56,24 @@ namespace :etc do
     result_train, result_test = [o[:header]], [o[:header]]
     data.each_with_index do |e,i|
       #puts rand(), train_ratio
-      if o[:test_set] && !o[:test_set].include?(i)
+      if o[:test_set]
+        if !o[:test_set].include?(i)
+          if o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) > o[:train_ratio].to_f
+            next
+          else
+            result_train << e
+          end
+        else
+          result_test << e
+        end
+      elsif o[:train_ratio]
         if o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) > o[:train_ratio].to_f
-          next
+          result_test << e
         else
           result_train << e
         end
       else
-        result_test << e
+        puts "No parameter specified!"
       end
     end
     File.open(filename+"#{o[:train_ratio]}.train",'w'){|f|f.puts result_train.find_valid.join}
@@ -99,7 +109,7 @@ namespace :etc do
     when 'ranksvm' : IO.read(filename).split(/^(?=2)/)
     when 'liblinear' : IO.read(filename).split(/^/)
     when 'grid'
-      content = IO.read(filename).split(/^/)
+      content = IO.read(filename).split(/^(?=2)/)
       header = content[0]
       content[1..-1]
     else
