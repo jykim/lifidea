@@ -20,13 +20,15 @@ namespace :evaluate do
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
       weights.each_with_index do |weight,i|
-        rank_list = searcher.search_by_item(query, $type, :weights=>weight, :rows=>200).map{|fts|[fts[:id], fts[:score]]}
+        rank_list = searcher.search_by_item(query, $type, :weights=>weight).map{|fts|[fts[:id], fts[:score]]}
+        #puts rank_list.size if i == 0
         recip_rank = 0 ; rank_list.each_with_index{|e,i|recip_rank = 1.0 / (i+1) if e[0] == rel}
         result << recip_rank
       end
       result_all << [query, result].flatten if result[0] > 0 # use only entries where relevant items were found
     end
-    result_all << ["summary(#$type/#{set_type})", (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}].flatten
+    average = (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}
+    result_all << ["summary(#$type/#{set_type})", average].flatten #if average[0] > 0
     write_csv(output, result_all,  :header=>["query", methods].flatten) #:mode=>'a',
   end
   

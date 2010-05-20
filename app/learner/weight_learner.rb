@@ -15,7 +15,7 @@ class WeightLearner
       query, rel = ids[0].to_i, ids[1].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
-      rank_list = searcher.search_by_item(query, type, :features=>o[:features], :rows=>200, :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
+      rank_list = searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
       #puts rank_list.inspect
       result[query] = Searcher.recip_rank(rank_list, rel)
     end

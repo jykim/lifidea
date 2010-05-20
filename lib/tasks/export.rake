@@ -126,7 +126,7 @@ namespace :export do
     History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
       next if ENV['id'] && h.id != ENV['id'].to_i
       next if $user != 'all' && $user != 'top5' && h.user && $user != h.user.uid
-      next if $user == 'top5' && !['ylim','yhkim','rshorey''sjh','uysal'].include?(h.user.uid)
+      next if $user == 'top5' && !['ylim','yhkim','rshorey''gbh','uysal'].include?(h.user.uid)
       puts "Exporting #{h.id} (#{h.src_item_id})"
       result_str = []
       params = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}

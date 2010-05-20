@@ -110,7 +110,7 @@ namespace :etc do
     if !ENV['folds']
       split_file(filename, data, :train_ratio=>ENV['train_ratio'])
     else
-      test_sets=(0..data.size).to_a.shuffle.in_groups_of((data.size.to_f / ENV['folds'].to_f).ceil)
+      test_sets=(0..data.size).to_a.shuffle.in_groups_of((data.size.to_f / ENV['folds'].to_f).floor)
       #p test_sets
       1.upto(ENV['folds'].to_i) do |i|
         puts "#{test_sets[i-1].size} / #{data.size}"
