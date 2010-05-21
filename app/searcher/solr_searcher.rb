@@ -80,6 +80,7 @@ class SolrSearcher < Searcher
     result = []
     # Initial Solr Query
     solr = RSolr.connect :url=>Conf.solr_server
+    #puts "Connect to #{Conf.solr_server}"
     begin
       solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
         "mlt.fl" => "title_text,content_text,metadata_text,uri_text,itype_text", "mlt.mintf" => 1, "mlt.mindf" => 5, "mlt.boost"=>true, "rows" => (o[:rows] || 50)
