@@ -9,6 +9,6 @@ BEGIN {
 END {
   printf("%d,",NR)
   for (i=3; i<=NF; i++ ) 
-    { printf("%.4f,", sum[i]/NR) }
+    { printf("%.3f,", sum[i]/NR) }
   printf("\n")
 }
