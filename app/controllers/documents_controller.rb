@@ -95,10 +95,10 @@ class DocumentsController < ApplicationController
     @relevant_position = -1
     case session[:game_type]
       when:bc
-        @items = Item.find ($concept_list.sample(@no_entry_item).uniq - session[:display_docs])
+        @items = Item.find($concept_list.sample(@no_entry_item).uniq - session[:display_docs])
         render :start_browse
       when:bd
-        @items = Item.find ($document_list[itype_target_document].sample(@no_entry_item).uniq - session[:display_docs])
+        @items = Item.find($document_list[itype_target_document].sample(@no_entry_item).uniq - session[:display_docs])
         render :start_browse
     end
   end
