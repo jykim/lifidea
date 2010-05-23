@@ -130,7 +130,7 @@ namespace :etc do
         puts "#{test_sets[i-1].size} / #{data.size}"
         $fold = "-k#{ENV['folds']}-#{i}"
         split_file(get_learner_input_file(), data, 
-          :random=>true, :header=>header, :train_ratio=>ENV['train_ratio'], :test_set=>test_sets[i-1])
+          :random=>(ENV['random_split']||true), :header=>header, :train_ratio=>ENV['train_ratio'], :test_set=>test_sets[i-1])
         if $type == 'csel' && $method == 'grid'
           conv_file(get_learner_input_file()+'.train', 'ranksvm')
           conv_file(get_learner_input_file()+'.test', 'ranksvm')
