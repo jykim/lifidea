@@ -145,7 +145,7 @@ namespace :export do
           feature_values = features.map{|f|r[f]||0}
           if preference == 1 && searcher.clf.read('c', h.src_item_id.to_i, r[:id]) > 0
             puts "clicked item : #{h.src_item_id}-#{r[:id]} #{preference} / #{searcher.clf.read('c', h.src_item_id.to_i, r[:id])}"
-            next 
+            next
           end
           case $method
           when 'grid'
