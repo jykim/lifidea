@@ -67,7 +67,7 @@ namespace :etc do
           result_test << e
         end
       elsif o[:train_ratio]
-        if (o[:random] ? rand() : i.to_f / data.size) > o[:train_ratio].to_f
+        if (o[:random] ? rand() : i.to_f / data.size) >= o[:train_ratio].to_f
           result_test << e
         else
           result_train << e

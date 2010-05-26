@@ -29,7 +29,7 @@ def get_features_by_type(type, omit = nil)
   else
     result_new = result
   end
-  puts "[get_features_by_type] features = #{result_new.inspect}"
+  #puts "[get_features_by_type] features = #{result_new.inspect}"
   result_new
 end
 
