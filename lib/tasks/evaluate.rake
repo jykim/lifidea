@@ -7,10 +7,7 @@ namespace :evaluate do
     input = (ENV['input'] || get_learner_input_file())+"#{ENV['train_ratio']}.#{set_type}"
     output = ENV['output'] || get_evaluation_file(ENV['eval_type'] || $type)
     searcher = SolrSearcher.new
-    features = case $type
-    when 'con' : Searcher::CON_FEATURES
-    when 'doc' : Searcher::DOC_FEATURES
-    end
+    features = get_features_by_type(type, ENV['omit'])
     methods = [features, 'uniform','grid','svm'].flatten
     weights = methods.map{|e|Searcher::load_weights(features, $type, e)}
     weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']

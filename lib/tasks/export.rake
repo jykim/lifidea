@@ -111,14 +111,7 @@ namespace :export do
     $last_query_no = 0
 
     type = ENV['type']
-    case type
-    when 'con'
-      features = Searcher::CON_FEATURES
-    when 'doc'
-      features = Searcher::DOC_FEATURES
-    else
-      error "No parameter [type]"
-    end
+    features = get_features_by_type(type, ENV['omit'])
     $f_li.puts ['pref','basetime','src_id','target_id','src','target','sum'].concat(features).join(",") if $method=='grid'
     searcher = SolrSearcher.new
     searcher.open_index()

@@ -18,12 +18,18 @@ def get_cur_time()
   Time.now.in_time_zone(TIMEZONE)
 end
 
-def get_features_by_type(type)
-  case type
+def get_features_by_type(type, omit = nil)
+  result = case type
   when 'con' : Searcher::CON_FEATURES
   when 'doc' : Searcher::DOC_FEATURES
   when 'csel' : RubySearcher::CS_TYPES
   end
+  if omit
+    result_new = result.dup ; result_new.delete_at(omit.to_i)
+  else
+    result_new = result
+  end
+  result_new
 end
 
 def clear_webpage(html)
