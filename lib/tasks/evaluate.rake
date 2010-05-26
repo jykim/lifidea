@@ -7,8 +7,12 @@ namespace :evaluate do
     input = (ENV['input'] || get_learner_input_file())+"#{ENV['train_ratio']}.#{set_type}"
     output = ENV['output'] || get_evaluation_file(ENV['eval_type'] || $type)
     searcher = SolrSearcher.new
-    features = get_features_by_type(type, ENV['omit'])
-    methods = [features, 'uniform','grid','svm'].flatten
+    features = get_features_by_type(ENV['type'], ENV['omit'])
+    methods = if ENV['omit']
+       ['uniform','grid','svm']
+    else
+      [features, 'uniform','grid','svm'].flatten
+    end
     weights = methods.map{|e|Searcher::load_weights(features, $type, e)}
     weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
     result_all = []
@@ -17,7 +21,7 @@ namespace :evaluate do
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
       weights.each_with_index do |weight,i|
-        rank_list = searcher.search_by_item(query, $type, :weights=>weight).map{|fts|[fts[:id], fts[:score]]}
+        rank_list = searcher.search_by_item(query, $type, :features=>features, :weights=>weight).map{|fts|[fts[:id], fts[:score]]}
         #puts rank_list.size if i == 0
         recip_rank = 0 ; rank_list.each_with_index{|e,i|recip_rank = 1.0 / (i+1) if e[0] == rel}
         result << recip_rank

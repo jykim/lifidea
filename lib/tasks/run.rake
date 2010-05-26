@@ -81,7 +81,7 @@ namespace :run do
       when "csel" : read_csv(input+"#{ENV['train_ratio']}.train")
       end
       #debugger
-      learner.learn_by_grid_search(input_data, weights, $type, :features=>get_features_by_type($type), :grid_type=>ENV['grid_type'])
+      learner.learn_by_grid_search(input_data, weights, $type, :features=>get_features_by_type($type, ENV['omit']), :grid_type=>ENV['grid_type'])
     else
       puts "[run:learner] No method selected!"
     end

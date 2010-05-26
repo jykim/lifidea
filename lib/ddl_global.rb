@@ -25,10 +25,11 @@ def get_features_by_type(type, omit = nil)
   when 'csel' : RubySearcher::CS_TYPES
   end
   if omit
-    result_new = result.dup ; result_new.delete_at(omit.to_i)
+    result_new = result.dup ; result_new.delete_at(omit.to_i-1)
   else
     result_new = result
   end
+  puts "[get_features_by_type] features = #{result_new.inspect}"
   result_new
 end
 

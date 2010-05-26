@@ -34,7 +34,7 @@ def get_learner_output_file(method = nil)
 end
 
 def get_evaluation_file(eval_type)
-  "data/evaluation_#$renv-#$today-#$type-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}.csv"
+  "data/evaluation_#$renv-#$today-#$type-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}o#{ENV['omit']}.csv"
 end
 
 #LEARNER_INPUT = 
