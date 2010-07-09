@@ -1,7 +1,7 @@
 # Standalone Ruby Library
 
 require 'rubygems'
-require 'ruby-debug'
+#require 'ruby-debug'
 require 'jcode'
 require 'matrix'
 $KCODE = "u"

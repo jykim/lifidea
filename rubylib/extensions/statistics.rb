@@ -77,6 +77,10 @@ module Statistics
      Math.sqrt(var)
   end
   
+  def range
+     self.max - self.min
+  end
+  
   def covar( other )
     return nil if length != other.length
     tmp = [] ; 0.upto(length - 1) do |i|
@@ -88,6 +92,14 @@ module Statistics
   def pcc( other )
     return nil if length != other.length# || (stdev == 0 || other.stdev == 0)
     covar( other ) / (stdev * other.stdev)
+  end
+  
+  def kendalls_tau( other, index_limit = -1)
+  	pref_a = self[0..index_limit].to_comb
+  	pref_b = other[0..index_limit].to_comb
+  	pref_concord = pref_a & pref_b
+  	#pref_discord = (pref_a | pref_b) - pref_concord
+  	(pref_concord.size) / pref_a.size.to_f
   end
   
   def r
