@@ -8,8 +8,8 @@ filename = 'queries_chk.txt'
 
 wsc = WebSearchCollector.new
 
-['yahoo','google'].each do |mode|
-	File.open("#{filename}.#{mode}.res", 'w') do |f|
+['google','yahoo'].each do |mode|
+	File.open("#{filename}.#{mode}.#{Time.now.strftime('%Y%m%d')}.res", 'w') do |f|
 		f.puts "Query\tDocument\tDocumentScore"
 		IO.read(filename).split("\n").each_with_index do |q,i2|
 			case mode
