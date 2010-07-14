@@ -1,9 +1,11 @@
 # Reading
 setwd("c:/data")
-source("code/rs_import_data.R")
-source("code/rs_library.R")
+source("c:/dev/lifidea/etc/intern/rs_import_data.R")
+source("c:/dev/lifidea/etc/intern/rs_library.R")
 
 #hist(agg$NDCG5, breaks=20)
+cor(agg[,2:18])
+cor(agg[,c(2:10,19:26)])
 
 # Subset of Data
 d_hPerf = subset(agg, agg$NDCG5 > 0.5)

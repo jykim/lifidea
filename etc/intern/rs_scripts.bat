@@ -12,16 +12,54 @@
 .\bin\ExtractColumnsFromTSV.exe EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jun-28-10-19-31.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jun-29-10-27-44.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jun-30-11-20-49.tsv
 .\bin\ExtractColumnsFromTSV.exe EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-01-10-40-27.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-02-10-19-59.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-03-10-46-33.tsv
 .\bin\ExtractColumnsFromTSV.exe EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-04-10-42-16.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-05-10-24-14.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-06-10-12-31.tsv
-.\bin\ExtractColumnsFromTSV.exe EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-07-10-18-18.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-08-10-26-45.tsv
-ruby -I /cygdrive/c/dev/lifidea/rubylib/ code\rs_process.rb
+.\bin\ExtractColumnsFromTSV.exe EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-07-10-18-18.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-08-10-26-45.tsv  EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-09-10-32-37.tsv EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-10-10-32-43.tsv
+
+.\bin\ExtractColumnsFromTSV.exe EnUsB06-FeatureValuesPerQueryPerDocument-1-2010-Jul-13-09-07-09.tsv
 
 # Create single big result file
+export batch=all
+grep -h ^[0-9] B06_$batch/result_daily_15* > result_daily_$batch.tmp 
+cat result_daily_header.tsv result_daily_$batch.tmp > result_daily_$batch.txt 
+cat result_all_header.tsv B06_$batch/result_all_15* > result_all_$batch.txt 
+cat result_cdocs_header.tsv B06_$batch/result_cdocs_15* > result_cdocs_$batch.txt 
+cat result_sdocs_header.tsv B06_$batch/result_sdocs_15* > result_sdocs_$batch.txt 
+
+export batch=train
+grep -h ^[0-9] B06_$batch/result_daily_15* > result_daily_$batch.tmp 
+cat result_daily_header.tsv result_daily_$batch.tmp > result_daily_$batch.txt 
+cat result_all_header.tsv B06_$batch/result_all_15* > result_all_$batch.txt 
+cat result_cdocs_header.tsv B06_$batch/result_cdocs_15* > result_cdocs_$batch.txt 
+cat result_sdocs_header.tsv B06_$batch/result_sdocs_15* > result_sdocs_$batch.txt 
+
 export batch=test
 grep -h ^[0-9] B06_$batch/result_daily_15* > result_daily_$batch.tmp 
 cat result_daily_header.tsv result_daily_$batch.tmp > result_daily_$batch.txt 
 cat result_all_header.tsv B06_$batch/result_all_15* > result_all_$batch.txt 
-cat result_docs_header.tsv B06_$batch/result_docs_15* > result_docs_$batch.txt 
-#finally, change the format of result_docs_$batch.txt in excel
+cat result_cdocs_header.tsv B06_$batch/result_cdocs_15* > result_cdocs_$batch.txt 
+cat result_sdocs_header.tsv B06_$batch/result_sdocs_15* > result_sdocs_$batch.txt 
+
+export batch=w1
+grep -h ^[0-9] B06_$batch/result_daily_15* > result_daily_$batch.tmp 
+cat result_daily_header.tsv result_daily_$batch.tmp > result_daily_$batch.txt 
+cat result_all_header.tsv B06_$batch/result_all_15* > result_all_$batch.txt 
+cat result_cdocs_header.tsv B06_$batch/result_cdocs_15* > result_cdocs_$batch.txt 
+cat result_sdocs_header.tsv B06_$batch/result_sdocs_15* > result_sdocs_$batch.txt 
+
+export batch=w2
+grep -h ^[0-9] B06_$batch/result_daily_15* > result_daily_$batch.tmp 
+cat result_daily_header.tsv result_daily_$batch.tmp > result_daily_$batch.txt 
+cat result_all_header.tsv B06_$batch/result_all_15* > result_all_$batch.txt 
+cat result_cdocs_header.tsv B06_$batch/result_cdocs_15* > result_cdocs_$batch.txt 
+cat result_sdocs_header.tsv B06_$batch/result_sdocs_15* > result_sdocs_$batch.txt 
+
+export batch=w3
+grep -h ^[0-9] B06_$batch/result_daily_15* > result_daily_$batch.tmp 
+cat result_daily_header.tsv result_daily_$batch.tmp > result_daily_$batch.txt 
+cat result_all_header.tsv B06_$batch/result_all_15* > result_all_$batch.txt 
+cat result_cdocs_header.tsv B06_$batch/result_cdocs_15* > result_cdocs_$batch.txt 
+cat result_sdocs_header.tsv B06_$batch/result_sdocs_15* > result_sdocs_$batch.txt 
+
+# finally, change the format of result_docs_$batch.txt in excel
 
 
 # Count NA judgments

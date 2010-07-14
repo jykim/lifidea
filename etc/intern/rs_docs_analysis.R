@@ -1,6 +1,6 @@
 setwd("c:/data")
-source("code/rs_import_data.R")
-source("code/rs_library.R")
+source("c:/dev/lifidea/etc/intern/rs_import_data.R")
+source("c:/dev/lifidea/etc/intern/rs_library.R")
 
 # 
 aggregate( docs$QID , by=list(docs$Type), FUN = length)

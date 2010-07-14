@@ -1,15 +1,16 @@
 setwd("c:/data")
-source("code/rs_import_data.R")
-source("code/rs_library.R")
+source("c:/dev/lifidea/etc/intern/rs_import_data.R")
+source("c:/dev/lifidea/etc/intern/rs_library.R")
 
-daily_chg = daily[daily$Tau != 1.0,]   # Queries with change in rank list
+daily   = daily[daily_o$Date != '6_17_2010',]   # Queries with change in rank list
+daily_chg = daily[daily$Tau5 != 1.0,]   # Queries with change in Top5 rank list
 daily_imp1 = daily[daily$dNDCG1 > 0,] # Queries with change in perf. (+)
 daily_deg1 = daily[daily$dNDCG1 < 0,] # Queries with change in perf. (-)
 daily_imp3 = daily[daily$dNDCG3 > 0,] # Queries with change in perf. (+)
 daily_deg3 = daily[daily$dNDCG3 < 0,] # Queries with change in perf. (-)
 daily_imp5 = daily[daily$dNDCG5 > 0,] # Queries with change in perf. (+)
 daily_deg5 = daily[daily$dNDCG5 < 0,] # Queries with change in perf. (-)
-daily_cchg = daily[daily$cTau != 1.0,]   # Queries with change in rank list
+daily_cchg = daily[daily$cTau != 1.0,]   # Queries with change in Top5 rank list
 daily_cimp1 = daily[daily$cNDCG1 > 0,] # Queries with change in perf. (+)
 daily_cdeg1 = daily[daily$cNDCG1 < 0,] # Queries with change in perf. (-)
 daily_cimp3 = daily[daily$cNDCG3 > 0,] # Queries with change in perf. (+)

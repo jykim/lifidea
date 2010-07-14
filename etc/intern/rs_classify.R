@@ -1,7 +1,7 @@
 # Reading
 setwd("c:/data")
-source("code/rs_import_data.R")
-source("code/rs_library.R")
+source("c:/dev/lifidea/etc/intern/rs_import_data.R")
+source("c:/dev/lifidea/etc/intern/rs_library.R")
 #d_b06 = read.table('result_all_0622.csv',sep=',',quote='',header=TRUE)
 
 # Import the Existence of Document in Each Index
@@ -37,6 +37,35 @@ daily_rw5   = reshape(daily_rn, v.names='dNDCG5', idvar='QID', timevar='Date',di
 daily_sw5   = reshape(daily_sn, v.names='dNDCG5', idvar='QID', timevar='Date',direction='wide')
 daily_rwt 	= reshape(daily_rn, v.names='Tau', idvar='QID', timevar='Date',direction='wide')
 
+# Aggregate Regression Result
+agg_m = merge(agg, anno, by.x='qID', by.y='QueryID')
+# DCG_k vs. NDCG_k
+#sapply( list( agg_m[,c(3:12,13,15)], agg_m[,c(3:12,16,18)], agg_m[,c(3:10,19:21,23)], agg_m[,c(3:10,19:20,24,26)], agg_m[,c(3:10,27:29,31)], agg_m[,c(3:10,27,28,32,34)]), analyze.table) # all records 
+sapply( list( agg_m[,c(3:7,16,18)], agg_m[,c(3:7,19:20,24,26)], agg_m[,c(3:7,27,28,32,34)]), analyze.table) # all records
+sapply( list( agg_r[,c(3:7,16,18)], agg_r[,c(3:7,19:20,24,26)], agg_r[,c(3:7,27,28,32,34)]), analyze.table) # all records
+sapply( list( agg_s[,c(3:7,16,18)], agg_s[,c(3:7,19:20,24,26)], agg_s[,c(3:7,27,28,32,34)]), analyze.table) # all records
+
+daily_rw1$x = NULL ; daily_sw1$x = NULL
+agg_r = merge(agg_m, filter_na_rows(daily_rw1), by.x='qID', by.y='QID')
+agg_s = merge(agg_m, filter_na_rows(daily_sw1), by.x='qID', by.y='QID')
+
+# Aggregate Regression Result with Query Features
+sapply( list( agg_m[,c(3:12,36:59,16,18)], agg_m[,c(3:10,36:59,19:20,24,26)], agg_m[,c(3:10,36:59,27,28,32,34)]), analyze.table) # all records
+sapply( list( agg_r[,c(3:12,36:59,16,18)], agg_r[,c(3:10,36:59,19:20,24,26)], agg_r[,c(3:10,36:59,27,28,32,34)]), analyze.table) # all records
+sapply( list( agg_s[,c(3:12,36:59,16,18)], agg_s[,c(3:10,36:59,19:20,24,26)], agg_s[,c(3:10,36:59,27,28,32,34)]), analyze.table) # all records
+
+sapply( list( agg_m[,c(3:12,36:59,16,18)], agg_m[,c(3:10,36:59,19:20,24,26)], agg_m[,c(3:10,36:59,27,28,32,34)]), analyze.table.rpart) # all records
+sapply( list( agg_r[,c(3:12,36:59,16,18)], agg_r[,c(3:10,36:59,19:20,24,26)], agg_r[,c(3:10,36:59,27,28,32,34)]), analyze.table.rpart) # all records
+sapply( list( agg_s[,c(3:12,36:59,16,18)], agg_s[,c(3:10,36:59,19:20,24,26)], agg_s[,c(3:10,36:59,27,28,32,34)]), analyze.table.rpart) # all records
+
+# Using rpart Package
+analyze.table.rpart(agg_s[,c(3:12,36:59,16,18)])
+
+
+
+#####################################
+### DAILY REGRESSION (drprecated) ###
+
 # Build Training Data by Merging
 d0613 = daily[daily$Date == '6_13_2010',]
 m0613_aw1 = merge(d0613, daily_aw1, by = 'QID', suffixes = c(".d",".a"))
@@ -58,29 +87,3 @@ sapply( list( m0613_aw3[, col_list], m0613_rw3[, col_list], m0613_sw3[, col_list
 
 col_list = c('Overlap1.d','Tau3.d','Tau5.d','dScore5','NDCG5','dNDCG5.6_11_2010','dNDCG5.6_12_2010','dNDCG5.6_13_2010')
 sapply( list( m0613_aw5[, col_list], m0613_rw5[, col_list], m0613_sw5[, col_list]), analyze.table)
-
-# Aggregate Regression Result
-agg_m = merge(agg, anno, by.x='qID', by.y='QueryID')
-sapply( list( agg_m[,c(2,3,8:10,12)], agg_m[,c(2,4,6,13:15,17)], agg_m[,c(2,5,7,18:20,22)]), analyze.table) # all records
-sapply( list( agg_m[,c(2,3,8:11)], agg_m[,c(2,4,6,13:16)], agg_m[,c(2,5,7,18:21)]), analyze.table) # all records
-
-daily_rw1$x = NULL ; daily_sw1$x = NULL
-agg_r = merge(agg_m, filter_na_rows(daily_rw1), by.x='qID', by.y='QID')
-agg_s = merge(agg_m, filter_na_rows(daily_sw1), by.x='qID', by.y='QID')
-
-sapply( list( agg_r[,c(2,3,8:10,12)], agg_r[,c(2,4,6,13:15,17)], agg_r[,c(2,5,7,18:20,22)]), analyze.table) # all records
-sapply( list( agg_r[,c(2,3,8:11)], agg_r[,c(2,4,6,13:16)], agg_r[,c(2,5,7,18:21)]), analyze.table) # all records
-
-sapply( list( agg_s[,c(2,3,8:10,12)], agg_s[,c(2,4,6,13:15,17)], agg_s[,c(2,5,7,18:20,22)]), analyze.table) # all records
-sapply( list( agg_s[,c(2,3,8:11)], agg_s[,c(2,4,6,13:16)], agg_s[,c(2,5,7,18:21)]), analyze.table) # all records
-
-# Aggregate Regression Result with Query Features
-sapply( list( agg_m[,c(2,3,8:10,24:47,12)], agg_m[,c(2,4,6,13:15,24:47,17)], agg_m[,c(2,5,7,18:20,24:47,22)]), analyze.table) # all records
-sapply( list( agg_m[,c(2,3,8:10,24:47,11)], agg_m[,c(2,4,6,13:15,24:47,16)], agg_m[,c(2,5,7,18:20,24:47,21)]), analyze.table) # all records
-
-sapply( list( agg_r[,c(2,3,8:10,24:47,12)], agg_r[,c(2,4,6,13:15,24:47,17)], agg_r[,c(2,5,7,18:20,24:47,22)]), analyze.table) # all records
-sapply( list( agg_r[,c(2,3,8:10,24:47,11)], agg_r[,c(2,4,6,13:15,24:47,16)], agg_r[,c(2,5,7,18:20,24:47,21)]), analyze.table) # all records
-
-sapply( list( agg_s[,c(2,3,8:10,24:47,12)], agg_s[,c(2,4,6,13:15,24:47,17)], agg_s[,c(2,5,7,18:20,24:47,22)]), analyze.table) # all records
-sapply( list( agg_s[,c(2,3,8:10,24:47,11)], agg_s[,c(2,4,6,13:15,24:47,16)], agg_s[,c(2,5,7,18:20,24:47,21)]), analyze.table) # all records
-
