@@ -22,34 +22,14 @@ def	process_data( files_all, start_date, end_date, batch_id)
 		overlaps3 = v_docs.map_cons(2).map{|e|(e[0][0..2] & e[1][0..2]).size/3.0}
 		taus5 = v_docs.map_cons(2).map{|e|e[0].kendalls_tau e[1], 4}
 		overlaps5 = v_docs.map_cons(2).map{|e|(e[0][0..4] & e[1][0..4]).size/5.0}
+		overlaps = v_docs.map_cons(2).map{|e|(e[0] & e[1]).size/10.0}
 
 		# Cumulative Correlation
 		cTaus = v_docs[1..-1].map{|e|v_docs[0].kendalls_tau e}
 		cOverlaps = v_docs[1..-1].map{|e|(v_docs[0] & e).size/10.0}
 		
-		# Daily Result
-		File.open(File.join(output_path, "result_daily_#{qid}.tsv"),'w'){|f|
-			prev_dcg1, prev_dcg3, prev_dcg5 = 0, 0, 0
-			f.puts ['QID', 'Date', 
-					'NDCG1', 'dNDCG1', 'cNDCG1', 'dScore1' ,'drScr1',
-					'NDCG3', 'dNDCG3', 'cNDCG3', 'dScore3' ,'drScr3',
-					'NDCG5', 'dNDCG5', 'cNDCG5', 'dScore5' ,'drScr5',
-					'Overlap1','Overlap3','Overlap5',"Tau3","Tau5",
-					"cTau",'cOvrlap','Query'].join("\t")
-			values.each_with_index{|value,j|
-				cur_dcg1, cur_dcg3, cur_dcg5 = value[0][6].to_f.r3, value[0][7].to_f.r3, value[0][8].to_f.r3
-				f.puts [value[0][0], value[0][2], 
-					cur_dcg1, (j==0)? 0 : (cur_dcg1 - prev_dcg1), (j==0)? 0 : (cur_dcg1 - values[0][0][3].to_f.r3), value[1][C_URL].to_f.r3, value[1][11].to_f.r3, 
-					cur_dcg3, (j==0)? 0 : (cur_dcg3 - prev_dcg3), (j==0)? 0 : (cur_dcg3 - values[0][0][4].to_f.r3), value[3][C_URL].to_f.r3, value[3][11].to_f.r3, 
-					cur_dcg5, (j==0)? 0 : (cur_dcg5 - prev_dcg5), (j==0)? 0 : (cur_dcg5 - values[0][0][5].to_f.r3), value[5][C_URL].to_f.r3, value[5][11].to_f.r3, 
-					(j==0)? 1 : overlaps1[j-1], (j==0)? 1 : overlaps3[j-1].r3, (j==0)? 1 : overlaps5[j-1].r3, (j==0)? 1 : taus3[j-1].r3, (j==0)? 1 : taus5[j-1].r3, 
-					(j==0)? 1 : cTaus[j-1].r3, (j==0)? 1 : cOverlaps[j-1].r3, value[0][1]].join("\t")
-				prev_dcg1, prev_dcg3, prev_dcg5 = cur_dcg1, cur_dcg3, cur_dcg5
-			}
-		}
-		
 		# Doc-level Result (change)
-		qfs['ins'], qfs['swap'] = 0, 0
+		qfs['ins'], qfs['swap'] = [0], [0]
 		File.open(File.join(output_path, "result_cdocs_#{qid}.tsv"),'w'){|f|
 			values.each_with_index{|value,j| # for each pair of days
 				next if j == 0
@@ -68,7 +48,7 @@ def	process_data( files_all, start_date, end_date, batch_id)
 					each{|d|f.puts extract_swap_info(values[j-1].find{|e|e[C_URL] == d[0][0]}, values[j-1].find{|e|e[C_URL] == d[1][0]}, value.find{|e|e[C_URL] == d[0][0]}, value.find{|e|e[C_URL] == d[1][0]}, 'swapN')}
 				swaps.find_all{|e|e[0][1].to_i == e[1][1].to_i}.
 					each{|d|f.puts extract_swap_info(values[j-1].find{|e|e[C_URL] == d[0][0]}, values[j-1].find{|e|e[C_URL] == d[1][0]}, value.find{|e|e[C_URL] == d[0][0]}, value.find{|e|e[C_URL] == d[1][0]}, 'swapU')}
-				qfs['ins'] += ins.size ; qfs['swap'] +=  swaps.size
+				qfs['ins'] << ins.size ; qfs['swap'] <<  swaps.size
 			}
 		}
 		
@@ -80,6 +60,28 @@ def	process_data( files_all, start_date, end_date, batch_id)
 			#results.collapse.sort_by{|e|e[C_URL]}.each{|e|f.puts e.join("\t")}
 			results.collapse.group_by{|e|e[C_URL]}.each{|k,v| f.puts [v[0][C_QID], v.map{|e|e[C_RANK].to_i}.range, v.map{|e|e[C_DS].to_f}.range, v.map{|e|e[C_RANK].to_i}.var, v.map{|e|e[C_DS].to_f}.var, k].join("\t")}
 		}
+		
+		# Daily Result
+		File.open(File.join(output_path, "result_daily_#{qid}.tsv"),'w'){|f|
+			prev_dcg1, prev_dcg3, prev_dcg5 = 0, 0, 0
+			f.puts ['QID', 'Date', 
+					'NDCG1', 'dNDCG1', 'cNDCG1', 'dScore1' ,'drScr1',
+					'NDCG3', 'dNDCG3', 'cNDCG3', 'dScore3' ,'drScr3',
+					'NDCG5', 'dNDCG5', 'cNDCG5', 'dScore5' ,'drScr5',
+					'Overlap1','Overlap3','Overlap5',"Tau3","Tau5",
+					"cTau",'cOvrlap','cIns','cSwap','cStable','Query'].join("\t")
+			values.each_with_index{|value,j|
+				cur_dcg1, cur_dcg3, cur_dcg5 = value[0][6].to_f.r3, value[0][7].to_f.r3, value[0][8].to_f.r3
+				f.puts [value[0][0], value[0][2], 
+					cur_dcg1, (j==0)? 0 : (cur_dcg1 - prev_dcg1), (j==0)? 0 : (cur_dcg1 - values[0][0][3].to_f.r3), value[1][C_URL].to_f.r3, value[1][11].to_f.r3, 
+					cur_dcg3, (j==0)? 0 : (cur_dcg3 - prev_dcg3), (j==0)? 0 : (cur_dcg3 - values[0][0][4].to_f.r3), value[3][C_URL].to_f.r3, value[3][11].to_f.r3, 
+					cur_dcg5, (j==0)? 0 : (cur_dcg5 - prev_dcg5), (j==0)? 0 : (cur_dcg5 - values[0][0][5].to_f.r3), value[5][C_URL].to_f.r3, value[5][11].to_f.r3, 
+					(j==0)? 1 : overlaps1[j-1], (j==0)? 1 : overlaps3[j-1].r3, (j==0)? 1 : overlaps5[j-1].r3, (j==0)? 1 : taus3[j-1].r3, (j==0)? 1 : taus5[j-1].r3, 
+					(j==0)? 1 : cTaus[j-1].r3, (j==0)? 1 : cOverlaps[j-1].r3, qfs['ins'][j], qfs['swap'][j], (j==0)? 1 : overlaps[j-1], value[0][1] ].join("\t")
+				prev_dcg1, prev_dcg3, prev_dcg5 = cur_dcg1, cur_dcg3, cur_dcg5
+			}
+		}
+		
 		
 		# Aggregate Result
 		values_r5, values_r3, values_r1 = values.map{|e|e[5]}, values.map{|e|e[3]}, values.map{|e|e[1]}

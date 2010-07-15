@@ -44,7 +44,7 @@ class WebSearchCollector
             "&Web.Count=#{size}"                                         + 
             "&Web.Offset=#{offset}"                                      + 
             "&Web.Options=DisableHostCollapsing+DisableQueryAlterations";
-	puts url
+	#puts url
 	result_text = Net::HTTP.get(URI.parse(url))
 	JSON.parse(result_text)["SearchResponse"]["Web"]["Results"].map{|e|e["Url"]}
   end
@@ -53,15 +53,15 @@ end
 wsc = WebSearchCollector.new
 ['google','yahoo','bing'].each do |mode|
 	File.open("#{filename}.#{mode}.#{Time.now.strftime('%Y%m%d')}.res", 'w') do |f|
-		f.puts "Query\tDocument\tDocumentScore"
+		f.puts "Query\tDocument\tDocumentScore\tCreateTime"
 		IO.read(filename).split("\n").each_with_index do |q,i2|
 			case mode
-			when 'yahoo': wsc.get_yahoo_results(q).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{10-i}"}
+			when 'yahoo': wsc.get_yahoo_results(q).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{10-i}\t#{Time.now.strftime('%Y_%m_%d %H')}"}
 			when 'google'
-				wsc.get_google_results(q).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{10-i}"}
+				wsc.get_google_results(q).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{10-i}\t#{Time.now.strftime('%Y_%m_%d %H')}"}
 				sleep(1)
-				wsc.get_google_results(q, :offset=>8, :size=>2).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{2-i}"}
-			when 'bing': wsc.get_bing_results(q).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{10-i}"}
+				wsc.get_google_results(q, :offset=>8, :size=>2).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{2-i}\t#{Time.now.strftime('%Y_%m_%d %H')}"}
+			when 'bing': wsc.get_bing_results(q).each_with_index{|e,i|f.puts "#{q.strip}\t#{e}\t#{10-i}\t#{Time.now.strftime('%Y_%m_%d %H')}"}
 			end
 			sleep(1)
 			puts "Processing #{i2}th query... (#{mode})"
