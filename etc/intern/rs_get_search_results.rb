@@ -31,7 +31,7 @@ class WebSearchCollector
   end
   
   def get_bing_results(query, o = {})
-	size = o[:size] || 8
+	size = o[:size] || 10
 	offset = o[:offset] || 0
 	appid = "9E0807AEECA586DFCC6730438FA4DA6C0BE54B82"
 	url = "http://api.bing.net/json.aspx?"                               + 
