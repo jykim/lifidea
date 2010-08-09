@@ -2,10 +2,12 @@ setwd("c:/data")
 source("c:/dev/lifidea/etc/intern/rs_import_data.R")
 source("c:/dev/lifidea/etc/intern/rs_library.R")
 
-# 
-aggregate( docs$QID , by=list(docs$Type), FUN = length)
-result = aggregate( docs$QID , by=list(docs$Date, docs$Type), FUN = length)
-reshape(result, v.names='x', idvar='Group.1', timevar='Group.2',direction='wide')
+daily.cdocs <- function( docs )
+{
+	aggregate( docs$QID , by=list(docs$Type), FUN = length)
+	result = aggregate( docs$QID , by=list(docs$Date, docs$Type), FUN = length)
+	reshape(result, v.names='x', idvar='Group.1', timevar='Group.2',direction='wide')
+}
 
 # Documents dropped from 1
 docs_1   = docs[docs$Rank == 1 & docs$Type == 'del',]   # Queries with change in rank list
@@ -14,14 +16,12 @@ aggregate( docs_1$QID , by=list(docs_1$Date), FUN = length)
 # Export the list of added & deleted documents
 #aggregate( docs_a$URL , by=list(docs_a$URL), FUN = length)
 
-
 # The set of additions vs. swaps 
 qry_a = aggregate( docs_a$QID , by=list(docs_a$QID), FUN = length)
 qry_s = aggregate( docs_s$QID , by=list(docs_s$QID), FUN = length)
 lapply( list( qry_a[[1]], qry_s[[1]], setdiff( qry_a[[1]] , qry_s[[1]]), 
 		setdiff( qry_s[[1]] , qry_a[[1]]), intersect( qry_s[[1]] , qry_a[[1]])), 'length')
 
-		
 # Dist. of Position for deleted/added/swapped documents
 par ( mfrow=c(1,3) ) 
 hist( docs[docs$Type == 'del',]$Rank, main='Rank dist. of deleted docs')   # Queries with change in rank list

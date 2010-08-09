@@ -1,102 +1,57 @@
 library(DAAG)
+library(randomForest)
 
-# Analyze the table of independent (1~n-1 column) and dependent (n column) variables.
-# - Remove all row with NA value
-# - correlation 
-# - regression
-# - classification
-analyze.table <- function( tbl_a, run_id = 'analyze_table' )
+import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 {
-	l_cols = length(colnames(tbl_a))
-	tbl = na.omit( tbl_a )
-	#print(c(nrow(tbl_a), nrow(tbl)))
-	tbl.fit = lm( build.formula(tbl), data=tbl)
-	write.table(
-	t(rbind(cor(tbl)[1:(l_cols-1),l_cols], 
-	tbl.fit$coefficients[2:l_cols])), sep=',', file=paste(run_id, 'csv', sep='.'))
-	#summary_regression( tbl.fit )
-	smry = summary.lm(tbl.fit)
-	cv = cv.lm( tbl, build.formula(tbl), m=5, printit=F, plotit=F)
-	list(tbl.fit$df, smry$r.squared, smry$sigma, sqrt(cv[['ss']])) 
-}
 
-analyze.table.rpart <- function( tbl_a, run_id = 'analyze_table' )
-{
-	#tbl = na.omit( tbl_a )
-	#print(c(nrow(tbl_a), nrow(tbl)))
-	#print(fmla)
-	tbl.fit = rpart( build.formula(tbl_a), data=tbl_a, method='anova')
-	calc.rmse( tbl.fit, tbl_a, tbl_a, last.col(tbl) )
-}
+	print('Aggregate results')
+	agg = read.table(paste('result_all_',batch,'.txt',sep=''),sep='\t',quote='',header=TRUE)
 
-cross.val.queries <- function(train, test = NULL, fold = 3)
-{
-	qids = sample( train[,1], nrow(train) )
-	train_size = round( nrow(train) / fold )
-	result = list()
-	for( i in 1:fold )
+	print('Daily Results')
+	daily = read.table(paste('result_daily_',batch,'.txt',sep=''),sep='\t',quote='',header=TRUE)
+
+	print('Document-level Results')
+	cdocs = read.table(paste('result_cdocs_',batch,'.txt.short',sep=''),sep='\t',quote='"',header=TRUE)
+	docs_a   = cdocs[cdocs$Type == 'add' | cdocs$Type == 'del',]   # Documents added / deleted
+	docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
+	
+	if( !skip_sdoc )
 	{
-		idx_s = train_size * (i-1) + 1
-		if( i < fold )
-			idx_e = train_size * i
-		else
-			idx_e = nrow(train)
-		#print( c(idx_s, idx_e) )
-		result = rbind(result, train.and.test.queries(train, test, train_queries = qids[idx_s:idx_e]))
+		sdocs = read.table(paste('result_sdocs_',batch,'.txt.short',sep=''),sep='\t',quote='"',header=TRUE)
+		# Aggregate Stable Docs Result by Query
+		a_sdocs = cbind( aggregate( sdocs$rRank , by=list(sdocs$QID), FUN = mean), aggregate( sdocs$rScore , by=list(sdocs$QID), FUN = mean))[,c(1,2,4)]
+		colnames(a_sdocs) = c('QID', 'rRank','rScore')
 	}
-	result #apply(result, 2, mean)
-}
-
-train.and.test.queries <- function(train, test = NULL, train_queries = NULL, train_ratio = 0.5)
-{
-	#if( colnames(train) != colnames(test) )
-	#{
-	#	print('[Error] Columns mismatch!!!')
-	#	return()
-	#}
-	if( is.null(test) )
-		test = train
-	if( is.null(train_queries) )
-		train_queries = sample( train[,1], round(nrow(train) * train_ratio));
-	train_s = train[  train[,1] %in% train_queries, -c(1)]
-	test_s  =  test[-(test[,1]  %in% train_queries),-c(1)]
-	mdl = lm( build.formula(train_s), data=train_s)
-	calc.rmse(mdl, train_s, test_s, last.col(train_s))
-}
-
-last.col <- function(tbl)
-{
-	cols = colnames(tbl)
-	cols[length(cols)]
-}
-
-# Select a subset of aggregate table
-sel.cols <- function( agg_m , add_id = FALSE)
-{
-	if( add_id )
-		result = c(1)
 	else
-		result = c()
-	result = append( result, c(3:10, 36:59) )
-	list(k1 = agg_m[,append(result, c(11:12,16,18))], k3 = agg_m[,append(result, c(19:20,24,26))], k5 = agg_m[,append(result, c(27,28,32,34))])
+	{
+		a_sdocs = NULL
+	}
+	if( !is.null(anno) )
+	{
+		agg = merge(agg, anno, by.x='QID', by.y='QueryID')
+		agg = merge(agg, a_sdocs, by='QID')
+	}
+	list(agg=agg, daily=daily, cdocs=cdocs, add=docs_a, swap=docs_s, sdocs=a_sdocs)#
 }
 
-
-build.formula <- function(tbl)
+# Filter the query set by filter_table
+# filter_table : data.table( Group.1 / Group.2 / x )
+filter.queries.by <- function(batch, ichk = NULL)
 {
-	cols = colnames(tbl)
-	as.formula( paste( cols[length(cols)], '~', paste( cols[-length(cols)], collapse='+ ')))
-}
-
-calc.rmse <- function(mdl, train, test, yval) {
-	train.yhat <- predict(object=mdl,newdata=train)
-	test.yhat  <- predict(object=mdl,newdata=test)
-	train.y    <- with(train,get(yval))
-	test.y     <- with(test,get(yval))
-	train.err  <- sqrt(mean((train.yhat - train.y)^2))
-	test.err   <- sqrt(mean((test.yhat - test.y)^2))
-	#plot(test.y, test.yhat)
-	c(train.err=train.err, test.err=test.err)
+	if( !is.null(ichk) )
+	{
+		m_docs  = merge(batch$add, ichk, by="URL")
+		ichk_n = cbind(m_docs, nrc=apply( m_docs, 1, non_rank_chg))
+		filter_table = aggregate(ichk_n$nrc , by=list(ichk_n$Date, ichk_n$QID), FUN = sum) 
+	}
+	else
+		filter_table = aggregate( batch$add$QID , by=list(batch$add$Date, batch$add$QID), FUN = length) 
+	daily_n	= batch$daily[,c('QID','Date','dNDCG1','dNDCG3','dNDCG5')] # filter only qid/date/ndcg_k
+	daily_rn  = merge(daily_n, filter_table,  by.x=c('Date', 'QID'), by.y=c('Group.1', 'Group.2'), all.x=TRUE)
+	daily_rn = daily_rn[-which(daily_rn$x > 0),]
+	daily_rw1   = reshape(daily_rn, v.names='dNDCG1', idvar='QID', timevar='Date', direction='wide')
+	daily_rw1$x = NULL
+	agg_r = merge(batch$agg, filter_na_rows(daily_rw1), by.x='QID', by.y='QID')
 }
 
 # Check whether given row represents ranking-related change
@@ -106,7 +61,7 @@ non_rank_chg <- function(arg)
 	{
 		return(0);
 	}
-	else if( arg['Main'] == 1 & arg['SFresh'] == 0 & arg['QFresh'] == 0 )
+	if( arg['Main'] == 1 & arg['SFresh'] == 0 & arg['QFresh'] == 0 )
 	{
 		return(0);
 	}
@@ -114,8 +69,9 @@ non_rank_chg <- function(arg)
 	{	
 		return(1);
 	}
-}# Calculate the difference between items in a array
+}
 
+# Calculate the difference between items in a array
 sub_all <- function(rows)
 {
 	result = c()
@@ -129,7 +85,30 @@ sub_all <- function(rows)
 	return(result);
 }
 
-### DEPRECATED ONES
+LOG <- function(fmt, ...)
+{
+	print(sprintf(fmt, ...))
+}
+
+sample.tbl <- function(tbl, size)
+{
+	rows = sample( nrow(tbl), size);
+	tbl[rows, ]
+}
+
+
+#######################
+#   DEPRECATED ONES   #
+
+
+analyze.table.rpart <- function( tbl_a, run_id = 'analyze_table' )
+{
+	#tbl = na.omit( tbl_a )
+	#print(c(nrow(tbl_a), nrow(tbl)))
+	#print(fmla)
+	tbl.fit = rpart( build.formula(tbl_a), data=tbl_a, method='anova')
+	predict.and.calc.rmse( tbl.fit, tbl_a, tbl_a, last.col(tbl) )
+}
 
 split.table <- function(tbl, train_ratio)
 {

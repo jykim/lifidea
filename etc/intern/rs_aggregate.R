@@ -15,10 +15,6 @@ d_var = subset(agg, agg$vNDCG5 > 0)
 d_nvar = subset(agg, agg$vNDCG5 == 0)
 
 
-# Query-level Feature Selection 
-agganno = merge(anno, agg, by.y='qID', by.x='QueryID')
-write.table(cor(agganno[,2:45]), file='query_features.csv', sep=',')
-
 # rNDCG ~ Freq
 par ( mfrow=c(2,1) ) 
 boxplot( agg$rNDCG5 ~ cut(agg$log_freq, 10), varwidth=T, outline=F )

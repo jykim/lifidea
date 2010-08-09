@@ -1,12 +1,12 @@
 # Reading
 setwd("c:/data")
-source("c:/dev/lifidea/etc/intern/rs_import_data.R")
 source("c:/dev/lifidea/etc/intern/rs_library.R")
 #d_b06 = read.table('result_all_0622.csv',sep=',',quote='',header=TRUE)
 
 # Import the Existence of Document in Each Index
 # Group.1 Group.2  x
 #list( nrow(ichk), sum(ichk$Main), sum(ichk$SFresh), sum(ichk$QFresh))
+ichk_o = read.table('docs_ichk_all.txt.result',sep='\t',quote='',header=TRUE) # Index check results
 m_docs  = merge(docs_a, ichk_o, by="URL")
 ichk = cbind(m_docs, nrc=apply( m_docs, 1, non_rank_chg))
 
@@ -26,19 +26,21 @@ daily_sn = daily_sn[-which(daily_sn$x > 0),]
 #aggregate( daily_sn5$QID , by=list(daily_sn5$Date), FUN = length)
 
 # Group Target Var (dNDCG5) by Date
-daily_aw1 	= reshape(daily_n,  v.names='dNDCG1', idvar='QID', timevar='Date',direction='wide')
-daily_rw1   = reshape(daily_rn, v.names='dNDCG1', idvar='QID', timevar='Date',direction='wide')
-daily_sw1   = reshape(daily_sn, v.names='dNDCG1', idvar='QID', timevar='Date',direction='wide')
-daily_aw3 	= reshape(daily_n,  v.names='dNDCG3', idvar='QID', timevar='Date',direction='wide')
-daily_rw3   = reshape(daily_rn, v.names='dNDCG3', idvar='QID', timevar='Date',direction='wide')
-daily_sw3   = reshape(daily_sn, v.names='dNDCG3', idvar='QID', timevar='Date',direction='wide')
-daily_aw5 	= reshape(daily_n,  v.names='dNDCG5', idvar='QID', timevar='Date',direction='wide')
-daily_rw5   = reshape(daily_rn, v.names='dNDCG5', idvar='QID', timevar='Date',direction='wide')
-daily_sw5   = reshape(daily_sn, v.names='dNDCG5', idvar='QID', timevar='Date',direction='wide')
+daily_aw1 	= reshape(daily_n,  v.names='dNDCG1', idvar='QID', timevar='Date', direction='wide')
+daily_rw1   = reshape(daily_rn, v.names='dNDCG1', idvar='QID', timevar='Date', direction='wide')
+daily_sw1   = reshape(daily_sn, v.names='dNDCG1', idvar='QID', timevar='Date', direction='wide')
+daily_aw3 	= reshape(daily_n,  v.names='dNDCG3', idvar='QID', timevar='Date', direction='wide')
+daily_rw3   = reshape(daily_rn, v.names='dNDCG3', idvar='QID', timevar='Date', direction='wide')
+daily_sw3   = reshape(daily_sn, v.names='dNDCG3', idvar='QID', timevar='Date', direction='wide')
+daily_aw5 	= reshape(daily_n,  v.names='dNDCG5', idvar='QID', timevar='Date', direction='wide')
+daily_rw5   = reshape(daily_rn, v.names='dNDCG5', idvar='QID', timevar='Date', direction='wide')
+daily_sw5   = reshape(daily_sn, v.names='dNDCG5', idvar='QID', timevar='Date', direction='wide')
 daily_rwt 	= reshape(daily_rn, v.names='Tau', idvar='QID', timevar='Date',direction='wide')
 
 # Aggregate Regression Result
-agg_m = merge(agg, anno, by.x='qID', by.y='QueryID')
+anno = read.table('annotationsB06_July.csv', sep=',',quote='',header=TRUE) # Query annotations
+agg_m = merge(agg, anno, by.x='QID', by.y='QueryID')
+
 # DCG_k vs. NDCG_k
 #sapply( list( agg_m[,c(3:12,13,15)], agg_m[,c(3:12,16,18)], agg_m[,c(3:10,19:21,23)], agg_m[,c(3:10,19:20,24,26)], agg_m[,c(3:10,27:29,31)], agg_m[,c(3:10,27,28,32,34)]), analyze.table) # all records 
 sapply( list( agg_m[,c(3:7,16,18)], agg_m[,c(3:7,19:20,24,26)], agg_m[,c(3:7,27,28,32,34)]), analyze.table) # all records
@@ -46,11 +48,11 @@ sapply( list( agg_r[,c(3:7,16,18)], agg_r[,c(3:7,19:20,24,26)], agg_r[,c(3:7,27,
 sapply( list( agg_s[,c(3:7,16,18)], agg_s[,c(3:7,19:20,24,26)], agg_s[,c(3:7,27,28,32,34)]), analyze.table) # all records
 
 daily_rw1$x = NULL ; daily_sw1$x = NULL
-agg_r = merge(agg_m, filter_na_rows(daily_rw1), by.x='qID', by.y='QID')
-agg_s = merge(agg_m, filter_na_rows(daily_sw1), by.x='qID', by.y='QID')
+agg_r = merge(agg_m, filter_na_rows(daily_rw1), by.x='QID', by.y='QID')
+agg_s = merge(agg_m, filter_na_rows(daily_sw1), by.x='QID', by.y='QID')
 
 # Aggregate Regression Result with Query Features
-sapply( list( agg_m[,c(3:12,36:59,16,18)], agg_m[,c(3:10,36:59,19:20,24,26)], agg_m[,c(3:10,36:59,27,28,32,34)]), analyze.table) # all records
+sapply( sel.cols(agg_m), analyze.table) # all records
 sapply( list( agg_r[,c(3:12,36:59,16,18)], agg_r[,c(3:10,36:59,19:20,24,26)], agg_r[,c(3:10,36:59,27,28,32,34)]), analyze.table) # all records
 sapply( list( agg_s[,c(3:12,36:59,16,18)], agg_s[,c(3:10,36:59,19:20,24,26)], agg_s[,c(3:10,36:59,27,28,32,34)]), analyze.table) # all records
 

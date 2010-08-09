@@ -22,3 +22,4 @@ END {
 #cat B06_raw/* |awk 'BEGIN{FS="\t"} {if($13 == "NA") print $3}' > hrs_na.txt
 
 #cat B06_raw/* |awk 'BEGIN{FS="\t"} {if($14 == "NA") print $3,"\t",$9}' >hrs_na.txt
+
