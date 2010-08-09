@@ -13,14 +13,35 @@ cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"'
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 stbl2 = create.swaptbl( docs_s, 'all', 'swapP' )
 
+batch = 'train2'
+cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
+docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
+stblt2 = create.swaptbl( docs_s, 'all', 'swapP' )
 
 ####################
 #     DEBUGGING    #
 
 #analyze.table(stbl1[,11:length(colnames(stbl1))], feature_cnt = 500)
-stbl_t = sample.tbl( stbl, 1000 )
+stbl_t = sample.tbl( stbl1, 1000 )
+result = rerank.queries(stbl_t, '6_11_2010', topk611, topk612, output=T)
+
+stbl_t = sample.tbl( stbl2, 1000 )
+result = rerank.queries(stbl_t, '6_21_2010', topk621, topk622)
+
 result = predict.swap( docs_s, 'all', 'swapP', stbl=stbl1 )
-result = rerank.queries(stbl_t, '6_11_2010', topk611, topk612)
+
+################################
+#     QUERY-LEVEL ANALYSIS     #
+
+qrys = read.table('result_all_all.txt', sep="\t", quote='', header=T)
+#query_text = queries[,c(1,length(colnames(queries)))]
+result = rerank.queries(stbl1, '6_11_2010', topk611, topk612, output=T)
+qrys_m = merge( result$queries, queries, by='QID', suffixes=c('','.ag'))
+qrys_m = merge( qrys_m, result$swaps, by='QID')
+qrys_m$NDCG5.gain = qrys_m$NDCG5.n - qrys_m$NDCG5
+
+qrys_m[order(qrys_m$NDCG5.gain,decreasing=T),][1:10,]
+qrys_m[order(qrys_m$NDCG5.gain),][1:10,]
 
 ################################
 #     PREDICTION EXPERIMENT    #
@@ -54,7 +75,7 @@ result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615))
 result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616))
 result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617))
 result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618))
-write.table(result, file='ndcg_result_w1_binary_0805.tsv',sep='\t')
+write.table(result, file='ndcg_result_w1_0809.tsv',sep='\t')
 
 ### WEEK2
 topk618 = read.table("top10_20100618.tsv", sep="\t", quote='', header=T)
@@ -75,6 +96,18 @@ result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623)) #, 
 result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624)) #, train_set=stbl1
 result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625)) #, train_set=stbl1
 result = rbind(result, write.table(result, file='ndcg_result_w2_0805.tsv',sep='\t'))
+
+### TRAIN2 (2 day interval)
+topk611 = read.table("top10_20100611.tsv", sep="\t", quote='', header=T)
+topk613 = read.table("top10_20100613.tsv", sep="\t", quote='', header=T)
+topk615 = read.table("top10_20100615.tsv", sep="\t", quote='', header=T)
+topk617 = read.table("top10_20100617.tsv", sep="\t", quote='', header=T)
+
+result = data.frame()
+result = rbind(result, rerank.queries(stblt2, '6_11_2010', topk611, topk613)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stblt2, '6_13_2010', topk613, topk615)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stblt2, '6_15_2010', topk615, topk617)) #, train_set=stbl1
+result = rbind(result, write.table(result, file='ndcg_result_t2_0805.tsv',sep='\t'))
 
 ####################
 #    DEPRECATED    #

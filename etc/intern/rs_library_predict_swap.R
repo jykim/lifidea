@@ -83,36 +83,37 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_set = NULL, feat
 		get.ndcg.result(topk_p, topk_ora$topk, topk_ora$qids_chg))
 	for(threshold in c(0.2, 0.4, 0.5, 0.6, 0.8) ) #0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 
 	{
-		if( nrow( swaps_m[swaps_m$yhat < threshold,] ) == 0 ) 
-			next
-		topk_res = undo.swap( topk, swaps_m[swaps_m$yhat < threshold,] )
-		result_cur = get.ndcg.result(topk_p, topk_res$topk, topk_res$qids_chg)
-		exp_info = get.exp.info(work_date, threshold, stbl_t, stbl_e, swaps_m)
-		result = rbind(result, cbind(exp_info, result_cur) )
+		arg_stbl = swaps_m[order(swaps_m$yhat),][1:round(nrow(swaps_m)*threshold),]
+		topk_res = undo.swap( topk, arg_stbl )
+		result_cur = get.ndcg.result(topk_p, topk_res$topk, topk_res$qids_chg, output=output)
+		if( threshold == 0.5 & output == TRUE)
+			return( list(swaps=arg_stbl, queries=result_cur) )
+		else if( output == FALSE)
+		{
+			exp_info = get.exp.info(work_date, threshold, stbl_t, stbl_e, swaps_m)
+			result = rbind(result, cbind(exp_info, result_cur))
+		}
 	}
 	result
 }
 
 
-undo.swap <- function( arg_topk , arg_stbl )
+undo.swap <- function( arg_topk , stbl )
 {
-	if( nrow(arg_stbl) == 0 )
-		return( list(topk=arg_topk, qids_chg=c()) )
+	#if( nrow(arg_stbl) == 0 )
+	#	return( list(topk=arg_topk, qids_chg=c()) )
 	topk = arg_topk
-	stbl = arg_stbl[order(arg_stbl$yhat),]
 	qids_chg = c()
 	rownames(topk) = paste( topk$QID, topk$Rank, sep='_' )
 	for( i in 1:nrow(stbl) )
 	{
 		rowid1 = paste( stbl[i,]$QID, stbl[i,]$Rank.x.a, sep='_' )
 		rowid2 = paste( stbl[i,]$QID, stbl[i,]$Rank.y.a, sep='_' )
-		if( topk[rowid1,'HRS'] == stbl[i,]$HRS.x && topk[rowid2,'HRS'] == stbl[i,]$HRS.y )
-		{
+		if( topk[rowid1,'HRS'] == stbl[i,]$HRS.x && topk[rowid2,'HRS'] == stbl[i,]$HRS.y ){
 			topk[rowid1,'HRS'] = stbl[i,]$HRS.y
 			topk[rowid2,'HRS'] = stbl[i,]$HRS.x
 		}
-		else
-		{
+		else{
 			#LOG("HRS value inconsistent!")
 			next
 			#return(NULL);
@@ -128,11 +129,11 @@ get.exp.info <- function(work_date, threshold, stbl_t, stbl_e, swaps_m)
 	if( threshold == -999 )
 		effect_swap = swaps_m[swaps_m$y == 0,]
 	else
-		effect_swap = swaps_m[swaps_m$yhat < threshold,]
+		effect_swap = swaps_m[1:round(nrow(swaps_m)*threshold),]#[swaps_m$yhat < threshold,]
 	
 	data.frame(work_date=work_date, threshold = threshold, 
 		train_swap = nrow(stbl_t), test_swap = nrow(stbl_e), effect_swap =  nrow(effect_swap), 
-		precision = nrow( swaps_m[swaps_m$yhat < threshold & swaps_m$y == 0 ,] ) / nrow(swaps_m[swaps_m$yhat < threshold,]))
+		precision = nrow( effect_swap[effect_swap$y == 0 ,] ) / nrow(effect_swap))
 }
 
 get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
@@ -142,6 +143,10 @@ get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
 	topk_m = merge( topk[topk$Rank == 1,], dcg1, by = 'QID' )
 	topk_m = merge( topk_m, dcg5, by = 'QID' )
 	topk_m = merge( topk_m, topk_p[topk_p$Rank == 1,], by='QID', suffixes=c('','.p' ))
+	topk_m[,'NDCG1'] = as.numeric( topk_m[,'NDCG1'] )
+	topk_m[,'NDCG1.p'] = as.numeric( topk_m[,'NDCG1.p'] )
+	topk_m[,'NDCG5'] = as.numeric( topk_m[,'NDCG5'] )
+	topk_m[,'NDCG5.p'] = as.numeric( topk_m[,'NDCG5.p'] )
 	topk_m$NDCG1.n = sapply(topk_m$DCG1.n / topk_m$DCG1 * topk_m$NDCG1, na2zero)
 	topk_m$NDCG5.n = sapply(topk_m$DCG5.n / topk_m$DCG5 * topk_m$NDCG5, na2zero)
 	topk_chg_m = topk_m[topk_m$QID %in% qids_chg,]
@@ -155,14 +160,15 @@ get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
 
 calc.ndcg.result <- function( topk_m, ndcg_n, ndcg, ndcg_p )
 {
-	if( nrow(topk_m) > 0)
+	if( FALSE & nrow(topk_m) > 0 & sum(topk_m[,ndcg_n] - topk_m[,ndcg]) != 0 )
 		p.value = t.test( topk_m[,ndcg_n] , topk_m[,ndcg], paired=T, na.action=na.omit)$p.value
 	else
 		p.value = -1
 	ndcg_gain = topk_m[,ndcg_n] - topk_m[,ndcg]
 	dndcg	= abs(topk_m[,ndcg_n] - topk_m[,ndcg_p])
 	dndcg_o = abs(topk_m[,ndcg] - topk_m[,ndcg_p])
-	data.frame( ndcg=mean(topk_m[,ndcg_n]), ndcg_gain=mean(ndcg_gain), ndcg_gain_percent=(mean(ndcg_gain) / mean(topk_m[,ndcg])) , p.value=p.value, dndcg=mean(dndcg), dndcg_o=mean(dndcg_o))
+	data.frame( ndcg=mean(topk_m[,ndcg_n]), ndcg_gain=mean(ndcg_gain), ndcg_gain_percent=(mean(ndcg_gain) / mean(topk_m[,ndcg])) , 
+		p.value=p.value, dndcg=mean(dndcg), dndcg_o=mean(dndcg_o))
 }
 
 ####################

@@ -9,8 +9,13 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 	output_path = "B06_#{batch_id}"
 	Dir.mkdir(output_path) if !File.exists?(output_path)
 	i = 0
-	files_all.find_all{|e|e=~/\d+\_(\d+)T\d+/ ; $1 && $1 >= start_date && $1 <= end_date }.sort.group_by{|e|e.split(/[_\.]/)[0]}.each do |qid,files|
-		next if files.size < ((Time.parse(end_date) - Time::parse(start_date))/86400).to_i + 1
+	files_all.find_all{|e|e=~/\d+\_(\d+)T\d+/ ; $1 && $1 >= start_date && $1 <= end_date && (!o[:work_date] || o[:work_date].include?($1)) }.
+	sort.group_by{|e|e.split(/[_\.]/)[0]}.each do |qid,files|
+		if o[:work_date] && files.size != o[:work_date].size
+			next
+		elsif !o[:work_date] && files.size < ((Time.parse(end_date) - Time::parse(start_date))/86400).to_i + 1
+			next
+		end
 		qfs = {} # additional query features
 		#next if $qid && $qid != qid
 		
@@ -56,6 +61,7 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 		} unless o[:skip_cdocs]
 		
 		# Doc-level Result (stable docs)
+		
 		qfs['stable'] = 0
 		File.open(File.join(output_path, "result_sdocs_#{qid}.tsv"),'w'){|f|
 			stable_docs = v_docs.inject(v_docs[0]){|result,e| result & e }.map{|e|e[0]}
@@ -117,16 +123,16 @@ end
 
 def build_output_files(batch_id, o = {})
 	puts "[build_output_files] job started..."
-	#system("grep -h ^[0-9] B06_#{batch_id}/result_daily_15* > result_daily_#{batch_id}.tmp")
-	#if o[:short]
-	#	system("cat result_all_header_short.tsv B06_#{batch_id}/result_all_15* > result_all_#{batch_id}.txt")
-	#else
-	#	system("cat result_all_header.tsv B06_#{batch_id}/result_all_15* > result_all_#{batch_id}.txt")
-	#end
-	#system("cat result_daily_header.tsv result_daily_#{batch_id}.tmp > result_daily_#{batch_id}.txt")
-	#system("cat result_cdocs_header.tsv B06_#{batch_id}/result_cdocs_15* |awk -f code/process_cdocs.awk  > result_cdocs_#{batch_id}.txt")
+	system("grep -h ^[0-9] B06_#{batch_id}/result_daily_15* > result_daily_#{batch_id}.tmp")
+	if o[:short]
+		system("cat result_all_header_short.tsv B06_#{batch_id}/result_all_15* > result_all_#{batch_id}.txt")
+	else
+		system("cat result_all_header.tsv B06_#{batch_id}/result_all_15* > result_all_#{batch_id}.txt")
+	end
+	system("cat result_daily_header.tsv result_daily_#{batch_id}.tmp > result_daily_#{batch_id}.txt")
+	system("cat result_cdocs_header.tsv B06_#{batch_id}/result_cdocs_15* |awk -f code/process_cdocs.awk  > result_cdocs_#{batch_id}.txt")
 	system("cat result_cdocs_#{batch_id}.txt |awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$2,$3,$4,$11,$12,$15,$(NF)}' > result_cdocs_#{batch_id}.txt.short")
-	#system("cat result_sdocs_header.tsv B06_#{batch_id}/result_sdocs_15* > result_sdocs_#{batch_id}.txt")
+	system("cat result_sdocs_header.tsv B06_#{batch_id}/result_sdocs_15* > result_sdocs_#{batch_id}.txt")
 	system("cat result_sdocs_#{batch_id}.txt |awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$2,$3,$(NF)}' > result_sdocs_#{batch_id}.txt.short")
 end
 

@@ -8,6 +8,9 @@ $swap_id = 0
 puts "File list read... (#{files_all.size} files)"
 
 # Weekly Data Processing
+process_data(files_all, '20100611', '20100625', 'train2', :skip_sdocs=>true, 
+	:work_date=>['20100611','20100613','20100615','20100617','20100619','20100621','20100623','20100625'])
+
 process_data(files_all, '20100611', '20100618', 'w1')
 process_data(files_all, '20100618', '20100625', 'w2')
 process_data(files_all, '20100625', '20100702', 'w3')
