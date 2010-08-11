@@ -87,7 +87,7 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, fea
 	topk_ora = undo.swap( topk, swaps_m[swaps_m$y == 0,] )
 	result = cbind( get.exp.info(work_date, -999, stbl_t, stbl_e, swaps_m), 
 		get.ndcg.result(topk_p, topk_ora$topk, topk_ora$qids_chg))
-	for(threshold in c(0,0.25, 0.5) ) #0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 
+	for(threshold in c(0,0.1, 0.15, 0.2, 0.25, 0.3, 0.5) ) # 0.4, 
 	{
 		arg_stbl = swaps_m[order(swaps_m$yhat),][1:round(nrow(swaps_m)*threshold),]#[swaps_m$yhat < threshold,]#
 		topk_res = undo.swap( topk, arg_stbl )

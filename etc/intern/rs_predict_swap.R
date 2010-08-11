@@ -5,8 +5,7 @@ batch = 'w1'
 cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 #docs_s   = cdocs[cdocs$Type == 'swapP'| cdocs$Type == 'swapN',]   # Only positive or negative swaps
-stbl1 = create.swaptbl( docs_s, 'all', 'Nhrsdiff' ) # Positive vs. Non-positive
-stbl1_t = select.features( stbl1[,11:length(colnames(stbl1))], 50, add_id = F )
+stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
 #stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Non-negative vs. Negative
 
 batch = 'w2'
@@ -23,7 +22,7 @@ stblt2 = create.swaptbl( docs_s, 'all', 'swapP' )
 #     DEBUGGING    #
 
 stbl1 = create.swaptbl( docs_s, 'basic', 'hrsdiff' ) # Positive vs. Non-positive
-
+stbl1_s = select.features( stbl1[,11:length(colnames(stbl1))], 50, add_id = F )
 
 #analyze.table(stbl1[,11:length(colnames(stbl1))], feature_cnt = 500)
 stbl_t = sample.tbl( stbl1, 1000 )
@@ -74,6 +73,20 @@ result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615))
 result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616))
 result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617))
 result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618))
+result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, feature_cnt=75))
+result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, feature_cnt=75))
+result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, feature_cnt=75))
+result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, feature_cnt=75))
+result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, feature_cnt=75))
+result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, feature_cnt=75))
+result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, feature_cnt=100))
+result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, feature_cnt=750))
 write.table(result, file='ndcg_result_w1_0810.tsv',sep='\t')
 
 ### WEEK2
