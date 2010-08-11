@@ -5,7 +5,7 @@ source("c:/dev/lifidea/etc/intern/rs_library_predict.R")
 create.swaptbl <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 {
 	# Create a Wider Table (one row per swap)
-	dsw = merge( 
+	dsw = merge(
 	merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')),
 	merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')), 
 						by=c('QID','Type','SwapID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c(".b",".a"))
@@ -17,10 +17,14 @@ create.swaptbl <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 				(2 ^ dsw['HRS.y'] - 1) * ( 1 / log( dsw['Rank.y.a'] + 1 ) -  1 / log( dsw['Rank.y.b'] + 1 ) )
 	else if(depvar == 'hrsdiff')
 		label = (dsw['HRS.x'] - dsw['HRS.y'])
+	else if(depvar == 'Nhrsdiff')
+		label = (dsw['HRS.x'] - dsw['HRS.y'])/8+0.5
+	else if(depvar == 'Bhrsdiff')
+		label = data.frame(Label = apply(dsw['HRS.x'] - dsw['HRS.y'], 1, generate.range.label))
 	else if(depvar == 'swapP')
-		label = data.frame(Label = apply( (dsw['Type'] == 'swapP'), 1, generate.label))
+		label = data.frame(Label = apply( (dsw['Type'] == 'swapP'), 1, generate.binary.label))
 	else if(depvar == 'swapN')
-		label = data.frame(Label = apply( (dsw['Type'] != 'swapN'), 1, generate.label))
+		label = data.frame(Label = apply( (dsw['Type'] != 'swapN'), 1, generate.binary.label))
 	else
 		exit();
 	colnames(label) = c('Label')
@@ -52,7 +56,7 @@ predict.swap <- function( docs_s, features, depvar, stbl = NULL )
 	label_set = data.frame(id = stbl$SwapID , label = (stbl$Type == 'swapP') )
 	print("table generated...")
 	
-	for(feature_cnt in c(10,25,50,100,250))
+	for(feature_cnt in c(10,25,50,75,100,150))
 		result = rbind(result, (cross.val.queries(stbl[c(1,11:length(colnames(stbl)))], feature_cnt = feature_cnt, label_set = label_set , method='glm')))
 	#for(feature_cnt in c(10,25,50,100,250))
 	#	result = rbind(result, (cross.val.queries(stbl[c(1,11:length(colnames(stbl)))], feature_cnt = feature_cnt, label_set = label_set , method='rf')))
@@ -65,15 +69,17 @@ predict.swap <- function( docs_s, features, depvar, stbl = NULL )
 	result
 }
 
-rerank.queries <- function(stbl, work_date, topk_p, topk, train_set = NULL, feature_cnt = 50, output = FALSE)
+rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, feature_cnt = NULL, output = FALSE)
 {
 	stbl_e = stbl[stbl$Date == work_date,] ; stbl_t = stbl[stbl$Date != work_date,] ; cs=colnames(stbl_e)
 	#label_set = data.frame(id = stbl_e$SwapID , label = (stbl_e$Type == 'swapP'))
-	if( !is.null(train_set) )
-		swaps = train.and.test.queries(train_set,stbl_e, method = 'glm')
+	if( !is.null(train_stbl) )
+		swaps = train.and.test.queries(train_stbl[,11:length(cs)],stbl_e[,11:length(cs)], feature_cnt = feature_cnt, method = 'glm')
 	else
-		swaps = cross.val.queries(stbl_t[c(1,11:length(cs))], stbl_e[c(1,11:length(cs))], feature_cnt = feature_cnt , method='glm', output=T)
-	swaps_m = merge( stbl_e[,c(1:2, match('Rank.x.a',cs), match('Rank.y.a',cs), match('HRS.x',cs), match('HRS.y',cs))], swaps, by.x='SwapID',by.y='id' )
+		swaps = train.and.test.queries(stbl_t[,11:length(cs)], stbl_e[,11:length(cs)], feature_cnt = feature_cnt, method = 'glm')
+		#swaps = cross.val.queries(stbl_t[c(1,11:length(cs))], stbl_e[c(1,11:length(cs))], feature_cnt = feature_cnt , method='glm', output=T)
+	#swaps_m = merge( stbl_e[,c(1:2, match('Rank.x.a',cs), match('Rank.y.a',cs), match('HRS.x',cs), match('HRS.y',cs))], swaps, by.x='SwapID',by.y='id' )
+	swaps_m = cbind( stbl_e[,c(1:2, match('Rank.x.a',cs), match('Rank.y.a',cs), match('HRS.x',cs), match('HRS.y',cs))], swaps$y, swaps$yhat )
 	
 	LOG("Evaluating results...")
 
@@ -81,15 +87,14 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_set = NULL, feat
 	topk_ora = undo.swap( topk, swaps_m[swaps_m$y == 0,] )
 	result = cbind( get.exp.info(work_date, -999, stbl_t, stbl_e, swaps_m), 
 		get.ndcg.result(topk_p, topk_ora$topk, topk_ora$qids_chg))
-	for(threshold in c(0.2, 0.4, 0.5, 0.6, 0.8) ) #0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 
+	for(threshold in c(0,0.25, 0.5) ) #0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 
 	{
-		arg_stbl = swaps_m[order(swaps_m$yhat),][1:round(nrow(swaps_m)*threshold),]
+		arg_stbl = swaps_m[order(swaps_m$yhat),][1:round(nrow(swaps_m)*threshold),]#[swaps_m$yhat < threshold,]#
 		topk_res = undo.swap( topk, arg_stbl )
 		result_cur = get.ndcg.result(topk_p, topk_res$topk, topk_res$qids_chg, output=output)
-		if( threshold == 0.5 & output == TRUE)
-			return( list(swaps=arg_stbl, queries=result_cur) )
-		else if( output == FALSE)
-		{
+		if( threshold == 0.4 & output == TRUE)
+			return( list(stbl=stbl_e, swaps=swaps_m, queries=result_cur) )
+		else if( output == FALSE ){
 			exp_info = get.exp.info(work_date, threshold, stbl_t, stbl_e, swaps_m)
 			result = rbind(result, cbind(exp_info, result_cur))
 		}
@@ -129,7 +134,7 @@ get.exp.info <- function(work_date, threshold, stbl_t, stbl_e, swaps_m)
 	if( threshold == -999 )
 		effect_swap = swaps_m[swaps_m$y == 0,]
 	else
-		effect_swap = swaps_m[1:round(nrow(swaps_m)*threshold),]#[swaps_m$yhat < threshold,]
+		effect_swap = swaps_m[1:round(nrow(swaps_m)*threshold),]#[swaps_m$yhat < threshold,]#
 	
 	data.frame(work_date=work_date, threshold = threshold, 
 		train_swap = nrow(stbl_t), test_swap = nrow(stbl_e), effect_swap =  nrow(effect_swap), 
@@ -215,12 +220,23 @@ na2zero <- function( value )
 		value
 }
 
-generate.label <- function( bool )
+generate.binary.label <- function( bool )
 {
 	if(bool)
 		1
 	else
 		0
 }
+
+generate.range.label <- function( value )
+{
+	if( value <= -1 )
+		0
+	else if( value == 0 )
+		0.5
+	else
+		1
+}
+
 
 

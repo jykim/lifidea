@@ -5,7 +5,8 @@ batch = 'w1'
 cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 #docs_s   = cdocs[cdocs$Type == 'swapP'| cdocs$Type == 'swapN',]   # Only positive or negative swaps
-stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
+stbl1 = create.swaptbl( docs_s, 'all', 'Nhrsdiff' ) # Positive vs. Non-positive
+stbl1_t = select.features( stbl1[,11:length(colnames(stbl1))], 50, add_id = F )
 #stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Non-negative vs. Negative
 
 batch = 'w2'
@@ -20,6 +21,9 @@ stblt2 = create.swaptbl( docs_s, 'all', 'swapP' )
 
 ####################
 #     DEBUGGING    #
+
+stbl1 = create.swaptbl( docs_s, 'basic', 'hrsdiff' ) # Positive vs. Non-positive
+
 
 #analyze.table(stbl1[,11:length(colnames(stbl1))], feature_cnt = 500)
 stbl_t = sample.tbl( stbl1, 1000 )
@@ -46,11 +50,6 @@ qrys_m[order(qrys_m$NDCG5.gain),][1:10,]
 ################################
 #     PREDICTION EXPERIMENT    #
 
-#predict.swap( docs_s, 'basic', 	'dcgdiff' )
-#predict.swap( docs_s, 'basic', 	'hrsdiff' )
-#predict.swap( docs_s, 'all', 	'dcgdiff' )
-#predict.swap( docs_s, 'all', 	'hrsdiff' )
-
 predict.swap( docs_s, 'basic', 	'swapP' )
 predict.swap( docs_s, 'all', 	'swapP' )
 
@@ -75,7 +74,7 @@ result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615))
 result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616))
 result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617))
 result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618))
-write.table(result, file='ndcg_result_w1_0809.tsv',sep='\t')
+write.table(result, file='ndcg_result_w1_0810.tsv',sep='\t')
 
 ### WEEK2
 topk618 = read.table("top10_20100618.tsv", sep="\t", quote='', header=T)

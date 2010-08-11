@@ -42,13 +42,15 @@ cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, 
 		#print( c(idx_s, idx_e) )
 		if( !is.null( feature_cnt ) )
 			train = select.features( train, feature_cnt, add_id = TRUE )
-		result_cur = train.and.test.queries(train, test, test_queries = qids[idx_s:idx_e], method = method, debug=debug)
+		train_s = train[ !(train[,1] %in% qids[idx_s:idx_e]), -c(1)]
+		test_s  =  test[ test[,1] %in% qids[idx_s:idx_e],     -c(1)]
+		result_cur = train.and.test.queries(train_s, test_s, method = method, debug=debug)
 		#print(result_cur)
 		train.err = append( train.err, result_cur[['train.err']])
 		test.err  = append( test.err,  result_cur[['test.err']])
 		test.prec = append( test.prec,  result_cur[['test.prec']])
 		test.recall = append( test.recall,  result_cur[['test.recall']])
-		result_output = rbind( result_output, data.frame(id = result_cur[['ids']], y = result_cur[['y']] , yhat = result_cur[['yhat']]) )
+		result_output = rbind( result_output, data.frame(id = qids[idx_s:idx_e], y = result_cur[['y']] , yhat = result_cur[['yhat']]) )
 		#result_output =  data.frame(id = result_cur[['ids']], y = result_cur[['y']] , yhat = result_cur[['yhat']])
 	}
 	if( !(method %in% c('svm','rf')) && !is.null(label_set) ){
@@ -65,60 +67,32 @@ cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, 
 	}
 }
 
-pr.curve <- function(arg, run_id = "" ,plottype = NULL)
-{
-	arg = arg[order(arg$predict, decreasing = T),]
-	count_total = nrow( arg[arg$actual == TRUE,])
-	count_cur = 0
-	prec = c()
-	recall = c()
-	f1 = c()
-	for(i in (1:nrow(arg)))
-	{
-		if( arg$actual[i] == TRUE )
-			count_cur = count_cur + 1
-		prec_cur = count_cur / i ; recall_cur = count_cur / count_total
-		prec   = append( prec,  prec_cur  )
-		recall = append( recall, recall_cur )
-		f1	   = append( f1, 2 * prec_cur * recall_cur / (prec_cur + recall_cur) )
-		#print(sprintf("%f / %f", prec, recall))
-	}
-	if( plottype == 'png' )
-		png(paste('plots/prcurve', run_id, 'png', sep='.'), width = 600, height = 600)
-	plot( recall, prec, xlim=c(0,1), ylim=c(0,1) )
-	lines( recall, f1, lty=1 )
-	if( !is.null(plottype) )
-		dev.off()
-	arg
-}
-
-train.and.test.queries <- function(train, test = NULL, test_queries = NULL, test_ratio = 0.5, method = 'lm', debug = FALSE)
+train.and.test.queries <- function(train, test = NULL, test_queries = NULL, method = 'lm', feature_cnt =50, debug = FALSE)
 {
 	if( is.null(test) )
 		test = train
-	if( is.null(test_queries) )
-		test_queries = sample( train[,1], round(nrow(train) * test_ratio));
 	#print( test_queries )
-	train_s = train[ !(train[,1] %in% test_queries), -c(1)]
-	test_s  =  test[ test[,1] %in% test_queries,     -c(1)]
+	
+	if( !is.null(feature_cnt) )
+		train = select.features( train, feature_cnt, add_id = F )
+	
 	if( method == 'lm' )
-		mdl = lm( build.formula(train_s), data=train_s)
+		mdl = lm( build.formula(train), data=train)
 	else if( method == 'glm' )
-		mdl = glm( build.formula(train_s), family=binomial(link="logit"), data=train_s)
+		mdl = glm( build.formula(train), family=binomial(link="logit"), data=train)
 	else if( method == 'rpart' )
-		mdl = rpart( build.formula(train_s), data=train_s, method='anova')
-	else if( method == 'rf' )
-	{
-		train_s2 = train_s
-		train_s2$Label = as.factor(train_s[,'Label'])
-		mdl = randomForest( build.formula(train_s), data=train_s2)
+		mdl = rpart( build.formula(train), data=train, method='anova')
+	else if( method == 'rf' ){
+		train2 = train
+		train2$Label = as.factor(train[,'Label'])
+		mdl = randomForest( build.formula(train), data=train2)
 	}
 	else if( method == 'gam' )
-		mdl = gam( build.formula(train_s), data=train_s)
-	predict.and.calc.rmse(method, mdl, train_s, test_s, last.col(train_s), ids=test[ test[,1] %in% test_queries,1], debug=debug)
+		mdl = gam( build.formula(train), data=train)
+	predict.and.calc.rmse(method, mdl, train, test, last.col(train), debug=debug)
 }
 
-predict.and.calc.rmse <- function(method, mdl, train, test, yval, topk = NULL, ids = NULL , debug=FALSE) 
+predict.and.calc.rmse <- function(method, mdl, train, test, yval, topk = NULL, debug=FALSE) 
 {
 	if( method %in% c('rf', 'svm') )
 		ptype = 'class'
@@ -152,11 +126,37 @@ predict.and.calc.rmse <- function(method, mdl, train, test, yval, topk = NULL, i
 		print(sprintf("features : %d / train_set : %d / test_set : %d",length(colnames(train)), nrow(train), nrow(test)))
 		print(sprintf("yhat : %d / y : %d / overlap : %d ",length(ti1), length(ti2), length(intersect(ti1, ti2))))
 	}
-	if( length(ids) != length(test.yhat) ) {print('ERROR!!! length(ids) != length(yhat)') ; exit()}
-	list(features=length(colnames(train)), rows=nrow(test) , y=test.y, yhat=test.yhat, ids=ids, 
+	#if( !is.null(ids) && length(ids) != length(test.yhat) ) {print('ERROR!!! length(ids) != length(yhat)') ; exit()}
+	list(features=length(colnames(train)), rows=nrow(test) , y=test.y, yhat=test.yhat, 
 	  train.err=train.err, test.err=test.err, test.prec=test_prec, test.recall=test_recall)
 }
 
+pr.curve <- function(arg, run_id = "" ,plottype = NULL)
+{
+	arg = arg[order(arg$predict, decreasing = T),]
+	count_total = nrow( arg[arg$actual == TRUE,])
+	count_cur = 0
+	prec = c()
+	recall = c()
+	f1 = c()
+	for(i in (1:nrow(arg)))
+	{
+		if( arg$actual[i] == TRUE )
+			count_cur = count_cur + 1
+		prec_cur = count_cur / i ; recall_cur = count_cur / count_total
+		prec   = append( prec,  prec_cur  )
+		recall = append( recall, recall_cur )
+		f1	   = append( f1, 2 * prec_cur * recall_cur / (prec_cur + recall_cur) )
+		#print(sprintf("%f / %f", prec, recall))
+	}
+	if( plottype == 'png' )
+		png(paste('plots/prcurve', run_id, 'png', sep='.'), width = 600, height = 600)
+	plot( recall, prec, xlim=c(0,1), ylim=c(0,1) )
+	lines( recall, f1, lty=1 )
+	if( !is.null(plottype) )
+		dev.off()
+	arg
+}
 
 # Select TopK features based on the correlation w/ the dependent variable
 select.features <- function( tbl, feature_cnt = 100, add_id = FALSE )
