@@ -1,5 +1,10 @@
 library(DAAG)
 library(randomForest)
+library('e1071')
+library('earth')
+library('gam')
+library('ipred')
+library('nnet')
 
 import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 {
@@ -52,6 +57,12 @@ filter.queries.by <- function(batch, ichk = NULL)
 	daily_rw1   = reshape(daily_rn, v.names='dNDCG1', idvar='QID', timevar='Date', direction='wide')
 	daily_rw1$x = NULL
 	agg_r = merge(batch$agg, filter_na_rows(daily_rw1), by.x='QID', by.y='QID')
+}
+
+# Create a projection of given table 
+project.table <- function(tbl, indices, titles)
+{
+	cbind( tbl[,indices], tbl[,sapply(titles, match, colnames(tbl))] )
 }
 
 # Check whether given row represents ranking-related change

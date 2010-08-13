@@ -2,55 +2,69 @@ setwd("c:/data")
 source("c:/dev/lifidea/etc/intern/rs_library_predict_swap.R")
 
 batch = 'w1'
-cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
+cdocs_all = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
+cdocs = project.table(cdocs_all, c(1:4, 8:16), read.table('EffectiveFeatureList.txt', header=T) )
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 #docs_s   = cdocs[cdocs$Type == 'swapP'| cdocs$Type == 'swapN',]   # Only positive or negative swaps
-stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
-#stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Non-negative vs. Negative
+#stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
+stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Non-negative vs. Negative
 
 batch = 'w2'
-cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
+cdocs_all = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
+cdocs = project.table(cdocs_all, c(1:4, 8:16), read.table('EffectiveFeatureList.txt', header=T) )
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 stbl2 = create.swaptbl( docs_s, 'all', 'swapP' )
-
-batch = 'train2'
-cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
-docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
-stblt2 = create.swaptbl( docs_s, 'all', 'swapP' )
 
 ####################
 #     DEBUGGING    #
 
-stbl1 = create.swaptbl( docs_s, 'basic', 'hrsdiff' ) # Positive vs. Non-positive
-stbl1_s = select.features( stbl1[,11:length(colnames(stbl1))], 50, add_id = F )
 
 #analyze.table(stbl1[,11:length(colnames(stbl1))], feature_cnt = 500)
 stbl_t = sample.tbl( stbl1, 1000 )
 result = rerank.queries(stbl_t, '6_11_2010', topk611, topk612, output=T)
 
 stbl_t = sample.tbl( stbl2, 1000 )
-result = rerank.queries(stbl_t, '6_21_2010', topk621, topk622)
+result = rerank.queries( stbl_t, '6_21_2010', topk621, topk622 )
 
 result = predict.swap( docs_s, 'all', 'swapP', stbl=stbl1 )
 
-################################
-#     QUERY-LEVEL ANALYSIS     #
+###########################
+#     FEATURE ANALYSIS    #
 
-qrys = read.table('result_all_all.txt', sep="\t", quote='', header=T)
-#query_text = queries[,c(1,length(colnames(queries)))]
-result = rerank.queries(stbl1, '6_11_2010', topk611, topk612, output=T)
-qrys_m = merge( result$queries, queries, by='QID', suffixes=c('','.ag'))
-qrys_m = merge( qrys_m, result$swaps, by='QID')
-qrys_m$NDCG5.gain = qrys_m$NDCG5.n - qrys_m$NDCG5
-
-qrys_m[order(qrys_m$NDCG5.gain,decreasing=T),][1:10,]
-qrys_m[order(qrys_m$NDCG5.gain),][1:10,]
+stbl1 = create.swaptbl( docs_s, 'all', 'hrsdiff' ) # Positive vs. Non-positive
+analyze.table( stbl1[,11:length(colnames(stbl1))], 'all', feature_cnt = 100 )
+stbl1 = create.swaptbl( docs_s, 'basic', 'swapP' ) # Positive vs. Non-positive
+analyze.table( stbl1[,11:length(colnames(stbl1))], 'basic', feature_cnt = 100 )
+stbl1_s = project.table(stbl1, c(1:10), colnames(select.features( stbl1[,11:length(colnames(stbl1))], 50)))
 
 ################################
 #     PREDICTION EXPERIMENT    #
 
-predict.swap( docs_s, 'basic', 	'swapP' )
-predict.swap( docs_s, 'all', 	'swapP' )
+predict.swap( docs_s, 'basic', 	'Bhrsdiff' )
+predict.swap( docs_s, 'all', 	'swapP', method='lm')
+predict.swap( docs_s, 'all', 	'swapP', method='rf', feature_cnts=c(50) )
+predict.swap( docs_s, 'all', 	'Bhrsdiff', method='rf', feature_cnts=c(10) )
+
+predict.swap( docs_s, 'all', 	'swapP', stbl=stbl1, method='mars', feature_cnts=c(10) )
+predict.swap( docs_s, 'all', 	'swapP', stbl=stbl1, method='nnet', feature_cnts=c(10) )
+predict.swap( docs_s, 'all', 	'swapP', stbl=stbl1, method='ppr', feature_cnts=c(10) )
+predict.swap( docs_s, 'all', 	'swapP', stbl=stbl1, method='gam', feature_cnts=c(10) )
+predict.swap( docs_s, 'all', 	'swapP', stbl=stbl1, method='svm', feature_cnts=c(10) )
+
+################################
+#     QUERY-LEVEL ANALYSIS     #
+
+#query_text = queries[,c(1,length(colnames(queries)))]
+result = rerank.queries(stbl1, '6_11_2010', topk611, topk612, output=T)
+qrys = read.table('result_all_all.txt', sep="\t", quote='', header=T)
+qrys_m = merge( result$queries, qrys, by='QID', suffixes=c('','.ag'))
+qrys_m = merge( qrys_m, result$swaps, by='QID')
+qrys_m$NDCG5.gain = qrys_m$NDCG5.n - qrys_m$NDCG5
+
+write.table( qrys_m[order(qrys_m$NDCG5.gain,decreasing=T),][1:100,], file='swap_query_example.tsv', sep='\t' )
+write.table( qrys_m[order(qrys_m$NDCG5.gain),][1:100,], file='swap_query_example.tsv', append=T, sep='\t' )
+write.table( qrys_m[order(qrys_m$yhat, decreasing=T),][1:100,], file='swap_query_example.tsv', append=T, sep='\t' )
+write.table( qrys_m[order(qrys_m$yhat),][1:100,], file='swap_query_example.tsv', append=T, sep='\t' )
 
 #################################
 #     RE-RANKING EXPERIMENT     #
@@ -66,28 +80,26 @@ topk617 = read.table("top10_20100617.tsv", sep="\t", quote='', header=T)
 topk618 = read.table("top10_20100618.tsv", sep="\t", quote='', header=T)
 
 result = data.frame()
-result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612))
-result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613))
-result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614))
-result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615))
-result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616))
-result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617))
-result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618))
-result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, feature_cnt=75))
-result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, feature_cnt=75))
-result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, feature_cnt=75))
-result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, feature_cnt=75))
-result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, feature_cnt=75))
-result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, feature_cnt=75))
-result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, feature_cnt=100))
-result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, feature_cnt=750))
-write.table(result, file='ndcg_result_w1_0810.tsv',sep='\t')
+stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
+thresholds = c(0.1,0.2,0.25,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
+result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+
+stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Positive vs. Non-positive
+thresholds = c(0.1,0.2,0.25,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
+result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
+write.table(result, file='ndcg_result_w1_0813.tsv',sep='\t')
 
 ### WEEK2
 topk618 = read.table("top10_20100618.tsv", sep="\t", quote='', header=T)
@@ -100,14 +112,15 @@ topk624 = read.table("top10_20100624.tsv", sep="\t", quote='', header=T)
 topk625 = read.table("top10_20100625.tsv", sep="\t", quote='', header=T)
 
 result = data.frame()
-result = rbind(result, rerank.queries(stbl2, '6_18_2010', topk618, topk619)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_19_2010', topk619, topk620)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_20_2010', topk620, topk621)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_21_2010', topk621, topk622)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625)) #, train_set=stbl1
-result = rbind(result, write.table(result, file='ndcg_result_w2_0805.tsv',sep='\t'))
+thresholds = c(0.1,0.2,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
+result = rbind(result, rerank.queries(stbl2, '6_18_2010', topk618, topk619, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_19_2010', topk619, topk620, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_20_2010', topk620, topk621, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_21_2010', topk621, topk622, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+write.table(result, file='ndcg_result_w2_0812.tsv',sep='\t')
 
 ### TRAIN2 (2 day interval)
 topk611 = read.table("top10_20100611.tsv", sep="\t", quote='', header=T)
@@ -119,10 +132,17 @@ result = data.frame()
 result = rbind(result, rerank.queries(stblt2, '6_11_2010', topk611, topk613)) #, train_set=stbl1
 result = rbind(result, rerank.queries(stblt2, '6_13_2010', topk613, topk615)) #, train_set=stbl1
 result = rbind(result, rerank.queries(stblt2, '6_15_2010', topk615, topk617)) #, train_set=stbl1
-result = rbind(result, write.table(result, file='ndcg_result_t2_0805.tsv',sep='\t'))
+write.table(result, file='ndcg_result_t2_0805.tsv',sep='\t')
 
 ####################
 #    DEPRECATED    #
+
+### 2-Day Interval
+batch = 'train2'
+cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
+docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
+stblt2 = create.swaptbl( docs_s, 'all', 'swapP' )
+
 
 analyze.table(stbl[stbl$Type=='swapP'|stbl$Type=='swapN',11:length(colnames(stbl))], feature_cnt = 500)
 stbl1 = stbl[stbl$Date == '6_11_2010',]
