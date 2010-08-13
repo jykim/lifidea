@@ -137,6 +137,6 @@ def build_output_files(batch_id, o = {})
 end
 
 def build_topk_file(date)
-	system("find B06_raw -name '*#{date}*'| xargs awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$3,$10,$15,$4,$5,$6,$7,$8,$9,$11}' > top10_#{date}.tmp")
+	system("find B06_raw -name '15*#{date}*'| xargs awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$3,$10,$15,$4,$5,$6,$7,$8,$9,$11}' > top10_#{date}.tmp")
 	system("cat top10_header.tsv top10_#{date}.tmp > top10_#{date}.tsv")
 end

@@ -116,8 +116,8 @@ undo.swap <- function( arg_topk , stbl )
 		}
 		else{
 			#LOG("HRS value inconsistent!")
-			next
 			swaps_skipped = append(swaps_skipped, stbl[i,]$SwapID)
+			next
 			#return(NULL);
 		}
 		qids_chg = append(qids_chg, stbl[i,]$QID)
@@ -168,14 +168,14 @@ get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
 
 calc.ndcg.result <- function( topk_m, ndcg_n, ndcg, ndcg_p )
 {
-	if( nrow(topk_m) > 0 & sum(topk_m[,ndcg_n] - topk_m[,ndcg]) != 0 )
+	if( nrow(topk_m) > 10 & sum(topk_m[,ndcg_n] - topk_m[,ndcg]) != 0 )
 		p.value = t.test( topk_m[,ndcg_n] , topk_m[,ndcg], paired=T, na.action=na.omit)$p.value
 	else
 		p.value = -1
 	ndcg_gain = topk_m[,ndcg_n] - topk_m[,ndcg]
 	dndcg	= abs(topk_m[,ndcg_n] - topk_m[,ndcg_p])
 	dndcg_o = abs(topk_m[,ndcg] - topk_m[,ndcg_p])
-	data.frame( ndcg=mean(topk_m[,ndcg_n]), ndcg_gain=mean(ndcg_gain), ndcg_gain_percent=(mean(ndcg_gain) / mean(topk_m[,ndcg])) , 
+	data.frame( ndcg=mean(topk_m[,ndcg_n]), ndcg_o=mean(topk_m[,ndcg]), ndcg_gain=mean(ndcg_gain), ndcg_gain_percent=(mean(ndcg_gain) / mean(topk_m[,ndcg])) , 
 		p.value=p.value, dndcg=mean(dndcg), dndcg_o=mean(dndcg_o), dndcg_percent=((mean(dndcg) - mean(dndcg_o)) / mean(dndcg_o)))
 }
 

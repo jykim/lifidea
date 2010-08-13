@@ -20,11 +20,12 @@ stbl2 = create.swaptbl( docs_s, 'all', 'swapP' )
 
 
 #analyze.table(stbl1[,11:length(colnames(stbl1))], feature_cnt = 500)
-stbl_t = sample.tbl( stbl1, 1000 )
-result = rerank.queries(stbl_t, '6_11_2010', topk611, topk612, output=T)
+stbl1_t = sample.tbl( stbl1, 1000 )
+result = rerank.queries(stbl1_t, '6_11_2010', topk611, topk612, output=T)
 
-stbl_t = sample.tbl( stbl2, 1000 )
-result = rerank.queries( stbl_t, '6_21_2010', topk621, topk622 )
+stbl1_t = sample.tbl( stbl1, 1000 )
+stbl2_t = sample.tbl( stbl2, 1000 )
+result = rerank.queries( stbl2_t, '6_21_2010', topk621, topk622, train_stbl=stbl1_t )
 
 result = predict.swap( docs_s, 'all', 'swapP', stbl=stbl1 )
 
@@ -80,17 +81,6 @@ topk617 = read.table("top10_20100617.tsv", sep="\t", quote='', header=T)
 topk618 = read.table("top10_20100618.tsv", sep="\t", quote='', header=T)
 
 result = data.frame()
-stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
-thresholds = c(0.1,0.2,0.25,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
-result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-result = rbind(result, rerank.queries(stbl1, '6_13_2010', topk613, topk614, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-result = rbind(result, rerank.queries(stbl1, '6_14_2010', topk614, topk615, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-result = rbind(result, rerank.queries(stbl1, '6_15_2010', topk615, topk616, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-result = rbind(result, rerank.queries(stbl1, '6_16_2010', topk616, topk617, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-result = rbind(result, rerank.queries(stbl1, '6_17_2010', topk617, topk618, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
-
-stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Positive vs. Non-positive
 thresholds = c(0.1,0.2,0.25,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
 result = rbind(result, rerank.queries(stbl1, '6_11_2010', topk611, topk612, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
 result = rbind(result, rerank.queries(stbl1, '6_12_2010', topk612, topk613, thresholds=thresholds, method=method, feature_cnt=feature_cnt))
@@ -113,13 +103,13 @@ topk625 = read.table("top10_20100625.tsv", sep="\t", quote='', header=T)
 
 result = data.frame()
 thresholds = c(0.1,0.2,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
-result = rbind(result, rerank.queries(stbl2, '6_18_2010', topk618, topk619, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_19_2010', topk619, topk620, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_20_2010', topk620, topk621, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_21_2010', topk621, topk622, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
-result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_set=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_18_2010', topk618, topk619, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_19_2010', topk619, topk620, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_20_2010', topk620, topk621, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_21_2010', topk621, topk622, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
 write.table(result, file='ndcg_result_w2_0812.tsv',sep='\t')
 
 ### TRAIN2 (2 day interval)
