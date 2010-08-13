@@ -103,13 +103,13 @@ topk625 = read.table("top10_20100625.tsv", sep="\t", quote='', header=T)
 
 result = data.frame()
 thresholds = c(0.1,0.2,0.3,0.4,0.5) ; method = 'rf' ; feature_cnt = 50
-result = rbind(result, rerank.queries(stbl2, '6_18_2010', topk618, topk619, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
-result = rbind(result, rerank.queries(stbl2, '6_19_2010', topk619, topk620, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
-result = rbind(result, rerank.queries(stbl2, '6_20_2010', topk620, topk621, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
-result = rbind(result, rerank.queries(stbl2, '6_21_2010', topk621, topk622, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
-result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
-result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
-result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625, thresholds=thresholds, method=method, feature_cnt=feature_cnt, train_stbl=stbl1)) #
+result = rbind(result, rerank.queries(stbl2, '6_18_2010', topk618, topk619, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_19_2010', topk619, topk620, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_20_2010', topk620, topk621, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_21_2010', topk621, topk622, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_22_2010', topk622, topk623, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_23_2010', topk623, topk624, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
+result = rbind(result, rerank.queries(stbl2, '6_24_2010', topk624, topk625, thresholds=thresholds, method=method, feature_cnt=feature_cnt)) #, train_stbl=stbl1
 write.table(result, file='ndcg_result_w2_0812.tsv',sep='\t')
 
 ### TRAIN2 (2 day interval)
