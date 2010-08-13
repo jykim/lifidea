@@ -6,14 +6,14 @@ cdocs_all = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote
 cdocs = project.table(cdocs_all, c(1:4, 8:16), read.table('EffectiveFeatureList.txt', header=T) )
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 #docs_s   = cdocs[cdocs$Type == 'swapP'| cdocs$Type == 'swapN',]   # Only positive or negative swaps
-#stbl1 = create.swaptbl( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
-stbl1 = create.swaptbl( docs_s, 'all', 'swapN' ) # Non-negative vs. Negative
+#stbl1 = create.swap.table( docs_s, 'all', 'swapP' ) # Positive vs. Non-positive
+stbl1 = create.swap.table( docs_s, 'all', 'swapN' ) # Non-negative vs. Negative
 
 batch = 'w2'
 cdocs_all = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
 cdocs = project.table(cdocs_all, c(1:4, 8:16), read.table('EffectiveFeatureList.txt', header=T) )
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
-stbl2 = create.swaptbl( docs_s, 'all', 'swapP' )
+stbl2 = create.swap.table( docs_s, 'all', 'swapP' )
 
 ####################
 #     DEBUGGING    #
@@ -32,9 +32,9 @@ result = predict.swap( docs_s, 'all', 'swapP', stbl=stbl1 )
 ###########################
 #     FEATURE ANALYSIS    #
 
-stbl1 = create.swaptbl( docs_s, 'all', 'hrsdiff' ) # Positive vs. Non-positive
+stbl1 = create.swap.table( docs_s, 'all', 'hrsdiff' ) # Positive vs. Non-positive
 analyze.table( stbl1[,11:length(colnames(stbl1))], 'all', feature_cnt = 100 )
-stbl1 = create.swaptbl( docs_s, 'basic', 'swapP' ) # Positive vs. Non-positive
+stbl1 = create.swap.table( docs_s, 'basic', 'swapP' ) # Positive vs. Non-positive
 analyze.table( stbl1[,11:length(colnames(stbl1))], 'basic', feature_cnt = 100 )
 stbl1_s = project.table(stbl1, c(1:10), colnames(select.features( stbl1[,11:length(colnames(stbl1))], 50)))
 
@@ -131,7 +131,7 @@ write.table(result, file='ndcg_result_t2_0805.tsv',sep='\t')
 batch = 'train2'
 cdocs = read.table(paste('result_cdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
 docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
-stblt2 = create.swaptbl( docs_s, 'all', 'swapP' )
+stblt2 = create.swap.table( docs_s, 'all', 'swapP' )
 
 
 analyze.table(stbl[stbl$Type=='swapP'|stbl$Type=='swapN',11:length(colnames(stbl))], feature_cnt = 500)
