@@ -1,20 +1,19 @@
 source("c:/dev/lifidea/etc/intern/rs_library.R")
 source("c:/dev/lifidea/etc/intern/rs_library_predict.R")
 
-# Create a table of features for prediction
-create.swaptbl <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
+# Create a table of features for swap prediction
+create.swap.table <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 {
 	# Create a Wider Table (one row per swap)
 	dsw = merge(
 	merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')),
 	merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')), 
 						by=c('QID','Type','SwapID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c("b","a"))
-	#write.table(docs_swr, file='docs_s_wider.txt', sep='\t')
 
 	xb = 14:56 ; yb = 57:99 ; xa = 104:146 ; ya = 147:189
 	#xb = 17:244 ; yb = 248:475 ; xa = 483:710 ; ya = 714:941
 	if(depvar == 'dcgdiff')
-		label =(2 ^ dsw['HRS.x'] - 1) * ( 1 / log( dsw['Rank.xa'] + 1 ) -  1 / log( dsw['Rank.xb'] + 1 ) ) + 
+		label = (2 ^ dsw['HRS.x'] - 1) * ( 1 / log( dsw['Rank.xa'] + 1 ) -  1 / log( dsw['Rank.xb'] + 1 ) ) + 
 				(2 ^ dsw['HRS.y'] - 1) * ( 1 / log( dsw['Rank.ya'] + 1 ) -  1 / log( dsw['Rank.yb'] + 1 ) )
 	else if(depvar == 'hrsdiff')
 		label = (dsw['HRS.x'] - dsw['HRS.y'])
@@ -29,7 +28,6 @@ create.swaptbl <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 	else
 		exit();
 	colnames(label) = c('Label')
-	#swaptbl = merge( dsw[,c(1:10,xa,ya)], anno, by.x='QID', by.y='QueryID')
 	swaptbl = dsw[,c(1:10)]
 	if( features == 'basic' | features =='all' ){
 		swaptbl = cbind( swaptbl,dsw[,c(xa,ya)])
@@ -46,11 +44,11 @@ create.swaptbl <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 	swaptbl = merge( swaptbl, cbind( dsw$SwapID, label), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('',''))
 }
 
-# Run swap prediction with varying parameters
+# Run a swap prediction experiment with varying parameters
 predict.swap <- function( docs_s, features, depvar, method, feature_cnts = c(10,25,50,75,100), stbl = NULL ) #feature_cnt = NULL, 
 {
 	if( is.null(stbl) ){
-		stbl = create.swaptbl( docs_s, features, depvar )# ; cs = colnames(stbl)
+		stbl = create.swap.table( docs_s, features, depvar )# ; cs = colnames(stbl)
 		#analyze.table(stbl[,11:length(colnames(stbl))], feature_cnt = 500, run_id = paste(features, depvar, sep='_'))
 	}
 	result = list()
@@ -63,16 +61,17 @@ predict.swap <- function( docs_s, features, depvar, method, feature_cnts = c(10,
 	result
 }
 
+# Run a swap re-ranking experiment
 rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, method = 'glm', feature_cnt = 100, thresholds = c(0,1, 0.2, 0.3, 0.4, 0.5) , output = FALSE)
 {
-	stbl_e = stbl[stbl$Date == work_date,] ; stbl_t = stbl[stbl$Date != work_date,] ; cs=colnames(stbl_e)
-	#label_set = data.frame(id = stbl_e$SwapID , label = (stbl_e$Type == 'swapP'))
+	cs=colnames(stbl_e)
+	stbl_e = stbl[stbl$Date == work_date,]
 	if( !is.null(train_stbl) )
-		swaps = train.and.test.queries(train_stbl[,11:length(cs)],stbl_e[,11:length(cs)], feature_cnt = feature_cnt, method = 'glm')
+		stbl_t = train_stbl
 	else
-		swaps = train.and.test.queries(stbl_t[,11:length(cs)], stbl_e[,11:length(cs)], feature_cnt = feature_cnt, method = 'glm')
-		#swaps = cross.val.queries(stbl_t[c(1,11:length(cs))], stbl_e[c(1,11:length(cs))], feature_cnt = feature_cnt , method='glm', output=T)
-	#swaps_m = merge( stbl_e[,c(1:2, match('Rank.xa',cs), match('Rank.ya',cs), match('HRS.x',cs), match('HRS.y',cs))], swaps, by.x='SwapID',by.y='id' )
+		stbl_t = stbl[stbl$Date != work_date,] 
+		
+	swaps = train.and.test.queries(stbl_t[,11:length(cs)], stbl_e[,11:length(cs)], feature_cnt = feature_cnt, method = method)
 	swaps_m = cbind( stbl_e[,c(1:2, match('Rank.xa',cs), match('Rank.ya',cs), match('HRS.x',cs), match('HRS.y',cs))], y=swaps$y, yhat=swaps$yhat )
 	
 	LOG("Evaluating results...")
@@ -80,7 +79,7 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, met
 	#result = data.frame()
 	topk_ora = undo.swap( topk, swaps_m[swaps_m$y <= 0.5,] )
 	result = cbind( get.exp.info(work_date, -999, stbl_t, stbl_e, swaps_m, topk_ora$swaps_skipped), 
-		get.ndcg.result(topk_p, topk_ora$topk, topk_ora$qids_chg))
+					get.ndcg.result(topk_p, topk_ora$topk, topk_ora$qids_chg))
 	for(threshold in thresholds ) #
 	{
 		arg_stbl = swaps_m[order(swaps_m$yhat),][1:round(nrow(swaps_m)*threshold),]#[swaps_m$yhat < threshold,]#
@@ -97,7 +96,7 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, met
 	result
 }
 
-
+# Re-rank topk results by applying swas
 undo.swap <- function( arg_topk , stbl )
 {
 	if( nrow(stbl) == 0 )
@@ -126,6 +125,7 @@ undo.swap <- function( arg_topk , stbl )
 	list(topk=topk, qids_chg=qids_chg, swaps_skipped=swaps_skipped)
 }
 
+# Get info. on experiments
 get.exp.info <- function(work_date, threshold, stbl_t, stbl_e, swaps_m, swaps_skipped)
 {
 	if( threshold == -999 )
@@ -138,6 +138,7 @@ get.exp.info <- function(work_date, threshold, stbl_t, stbl_e, swaps_m, swaps_sk
 		precision = nrow( effect_swap[effect_swap$y == 0 ,] ) / nrow(effect_swap))
 }
 
+# Calculate NDCG / dNDCG gain
 get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
 {
 	dcg1 = aggregate( topk$HRS, by=list(topk$QID), FUN = get_dcg1) ; colnames(dcg1) = c('QID','DCG1.n')
@@ -147,10 +148,6 @@ get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
 	topk_m = merge( topk_m, dcg3, by = 'QID' )
 	topk_m = merge( topk_m, dcg5, by = 'QID' )
 	topk_m = merge( topk_m, topk_p[topk_p$Rank == 1,], by='QID', suffixes=c('','.p' ))
-	#topk_m[,'NDCG1'] = as.numeric( topk_m[,'NDCG1'] )
-	#topk_m[,'NDCG1.p'] = as.numeric( topk_m[,'NDCG1.p'] )
-	#topk_m[,'NDCG5'] = as.numeric( topk_m[,'NDCG5'] )
-	#topk_m[,'NDCG5.p'] = as.numeric( topk_m[,'NDCG5.p'] )
 	topk_m$NDCG1.n = sapply(topk_m$DCG1.n / topk_m$DCG1 * topk_m$NDCG1, na2zero)
 	topk_m$NDCG3.n = sapply(topk_m$DCG3.n / topk_m$DCG3 * topk_m$NDCG3, na2zero)
 	topk_m$NDCG5.n = sapply(topk_m$DCG5.n / topk_m$DCG5 * topk_m$NDCG5, na2zero)
@@ -162,8 +159,6 @@ get.ndcg.result <- function(topk_p, topk, qids_chg = c(), output = FALSE)
 		cbind(calc.ndcg.result( topk_m, 'NDCG1.n', 'NDCG1', 'NDCG1.p' ), calc.ndcg.result( topk_chg_m, 'NDCG1.n', 'NDCG1', 'NDCG1.p' ),
 			  calc.ndcg.result( topk_m, 'NDCG3.n', 'NDCG3', 'NDCG3.p' ), calc.ndcg.result( topk_chg_m, 'NDCG3.n', 'NDCG3', 'NDCG3.p' ),
 			  calc.ndcg.result( topk_m, 'NDCG5.n', 'NDCG5', 'NDCG5.p' ), calc.ndcg.result( topk_chg_m, 'NDCG5.n', 'NDCG5', 'NDCG5.p' ))
-		#cbind(calc.ndcg.result( topk_chg_m, 'NDCG1.n', 'NDCG1', 'NDCG1.p' ),
-		#	  calc.ndcg.result( topk_chg_m, 'NDCG5.n', 'NDCG5', 'NDCG5.p' ))
 }
 
 calc.ndcg.result <- function( topk_m, ndcg_n, ndcg, ndcg_p )
@@ -179,8 +174,8 @@ calc.ndcg.result <- function( topk_m, ndcg_n, ndcg, ndcg_p )
 		p.value=p.value, dndcg=mean(dndcg), dndcg_o=mean(dndcg_o), dndcg_percent=((mean(dndcg) - mean(dndcg_o)) / mean(dndcg_o)))
 }
 
-####################
-# 
+###############
+#  UTILITIES
 
 get_dcg5 <- function(rows)
 {

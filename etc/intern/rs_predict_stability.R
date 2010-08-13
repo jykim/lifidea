@@ -21,20 +21,20 @@ test_f2 = filter.queries.by( test )
 ################################
 #     Check Model Fitness      #
 
-sapply( select.cols(train$agg), analyze.table) # all records
-sapply( select.cols(test$agg),  analyze.table) # all records
+sapply( select.ftypes(train$agg), analyze.table) # all records
+sapply( select.ftypes(test$agg),  analyze.table) # all records
 
-sapply( select.cols(train$agg), train.and.test.queries) # all records
-sapply( select.cols(test$agg),  train.and.test.queries) # all records
+sapply( select.ftypes(train$agg), train.and.test.queries) # all records
+sapply( select.ftypes(test$agg),  train.and.test.queries) # all records
 
-sapply( select.cols(train$agg, add_id=TRUE), cross.val.queries, fold=2) # all records
-sapply( select.cols(test$agg, add_id=TRUE),  cross.val.queries, fold=2) # all records
+sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, fold=2) # all records
+sapply( select.ftypes(test$agg, add_id=TRUE),  cross.val.queries, fold=2) # all records
 
 ######################################
 #     Predicting Aggregate Change    #
 
-sapply( select.cols(train$agg, add_id=TRUE), cross.val.queries, test=test$agg, fold=2) # all records
-sapply( select.cols(train$agg, add_id=TRUE), cross.val.queries, test=test$agg, fold=2, method='rpart') # all records
+sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test$agg, fold=2) # all records
+sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test$agg, fold=2, method='rpart') # all records
 
 # Changing Feature Set
 test.feature_set('lm', train$agg, test$agg)
@@ -46,16 +46,16 @@ test.feature_set('rpart', train_f2, test_f2)
 
 test.feature_set <- function( method, train_set,test_set, debug_flag = FALSE )
 {
-	print(sapply( select.cols(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = FALSE, ft_ndcg = FALSE, ft_qry = FALSE, ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag))
-	print(sapply( select.cols(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = TRUE,  ft_ndcg = FALSE, ft_qry = FALSE, ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
-	print(sapply( select.cols(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = TRUE,  ft_ndcg = TRUE,  ft_qry = FALSE, ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
-	print(sapply( select.cols(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = TRUE,  ft_ndcg = TRUE,  ft_qry = TRUE,  ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
-	print(sapply( select.cols(train_set, add_id=TRUE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
+	print(sapply( select.ftypes(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = FALSE, ft_ndcg = FALSE, ft_qry = FALSE, ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag))
+	print(sapply( select.ftypes(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = TRUE,  ft_ndcg = FALSE, ft_qry = FALSE, ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
+	print(sapply( select.ftypes(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = TRUE,  ft_ndcg = TRUE,  ft_qry = FALSE, ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
+	print(sapply( select.ftypes(train_set, add_id=TRUE, ft_rank = TRUE, ft_score = TRUE,  ft_ndcg = TRUE,  ft_qry = TRUE,  ft_qurl = FALSE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
+	print(sapply( select.ftypes(train_set, add_id=TRUE), cross.val.queries, test=test_set, method=method, debug=debug_flag ))
 }
 
 # Applying Feature Selection
 for(feature_cnt in c(10,25,50,100))
-	print(sapply( select.cols(train_set, add_id=TRUE), cross.val.queries, test=test_set, method=method, debug=debug_flag, feature_cnt=feature_cnt ))
+	print(sapply( select.ftypes(train_set, add_id=TRUE), cross.val.queries, test=test_set, method=method, debug=debug_flag, feature_cnt=feature_cnt ))
 
 
 ##################################
@@ -69,15 +69,15 @@ for(date_test in sort(unique(test_m$Date))[2:length(sort(unique(test_m$Date)))])
 		test_m[test_m$Date == date_test,c(63:86,13,14,16,22,25:27,61)]), cross.val.queries))
 
 #cross.val.queries( test_m[test_m$Date == '6_26_2010',c(63:86,61)] )
-#sapply( select.cols(train$agg, add_id=TRUE), cross.val.queries, test=test_m[test_m$Date == '6_26_2010',])
-#train.and.test.queries( select.cols(train$agg, add_id=TRUE)$k5, test=test_m[test_m$Date == '6_26_2010',], debug=TRUE )
-#train.and.test.queries( select.cols(train$agg, add_id=TRUE)$k5, debug=TRUE )
+#sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test_m[test_m$Date == '6_26_2010',])
+#train.and.test.queries( select.ftypes(train$agg, add_id=TRUE)$k5, test=test_m[test_m$Date == '6_26_2010',], debug=TRUE )
+#train.and.test.queries( select.ftypes(train$agg, add_id=TRUE)$k5, debug=TRUE )
 
 for(date_test in sort(unique(test_m$Date))[2:length(sort(unique(test_m$Date)))])
-	print(sapply( select.cols(train$agg, add_id=TRUE), cross.val.queries, test=test_m[test_m$Date == date_test,]))
+	print(sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test_m[test_m$Date == date_test,]))
 
 #for(date_test in sort(unique(test_m$Date))[2:length(sort(unique(test_m$Date)))])
-#	print(sapply( select.cols(train$agg, add_id=TRUE), cross.val.queries, test=test_m[test_m$Date == date_test,], method='rpart'))
+#	print(sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test_m[test_m$Date == date_test,], method='rpart'))
 
 
 ############################
@@ -89,25 +89,25 @@ w3 = import_data('w3', anno)
 w4 = import_data('w4', anno)
 
 rbind(
-sapply( select.cols(w1$agg, add_id=TRUE), cross.val.queries, fold=2), # all records
-sapply( select.cols(w2$agg, add_id=TRUE), cross.val.queries, fold=2), # all records
-sapply( select.cols(w3$agg, add_id=TRUE), cross.val.queries, fold=2), # all records
-sapply( select.cols(w4$agg, add_id=TRUE), cross.val.queries, fold=2)) # all records
+sapply( select.ftypes(w1$agg, add_id=TRUE), cross.val.queries, fold=2), # all records
+sapply( select.ftypes(w2$agg, add_id=TRUE), cross.val.queries, fold=2), # all records
+sapply( select.ftypes(w3$agg, add_id=TRUE), cross.val.queries, fold=2), # all records
+sapply( select.ftypes(w4$agg, add_id=TRUE), cross.val.queries, fold=2)) # all records
 
 rbind(
-cross.val.queries( select.cols(w1$agg, add_id=TRUE)$k1 , select.cols(w2$agg, add_id=TRUE)$k1 ),
-cross.val.queries( select.cols(w1$agg, add_id=TRUE)$k1 , select.cols(w3$agg, add_id=TRUE)$k1 ),
-cross.val.queries( select.cols(w1$agg, add_id=TRUE)$k1 , select.cols(w4$agg, add_id=TRUE)$k1 ),
-cross.val.queries( select.cols(w2$agg, add_id=TRUE)$k1 , select.cols(w3$agg, add_id=TRUE)$k1 ),
-cross.val.queries( select.cols(w2$agg, add_id=TRUE)$k1 , select.cols(w4$agg, add_id=TRUE)$k1 ),
-cross.val.queries( select.cols(w3$agg, add_id=TRUE)$k1 , select.cols(w4$agg, add_id=TRUE)$k1 ))
+cross.val.queries( select.ftypes(w1$agg, add_id=TRUE)$k1 , select.ftypes(w2$agg, add_id=TRUE)$k1 ),
+cross.val.queries( select.ftypes(w1$agg, add_id=TRUE)$k1 , select.ftypes(w3$agg, add_id=TRUE)$k1 ),
+cross.val.queries( select.ftypes(w1$agg, add_id=TRUE)$k1 , select.ftypes(w4$agg, add_id=TRUE)$k1 ),
+cross.val.queries( select.ftypes(w2$agg, add_id=TRUE)$k1 , select.ftypes(w3$agg, add_id=TRUE)$k1 ),
+cross.val.queries( select.ftypes(w2$agg, add_id=TRUE)$k1 , select.ftypes(w4$agg, add_id=TRUE)$k1 ),
+cross.val.queries( select.ftypes(w3$agg, add_id=TRUE)$k1 , select.ftypes(w4$agg, add_id=TRUE)$k1 ))
 
 ######## DEPRECATED
 
 
-#cross.val.queries( select.cols(train$agg, add_id=TRUE)$k1 , select.cols(test$agg, add_id=TRUE)$k1 )
-#cross.val.queries( select.cols(train$agg, add_id=TRUE)$k3 , select.cols(test$agg, add_id=TRUE)$k3 )
-#cross.val.queries( select.cols(train$agg, add_id=TRUE)$k5 , select.cols(test$agg, add_id=TRUE)$k5 )
+#cross.val.queries( select.ftypes(train$agg, add_id=TRUE)$k1 , select.ftypes(test$agg, add_id=TRUE)$k1 )
+#cross.val.queries( select.ftypes(train$agg, add_id=TRUE)$k3 , select.ftypes(test$agg, add_id=TRUE)$k3 )
+#cross.val.queries( select.ftypes(train$agg, add_id=TRUE)$k5 , select.ftypes(test$agg, add_id=TRUE)$k5 )
 
 # Correlation between train vs. test stability
 agg_m = merge( train$agg[,c(1,7,18,26,34)], test$agg[,c(1,7,18,26,34)], by='QID' )

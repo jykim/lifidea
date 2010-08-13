@@ -6,6 +6,8 @@ library('gam')
 library('ipred')
 library('nnet')
 
+# Import data from Ruby output
+# batch : ID of processing batch
 import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 {
 
@@ -20,19 +22,16 @@ import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 	docs_a   = cdocs[cdocs$Type == 'add' | cdocs$Type == 'del',]   # Documents added / deleted
 	docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
 	
-	if( !skip_sdoc )
-	{
+	if( !skip_sdoc ){
 		sdocs = read.table(paste('result_sdocs_',batch,'.txt.short',sep=''),sep='\t',quote='"',header=TRUE)
 		# Aggregate Stable Docs Result by Query
 		a_sdocs = cbind( aggregate( sdocs$rRank , by=list(sdocs$QID), FUN = mean), aggregate( sdocs$rScore , by=list(sdocs$QID), FUN = mean))[,c(1,2,4)]
 		colnames(a_sdocs) = c('QID', 'rRank','rScore')
 	}
-	else
-	{
+	else{
 		a_sdocs = NULL
 	}
-	if( !is.null(anno) )
-	{
+	if( !is.null(anno) ){
 		agg = merge(agg, anno, by.x='QID', by.y='QueryID')
 		agg = merge(agg, a_sdocs, by='QID')
 	}
@@ -43,8 +42,7 @@ import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 # filter_table : data.table( Group.1 / Group.2 / x )
 filter.queries.by <- function(batch, ichk = NULL)
 {
-	if( !is.null(ichk) )
-	{
+	if( !is.null(ichk) ){
 		m_docs  = merge(batch$add, ichk, by="URL")
 		ichk_n = cbind(m_docs, nrc=apply( m_docs, 1, non_rank_chg))
 		filter_table = aggregate(ichk_n$nrc , by=list(ichk_n$Date, ichk_n$QID), FUN = sum) 
@@ -60,6 +58,8 @@ filter.queries.by <- function(batch, ichk = NULL)
 }
 
 # Create a projection of given table 
+# - indices : indices to add
+# 0 titles : column titles to add
 project.table <- function(tbl, indices, titles)
 {
 	cbind( tbl[,indices], tbl[,sapply(titles, match, colnames(tbl))] )
@@ -68,12 +68,10 @@ project.table <- function(tbl, indices, titles)
 # Check whether given row represents ranking-related change
 non_rank_chg <- function(arg)
 {
-	if( arg['Rank'] == 1 & arg['Type'] == 'add' )
-	{
+	if( arg['Rank'] == 1 & arg['Type'] == 'add' ){
 		return(0);
 	}
-	if( arg['Main'] == 1 & arg['SFresh'] == 0 & arg['QFresh'] == 0 )
-	{
+	if( arg['Main'] == 1 & arg['SFresh'] == 0 & arg['QFresh'] == 0 ){
 		return(0);
 	}
 	else
@@ -109,7 +107,7 @@ sample.tbl <- function(tbl, size)
 
 
 #######################
-#   DEPRECATED ONES   #
+#   DEPRECATED        #
 
 
 analyze.table.rpart <- function( tbl_a, run_id = 'analyze_table' )

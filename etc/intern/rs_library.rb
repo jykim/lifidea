@@ -3,6 +3,10 @@ C_QID, C_DATE, C_RANK, C_URL, C_DS, C_NDS, C_HRS = 0, 2, 9, 10, 12, 13, 14
 C_NDCG1, C_NDCG3, C_NDCG5 = 6, 7, 8
 C_FEATURES = (16..239)
 
+# Process raw query files from C# program
+# - batch_id : ID of processing batch (used in output path & filename)
+# - start_date / end_date : the range of process (in dates)
+# - o[:work_date] : specify an array of dates you want to process
 def	process_data( files_all, start_date, end_date, batch_id, o = {})
 	puts "== Processing #{batch_id} =="
 	time_before = Time.now
@@ -120,7 +124,7 @@ def	extract_swap_info(doc1a, doc2a, doc1, doc2, swap_type)
 	 [swap_type, 'S'+$swap_id.to_s,  doc1].flatten.join("\t"), [swap_type,  'S'+$swap_id.to_s, doc2].flatten.join("\t")]
 end
 
-
+# Build final data files by combining query-level files
 def build_output_files(batch_id, o = {})
 	puts "[build_output_files] job started..."
 	system("grep -h ^[0-9] B06_#{batch_id}/result_daily_15* > result_daily_#{batch_id}.tmp")
