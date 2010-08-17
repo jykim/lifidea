@@ -1,4 +1,5 @@
 source("c:/dev/lifidea/etc/intern/rs_library.R")
+source("c:/dev/lifidea/etc/intern/rs_library_analyze.R")
 source("c:/dev/lifidea/etc/intern/rs_library_predict.R")
 
 # Create a table of features for swap prediction
@@ -6,9 +7,9 @@ create.swap.table <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 {
 	# Create a Wider Table (one row per swap)
 	dsw = merge(
-	merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')),
-	merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')), 
-						by=c('QID','Type','SwapID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c("b","a"))
+			merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')),
+			merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')), 
+			by=c('QID','Type','SwapID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c("b","a"))
 
 	xb = 14:56 ; yb = 57:99 ; xa = 104:146 ; ya = 147:189
 	#xb = 17:244 ; yb = 248:475 ; xa = 483:710 ; ya = 714:941
@@ -64,8 +65,7 @@ predict.swap <- function( docs_s, features, depvar, method, feature_cnts = c(10,
 # Run a swap re-ranking experiment
 rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, method = 'glm', feature_cnt = 100, thresholds = c(0,1, 0.2, 0.3, 0.4, 0.5) , output = FALSE)
 {
-	cs=colnames(stbl_e)
-	stbl_e = stbl[stbl$Date == work_date,]
+	stbl_e = stbl[stbl$Date == work_date,] ; cs=colnames(stbl_e)
 	if( !is.null(train_stbl) )
 		stbl_t = train_stbl
 	else
@@ -99,7 +99,7 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, met
 # Re-rank topk results by applying swas
 undo.swap <- function( arg_topk , stbl )
 {
-	if( nrow(stbl) == 0 )
+	if( nrow(stbl) <= 1 )
 		return( list(topk=arg_topk, qids_chg=c(), swaps_skipped=c()) )
 	topk = arg_topk
 	qids_chg = c()

@@ -2,49 +2,7 @@ setwd("c:/data")
 source("c:/dev/lifidea/etc/intern/rs_import_data.R")
 source("c:/dev/lifidea/etc/intern/rs_library.R")
 
-daily.change <- function( arg_daily )
-{
-	daily   = arg_daily[arg_daily$Date != sort(unique(arg_daily$Date))[1],]   # Queries with change in rank list
-	daily_chg = daily[daily$Tau5 != 1.0,]   # Queries with change in Top5 rank list
-	daily_imp1 = daily[daily$dNDCG1 > 0,] # Queries with change in perf. (+)
-	daily_deg1 = daily[daily$dNDCG1 < 0,] # Queries with change in perf. (-)
-	daily_imp3 = daily[daily$dNDCG3 > 0,] # Queries with change in perf. (+)
-	daily_deg3 = daily[daily$dNDCG3 < 0,] # Queries with change in perf. (-)
-	daily_imp5 = daily[daily$dNDCG5 > 0,] # Queries with change in perf. (+)
-	daily_deg5 = daily[daily$dNDCG5 < 0,] # Queries with change in perf. (-)
-	daily_cchg = daily[daily$cTau != 1.0,]   # Queries with change in Top5 rank list
-	daily_cimp1 = daily[daily$cNDCG1 > 0,] # Queries with change in perf. (+)
-	daily_cdeg1 = daily[daily$cNDCG1 < 0,] # Queries with change in perf. (-)
-	daily_cimp3 = daily[daily$cNDCG3 > 0,] # Queries with change in perf. (+)
-	daily_cdeg3 = daily[daily$cNDCG3 < 0,] # Queries with change in perf. (-)
-	daily_cimp5 = daily[daily$cNDCG5 > 0,] # Queries with change in perf. (+)
-	daily_cdeg5 = daily[daily$cNDCG5 < 0,] # Queries with change in perf. (-)
 
-	# Create the table of daily aggregate statistics
-	result = cbind( 
-	aggregate( daily$QID , by=list(daily$Date), FUN = length), 
-	aggregate( daily_chg$QID , by=list(daily_chg$Date), FUN = length), 
-	aggregate( daily_imp1$QID , by=list(daily_imp1$Date), FUN = length),
-	aggregate( daily_deg1$QID , by=list(daily_deg1$Date), FUN = length),
-	aggregate( daily_imp3$QID , by=list(daily_imp3$Date), FUN = length),
-	aggregate( daily_deg3$QID , by=list(daily_deg3$Date), FUN = length),
-	aggregate( daily_imp5$QID , by=list(daily_imp5$Date), FUN = length),
-	aggregate( daily_deg5$QID , by=list(daily_deg5$Date), FUN = length),
-	aggregate( daily_cchg$QID , by=list(daily_cchg$Date), FUN = length),
-	aggregate( daily_cimp1$QID , by=list(daily_cimp1$Date), FUN = length),
-	aggregate( daily_cdeg1$QID , by=list(daily_cdeg1$Date), FUN = length),
-	aggregate( daily_cimp3$QID , by=list(daily_cimp3$Date), FUN = length),
-	aggregate( daily_cdeg3$QID , by=list(daily_cdeg3$Date), FUN = length),
-	aggregate( daily_cimp5$QID , by=list(daily_cimp5$Date), FUN = length),
-	aggregate( daily_cdeg5$QID , by=list(daily_cdeg5$Date), FUN = length)
-	)[,c(1,2,4, 6,8,10,12,14,16, 18,20,22,24,26,28,30)]
-	
-	colnames(result) = c('Date','QID', 'chg','imp1','deg1','imp3','deg3','imp5','deg5','cchg','cimp1','cdeg1','cimp3','cdeg3','cimp5','cdeg5')
-	result
-}
-
-daily.change( train$daily)
-daily.change( test$daily)
 
 
 # Correlation of Daily NDCG

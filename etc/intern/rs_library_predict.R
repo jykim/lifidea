@@ -1,34 +1,16 @@
 
-# Analyze the table of independent (1~n-1 column) and dependent (n column) variables.
-# - Remove all row with NA value
-# - correlation 
-# - regression
-analyze.table <- function( tbl_a, run_id = 'def', feature_cnt = 100 )
-{
-	tbl = na.omit( tbl_a )
-	tbl = select.features( tbl, feature_cnt )
-	l_cols = length(colnames(tbl))
-	#print(c(nrow(tbl_a), nrow(tbl)))
-	tbl.fit = lm( build.formula(tbl), data=tbl)
-	write.table(
-		t(rbind(cor(tbl)[1:(l_cols-1),l_cols], 
-		tbl.fit$coefficients[2:l_cols])), sep=',', file=paste('analyze_table', run_id, 'csv', sep='.'))
-	#summary_regression( tbl.fit )
-	smry = summary.lm(tbl.fit)
-	list(tbl.fit$df, smry$r.squared, smry$sigma) 
-}
-
 # Run k-fold cross-validation for regression models
 # - test : if specified, use this data for evaluation
 # - feature_cnt : no. of features 
 cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, label_set = NULL, method = 'lm', debug = FALSE, output = FALSE)
 {
-	LOG("Running %s with %d features...", method, feature_cnt)
+	#LOG("Running %s with %d features...", method, feature_cnt)
 	if( is.null(test) ) test = train
 	qids = sample( test[,1], nrow(test) )
 	test_size = round( nrow(test) / fold )
 	train.err = c()
 	test.err = c()
+	test.prec = c()
 	result_output = data.frame()
 
 	if( !is.null( feature_cnt ) )
@@ -42,17 +24,23 @@ cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, 
 			idx_e = nrow(test)
 		train_s = train[ !(train[,1] %in% qids[idx_s:idx_e]), -c(1)]
 		test_s  =  test[ test[,1] %in% qids[idx_s:idx_e],     -c(1)]
-		test_ids = test[ test[,1] %in% qids[idx_s:idx_e],]$SwapID
+		test_ids = test[ test[,1] %in% qids[idx_s:idx_e],1]
 
 		result_cur = train.and.test.queries(train_s, test_s, method = method, debug=debug)
 
 		train.err = append( train.err, result_cur[['train.err']])
 		test.err  = append( test.err,  result_cur[['test.err']])
+		test.prec  = append( test.prec,  result_cur[['test.prec']])
 		result_output = rbind( result_output, data.frame(id = test_ids, y = result_cur[['y']] , yhat = result_cur[['yhat']]) )
 	}
-	result_m = merge( label_set, result_output, by='id')
-	result_avg = calc.precision( data.frame( actual = result_m$label, predict = result_m$yhat ), 
-		plottype = 'png', run_id = paste(feature_cnt, method, sep='_') )
+	if( !is.null(label_set) ){
+		result_m = merge( label_set, result_output, by='id')
+		result_avg = calc.precision( data.frame( actual = result_m$label, predict = result_m$yhat ), 
+			plottype = 'png', run_id = paste(feature_cnt, method, sep='_') )
+	}
+	else{
+		result_avg = list(train.err=mean(train.err), test.err=mean(test.err), test.prec=mean(test.prec))
+	}
 	if( output )
 		result_output
 	else{
@@ -86,7 +74,7 @@ train.and.test.queries <- function(train, test = NULL, method = 'lm', feature_cn
 	predict.and.calc.rmse(method, mdl, train, test, last.col(train), debug=debug)
 }
 
-predict.and.calc.rmse <- function(method, mdl, train, test, yval, topk = NULL, debug=FALSE) 
+predict.and.calc.rmse <- function(method, mdl, train, test, yval, debug=FALSE) 
 {
 	train.yhat <- predict(object=mdl, newdata=train)
 	test.yhat  <- predict(object=mdl, newdata=test)
@@ -95,15 +83,19 @@ predict.and.calc.rmse <- function(method, mdl, train, test, yval, topk = NULL, d
 	train.err  <- calc.rmse(train.yhat, train.y)
 	test.err   <- calc.rmse(test.yhat, test.y)
 	
+	topk = round(nrow(test)*0.10)
+	ti1 = topk.indices(test.yhat, topk) ; ti2 = topk.indices(test.y, topk)
+	test.prec = (sqrt(length(intersect(ti1, ti2)) / topk))
+	
 	if(debug == TRUE){
 		plot(test.y, test.yhat)
 		write.table(list(test.y, test.yhat), file = 'output_predicted_actual.txt')
-		print(colnames(train))
+		#print(colnames(train))
 		print(sprintf("features : %d / train_set : %d / test_set : %d",length(colnames(train)), nrow(train), nrow(test)))
 		print(sprintf("yhat : %d / y : %d / overlap : %d ",length(ti1), length(ti2), length(intersect(ti1, ti2))))
 	}
 	list(features=length(colnames(train)), rows=nrow(test) , y=test.y, yhat=test.yhat, 
-	  train.err=train.err, test.err=test.err)
+	  train.err=train.err, test.err=test.err, test.prec=test.prec)
 }
 
 # Calcuate prec & recall values
@@ -152,22 +144,6 @@ select.features <- function( tbl, feature_cnt = 100, add_id = FALSE )
 
 }
 
-# Select feature types of aggregate table
-# - ft_* : specify whether to add different types of features
-select.ftypes <- function( agg_m , add_id = FALSE, ft_rank = TRUE, ft_score = TRUE, ft_ndcg = TRUE, ft_qry = TRUE, ft_qurl = TRUE)
-{
-	if( add_id )
-		result = c(1)
-	else
-		result = c()
-	if( ft_rank ) result = append( result, c(3:10, 508 ) )
-	if( ft_score) result = append( result, c(11:12,509,19:20,27,28) )
-	if( ft_ndcg ) result = append( result, c(16,24,32) )
-	if( ft_qry  ) result = append( result, c(484:507 ) )
-	if( ft_qurl ) result = append( result, c(35:482) )
-	list(k1 = agg_m[,append(result, c(18))], k3 = agg_m[,append(result, c(26))], k5 = agg_m[,append(result, c(34))])
-}
-
 ###############
 #  UTILITIES
 
@@ -194,6 +170,7 @@ topk.indices <- function( arg, k )
 			result[j] = i;
 			j =  j + 1;
 		}
+		if(j > k) break;
 	}
 	result
 }

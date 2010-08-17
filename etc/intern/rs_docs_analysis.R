@@ -2,13 +2,6 @@ setwd("c:/data")
 source("c:/dev/lifidea/etc/intern/rs_import_data.R")
 source("c:/dev/lifidea/etc/intern/rs_library.R")
 
-daily.cdocs <- function( docs )
-{
-	aggregate( docs$QID , by=list(docs$Type), FUN = length)
-	result = aggregate( docs$QID , by=list(docs$Date, docs$Type), FUN = length)
-	reshape(result, v.names='x', idvar='Group.1', timevar='Group.2',direction='wide')
-}
-
 # Documents dropped from 1
 docs_1   = docs[docs$Rank == 1 & docs$Type == 'del',]   # Queries with change in rank list
 aggregate( docs_1$QID , by=list(docs_1$Date), FUN = length)
