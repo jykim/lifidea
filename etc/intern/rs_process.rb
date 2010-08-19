@@ -1,7 +1,4 @@
 load 'code/rs_library.rb'
-require 'time'
-$swap_id = 0
-
 
 # Data for each query
 $work_path = "B06_raw_all"
@@ -24,6 +21,14 @@ process_data(files_all, '20100625', '20100709', 'test')
 
 process_data(files_all, '20100611', '20100709', 'all')
 
+
+# Test Data (20 queries)
+$work_path = "B06_raw_test"
+files_all = Dir.entries($work_path) ; nil
+process_data(files_all, '20100611', '20100618', 'w1t')
+
+
+
 #process_data(files_all, '20100604', '20100604', 'test_ruby') ; nil
 
 # Generate Top10 Rank list
@@ -32,8 +37,6 @@ process_data(files_all, '20100611', '20100709', 'all')
 ['20100619','20100620','20100621','20100622','20100623','20100624','20100625'].each{|e| build_topk_file(e)}
 ['20100626','20100627','20100628','20100629','20100630','20100701','20100702'].each{|e| build_topk_file(e)}
 ['20100703','20100704','20100705','20100706','20100707','20100708','20100709'].each{|e| build_topk_file(e)}
-
-
 
 # Comparison of Stability for 3 Search Engines
 $work_path = "B06_raw_goog"

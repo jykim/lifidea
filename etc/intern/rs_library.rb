@@ -1,7 +1,10 @@
+require 'time'
 load 'rubylib_include.rb'
 C_QID, C_DATE, C_RANK, C_URL, C_DS, C_NDS, C_HRS = 0, 2, 9, 10, 12, 13, 14
 C_NDCG1, C_NDCG3, C_NDCG5 = 6, 7, 8
 C_FEATURES = (16..239)
+$cdid = 0
+$bdocs_k = 4
 
 # Process raw query files from C# program
 # - batch_id : ID of processing batch (used in output path & filename)
@@ -43,14 +46,32 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 		# Doc-level Result (change)
 		qfs['ins'], qfs['swap'] = [0], [0]
 		File.open(File.join(output_path, "result_cdocs_#{qid}.tsv"),'w'){|f|
+		File.open(File.join(output_path, "result_bdocs_#{qid}.tsv"),'w'){|f2|
 			values.each_with_index{|value,j| # for each pair of days
 				next if j == 0
-				ins = (v_docs[j-1] - v_docs[j])
-				ins.each{|d|
-					result = values[j-1].find{|e|e[C_URL] == d[0]}.dup ; result[2] = value[0][2] # Update the date of deleted document
-					f.puts ['del', '', result].flatten.join("\t")}
-				(v_docs[j] - v_docs[j-1]).each{|d|f.puts ['add', '', value.find{|e|e[C_URL] == d[0]}].flatten.join("\t")}
 				
+				### Deletion
+				del = (v_docs[j-1] - v_docs[j])
+				del.each{|d|
+					result = values[j-1].find{|e|e[C_URL] == d[0]}.dup ; result[C_DATE] = value[0][C_DATE] # Update the date of deleted document
+					if result[C_RANK].to_i <= 5
+						values[j-1][(result[C_RANK].to_i)..(result[C_RANK].to_i+$bdocs_k)].each_with_index{|e,k|f2.puts ["delb#{k}", "D#{$cdid}", e].flatten.join("\t")}
+					end
+					f.puts ['del', "D#{$cdid}", result].flatten.join("\t")
+					$cdid += 1
+				}
+				
+				### Insertion
+				(v_docs[j] - v_docs[j-1]).each{|d|
+					result = value.find{|e|e[C_URL] == d[0]}
+					if result[C_RANK].to_i <= 5
+						values[j][(result[C_RANK].to_i)..(result[C_RANK].to_i+$bdocs_k)].each_with_index{|e,k|f2.puts ["addb#{k}", "I#{$cdid}", e].flatten.join("\t")}
+					end
+					f.puts ['add', "I#{$cdid}", result].flatten.join("\t")
+					$cdid += 1
+				}
+				
+				### Swap
 				pref_a, pref_b, common_docs = v_docs[j-1].to_comb, v_docs[j].to_comb, (v_docs[j] & v_docs[j-1])
 				swaps = (pref_b - pref_a).find_all{|e|common_docs.include?(e[0]) && common_docs.include?(e[1])}
 				
@@ -60,9 +81,9 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 					each{|d|f.puts extract_swap_info(values[j-1].find{|e|e[C_URL] == d[0][0]}, values[j-1].find{|e|e[C_URL] == d[1][0]}, value.find{|e|e[C_URL] == d[0][0]}, value.find{|e|e[C_URL] == d[1][0]}, 'swapN')}
 				swaps.find_all{|e|e[0][1].to_i == e[1][1].to_i}.
 					each{|d|f.puts extract_swap_info(values[j-1].find{|e|e[C_URL] == d[0][0]}, values[j-1].find{|e|e[C_URL] == d[1][0]}, value.find{|e|e[C_URL] == d[0][0]}, value.find{|e|e[C_URL] == d[1][0]}, 'swapU')}
-				qfs['ins'] << ins.size ; qfs['swap'] <<  swaps.size
+				qfs['ins'] << del.size ; qfs['swap'] <<  swaps.size
 			}
-		} unless o[:skip_cdocs]
+		}} unless o[:skip_cdocs]
 		
 		# Doc-level Result (stable docs)
 		
@@ -119,9 +140,9 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 end
 
 def	extract_swap_info(doc1a, doc2a, doc1, doc2, swap_type)
-	$swap_id += 1
-	[[swap_type, 'S'+$swap_id.to_s, doc1a].flatten.join("\t"), [swap_type, 'S'+$swap_id.to_s, doc2a].flatten.join("\t"), 
-	 [swap_type, 'S'+$swap_id.to_s,  doc1].flatten.join("\t"), [swap_type,  'S'+$swap_id.to_s, doc2].flatten.join("\t")]
+	$cdid += 1
+	[[swap_type, 'S'+$cdid.to_s, doc1a].flatten.join("\t"), [swap_type, 'S'+$cdid.to_s, doc2a].flatten.join("\t"), 
+	 [swap_type, 'S'+$cdid.to_s,  doc1].flatten.join("\t"), [swap_type,  'S'+$cdid.to_s, doc2].flatten.join("\t")]
 end
 
 # Build final data files by combining query-level files
@@ -136,6 +157,8 @@ def build_output_files(batch_id, o = {})
 	system("cat result_daily_header.tsv result_daily_#{batch_id}.tmp > result_daily_#{batch_id}.txt")
 	system("cat result_cdocs_header.tsv B06_#{batch_id}/result_cdocs_15* |awk -f code/process_cdocs.awk  > result_cdocs_#{batch_id}.txt")
 	system("cat result_cdocs_#{batch_id}.txt |awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$2,$3,$4,$11,$12,$15,$(NF)}' > result_cdocs_#{batch_id}.txt.short")
+	system("cat result_cdocs_header.tsv B06_#{batch_id}/result_bdocs_15* |awk -f code/process_cdocs.awk  > result_bdocs_#{batch_id}.txt")
+	system("cat result_bdocs_#{batch_id}.txt |awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$2,$3,$4,$11,$12,$15,$(NF)}' > result_bdocs_#{batch_id}.txt.short")
 	system("cat result_sdocs_header.tsv B06_#{batch_id}/result_sdocs_15* > result_sdocs_#{batch_id}.txt")
 	system("cat result_sdocs_#{batch_id}.txt |awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$2,$3,$(NF)}' > result_sdocs_#{batch_id}.txt.short")
 end

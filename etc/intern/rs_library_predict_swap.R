@@ -7,9 +7,9 @@ create.swap.table <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 {
 	# Create a Wider Table (one row per swap)
 	dsw = merge(
-			merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')),
-			merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','SwapID')), 
-			by=c('QID','Type','SwapID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c("b","a"))
+			merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','CDID')),
+			merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','CDID')), 
+			by=c('QID','Type','CDID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c("b","a"))
 
 	xb = 14:56 ; yb = 57:99 ; xa = 104:146 ; ya = 147:189
 	#xb = 17:244 ; yb = 248:475 ; xa = 483:710 ; ya = 714:941
@@ -32,17 +32,17 @@ create.swap.table <- function( docs_s, features = 'all', depvar = 'dcgdiff' )
 	swaptbl = dsw[,c(1:10)]
 	if( features == 'basic' | features =='all' ){
 		swaptbl = cbind( swaptbl,dsw[,c(xa,ya)])
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,xa] - dsw[,xb])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.cX'))
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,ya] - dsw[,yb])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.cY'))
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,ya] - dsw[,xa])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.dA'))
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,yb] - dsw[,xb])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.dB'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,xa] - dsw[,xb])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.cX'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,ya] - dsw[,yb])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.cY'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,ya] - dsw[,xa])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.dA'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,yb] - dsw[,xb])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.dB'))
 	}
 	if( features == 'adv' | features =='all' ){
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,xa] - dsw[,xb]) - (dsw[,ya] - dsw[,yb])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.dcAB'))
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,yb] - dsw[,xb]) + (dsw[,ya] - dsw[,xa])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.adXY'))
-		swaptbl = merge( swaptbl, cbind( dsw$SwapID, (dsw[,yb] + dsw[,xb]) + (dsw[,ya] + dsw[,xa])), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('','.aXY'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,xa] - dsw[,xb]) - (dsw[,ya] - dsw[,yb])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.dcAB'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,yb] - dsw[,xb]) + (dsw[,ya] - dsw[,xa])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.adXY'))
+		swaptbl = merge( swaptbl, cbind( dsw$CDID, (dsw[,yb] + dsw[,xb]) + (dsw[,ya] + dsw[,xa])), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('','.aXY'))
 	}
-	swaptbl = merge( swaptbl, cbind( dsw$SwapID, label), by.x=c('SwapID'), by.y=c('dsw$SwapID'), suffixes=c('',''))
+	swaptbl = merge( swaptbl, cbind( dsw$CDID, label), by.x=c('CDID'), by.y=c('dsw$CDID'), suffixes=c('',''))
 }
 
 # Run a swap prediction experiment with varying parameters
@@ -53,7 +53,7 @@ predict.swap <- function( docs_s, features, depvar, method, feature_cnts = c(10,
 		#analyze.table(stbl[,11:length(colnames(stbl))], feature_cnt = 500, run_id = paste(features, depvar, sep='_'))
 	}
 	result = list()
-	label_set = data.frame(id = stbl$SwapID , label = (stbl$Type == 'swapP') )
+	label_set = data.frame(id = stbl$CDID , label = (stbl$Type == 'swapP') )
 	print("table generated...")
 	
 	for(feature_cnt in feature_cnts)
@@ -63,7 +63,7 @@ predict.swap <- function( docs_s, features, depvar, method, feature_cnts = c(10,
 }
 
 # Run a swap re-ranking experiment
-rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, method = 'glm', feature_cnt = 100, thresholds = c(0,1, 0.2, 0.3, 0.4, 0.5) , output = FALSE)
+rerank.queries	<- function(stbl, work_date, topk_p, topk, train_stbl = NULL, method = 'glm', feature_cnt = 100, thresholds = c(0,1, 0.2, 0.3, 0.4, 0.5) , output = FALSE)
 {
 	stbl_e = stbl[stbl$Date == work_date,] ; cs=colnames(stbl_e)
 	if( !is.null(train_stbl) )
@@ -72,7 +72,7 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, met
 		stbl_t = stbl[stbl$Date != work_date,] 
 		
 	swaps = train.and.test.queries(stbl_t[,11:length(cs)], stbl_e[,11:length(cs)], feature_cnt = feature_cnt, method = method)
-	swaps_m = cbind( stbl_e[,c(1:2, match('Rank.xa',cs), match('Rank.ya',cs), match('HRS.x',cs), match('HRS.y',cs))], y=swaps$y, yhat=swaps$yhat )
+	swaps_m = cbind( stbl_e[,c(1:2, match('Rank.xa',cs), match('Rank.ya',cs), match('URL.x',cs), match('URL.y',cs), match('HRS.x',cs), match('HRS.y',cs))], y=swaps$y, yhat=swaps$yhat )
 	
 	LOG("Evaluating results...")
 
@@ -96,6 +96,51 @@ rerank.queries <- function(stbl, work_date, topk_p, topk, train_stbl = NULL, met
 	result
 }
 
+# Re-rank topk results by applying swaps
+# - Multiple application for the same document 
+undo.swap.new <- function( arg_topk , stbl )
+{
+	if( nrow(stbl) <= 1 )
+		return( list(topk=arg_topk, qids_chg=c(), swaps_skipped=c()) )
+	topk = arg_topk
+	rowids = list()
+	qids_chg = c()
+	swaps_skipped = c()
+	rownames(topk) = paste( topk$QID, topk$Rank)
+	for( i in 1:nrow(stbl) )
+	{
+		curqid = stbl[i,]$QID ; urlx = stbl[i,]$URL.x ; urly = stbl[i,]$URL.y
+		rowid1 = get.rowid( topk, rowids, curqid, stbl[i,]$Rank.xa, urlx)
+		rowid2 = get.rowid( topk, rowids, curqid, stbl[i,]$Rank.ya, urly)
+		#LOG("[undo.swap] Working on '%s' - '%s'", rowid1, rowid2)
+		#LOG("[undo.swap] Working on '%s' - '%s'", topk[rowid1,'HRS'], topk[rowid2,'HRS'])
+		if( TRUE || topk[rowid1,'URL'] == urlx && topk[rowid2,'URL'] == urly ){
+			topk[rowid1,'HRS'] = stbl[i,]$HRS.y ; topk[rowid1,'URL'] = urly ; rowids[paste(curqid, urly)] = rowid1
+			topk[rowid2,'HRS'] = stbl[i,]$HRS.x ; topk[rowid2,'URL'] = urlx ; rowids[paste(curqid, urlx)] = rowid2
+		}
+		else{
+			#LOG("HRS value inconsistent!")
+			swaps_skipped = append(swaps_skipped, stbl[i,]$CDID)
+			next
+			#return(NULL);
+		}
+		qids_chg = append(qids_chg, curqid)
+		#LOG("Changing %s -> %d /  %s -> %d", rowid1, stbl[i,]$HRS.y, rowid2, stbl[i,]$HRS.x)
+	}
+	list(topk=topk, qids_chg=qids_chg, swaps_skipped=swaps_skipped)
+}
+
+get.rowid <- function( topk, rowids, qid, rank, URL)
+{
+	if( topk[paste(qid,rank),'URL'] == URL )
+		paste(qid,rank)
+	else
+	{
+		#LOG("[get.rowid] rowids[%s %s] = %s", qid, URL, rowids[paste(qid,URL)])
+		rowids[[paste(qid,URL)]]
+	}
+}
+
 # Re-rank topk results by applying swas
 undo.swap <- function( arg_topk , stbl )
 {
@@ -115,7 +160,7 @@ undo.swap <- function( arg_topk , stbl )
 		}
 		else{
 			#LOG("HRS value inconsistent!")
-			swaps_skipped = append(swaps_skipped, stbl[i,]$SwapID)
+			swaps_skipped = append(swaps_skipped, stbl[i,]$CDID)
 			next
 			#return(NULL);
 		}

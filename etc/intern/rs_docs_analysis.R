@@ -22,9 +22,9 @@ hist( docs[docs$Type == 'add',]$Rank, main='Rank dist. of added docs')   # Queri
 hist( docs[docs$Type == 'swapP' | docs$Type == 'swapU' | docs$Type == 'swapN',]$Rank, main='Rank dist. of swapped docs')   # Queries with change in rank list
 
 # No. of swaps in each deltaScore range
-r_score = aggregate( docs_s$dScore, by=list(docs_s$SwapID), FUN = sub_pair )
-r_score_a = aggregate( docs_s$dScore, by=list(docs_s$SwapID), FUN = sub_pair_a )
-r_rank = aggregate( docs_s$Rank, by=list(docs_s$SwapID), FUN = sub_pair )
+r_score = aggregate( docs_s$dScore, by=list(docs_s$CDID), FUN = sub_pair )
+r_score_a = aggregate( docs_s$dScore, by=list(docs_s$CDID), FUN = sub_pair_a )
+r_rank = aggregate( docs_s$Rank, by=list(docs_s$CDID), FUN = sub_pair )
 result = merge(r_rank, r_score, by='Group.1')
 plot(abs(result$x.x), abs(result$x.y))
 boxplot(abs(result$x.y) ~ abs(result$x.x))
@@ -32,13 +32,13 @@ boxplot(abs(result$x.y) ~ abs(result$x.x))
 # Transform Swapped pair data into wide format
 docs_sw = merge( 
 rbind( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),]),
-rbind( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),]), by=c('QID','Type','URL','Judgment','HRS','SwapID'), suffixes = c(".b",".a"))
+rbind( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),]), by=c('QID','Type','URL','Judgment','HRS','CDID'), suffixes = c(".b",".a"))
 write.table(docs_sw, file='docs_s_wide.txt', sep='\t')
 
 # Transform Swapped pair data into wider format
 docs_swr = merge( 
-merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','NDCG10','SwapID')),
-merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','NDCG10','SwapID')), by=c('QID','Type','SwapID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c(".b",".a"))
+merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','NDCG10','CDID')),
+merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','NDCG1','NDCG3','NDCG5','NDCG10','CDID')), by=c('QID','Type','CDID','URL.x','URL.y','Judgment.x','Judgment.y','HRS.x','HRS.y'), suffixes = c(".b",".a"))
 write.table(docs_swr, file='docs_s_wider.txt', sep='\t')
 
 # P(swap) against deltaScore1

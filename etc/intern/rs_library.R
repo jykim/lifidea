@@ -57,6 +57,14 @@ filter.queries.by <- function(batch, ichk = NULL)
 	agg_r = merge(batch$agg, filter_na_rows(daily_rw1), by.x='QID', by.y='QID')
 }
 
+get.sfindex.count <- function(batch, ichk)
+{
+	m_docs = merge(batch$add, ichk[ichk$Main == 0,], by="URL")
+	sfcounts = aggregate( m_docs$SFresh, by=list(m_docs$QID), FUN = sum )
+	m_sfcounts = merge(sfcounts, batch$agg[,c(1,483)], by.x='Group.1', by.y="QID")
+	m_sfcounts[order(m_sfcounts$x, decreasing=T),]
+}
+
 # Create a projection of given table 
 # - indices : indices to add
 # 0 titles : column titles to add
@@ -97,6 +105,14 @@ sub_all <- function(rows)
 LOG <- function(fmt, ...)
 {
 	print(sprintf(fmt, ...))
+}
+
+setgbl <- function(varname, varvalue)
+{
+	if( exists( varname, envir = .GlobalEnv ) )
+		assign(varname, varvalue, envir = .GlobalEnv)
+	else
+		eval(varname <- varvalue, envir = .GlobalEnv)
 }
 
 sample.tbl <- function(tbl, size)

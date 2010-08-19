@@ -72,9 +72,9 @@ analyze.table <- function( tbl_a, run_id = 'def', feature_cnt = 100 )
 get.wide.swap.table <- function( docs_s )
 {
 	merge(
-		merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','SwapID')),
-		merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','SwapID')), 
-		by=c('QID','Type','SwapID','URL.x','URL.y','HRS.x','HRS.y'), suffixes = c("b","a"))
+		merge( docs_s[seq(1,nrow(docs_s),by=4),], docs_s[seq(2,nrow(docs_s),by=4),], by=c('Date','QID','Type','CDID')),
+		merge( docs_s[seq(3,nrow(docs_s),by=4),], docs_s[seq(4,nrow(docs_s),by=4),], by=c('Date','QID','Type','CDID')), 
+		by=c('QID','Type','CDID','URL.x','URL.y','HRS.x','HRS.y'), suffixes = c("b","a"))
 }
 
 lifetime.add <- function( cdocs, argdate )
