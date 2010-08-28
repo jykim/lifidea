@@ -1,12 +1,12 @@
 # Aggregate Results
-setwd("c:/data")
 anno = read.table('annotationsB06_July.csv', sep=',',quote='',header=TRUE) # Query annotations
 ichk = read.table('docs_ichk_all.txt.result',sep='\t',quote='',header=TRUE) # Index check results
-source("c:/dev/lifidea/etc/intern/rs_library_predict_stability.R")
+source("c:/dev/lifidea/etc/intern/rs_library.R")
 
 # Load Data
-train = import_data('train', anno)
-test  = import_data('test', anno)
+train  = import_data('train', anno, ichk)
+sfcounts_train = get.sfcounts(train$add, ichk)
+test  = import_data('test', anno, sfcounts = sfcounts_train)
 
 ### Load Filtering Conditions
 
@@ -31,11 +31,16 @@ sapply( select.ftypes(test$agg),  train.and.test.queries) # all records
 sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, fold=2) # all records
 sapply( select.ftypes(test$agg, add_id=TRUE),  cross.val.queries, fold=2) # all records
 
+analyze.table( select.ftypes(test$agg, ft_ndcg = F, ft_qurl = F, add_id=F)$k5, run_id='agg' )
+
 ######################################
 #     Predicting Aggregate Change    #
 
-sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test$agg, fold=2) # all records
-sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, test=test$agg, fold=2, method='rpart') # all records
+# Final - all but ndcg fetures ([is.na(train$agg$sfresh),])
+sapply( select.ftypes(train$agg, ft_ndcg = F, ft_qurl = F, add_id=TRUE), cross.val.queries, test=test$agg, fold=2) # all records
+#sapply( select.ftypes(train$agg, ft_ndcg = F, ft_qurl = T, add_id=TRUE), cross.val.queries, test=test$agg, feature_cnt=100, fold=2) # all records
+sapply( select.ftypes(train$agg, ft_ndcg = F, ft_qurl = F, add_id=TRUE), cross.val.queries, test=test$agg, method='rf', fold=2) # all records
+
 
 # Changing Feature Set
 test.feature_set('lm', train$agg, test$agg)
@@ -56,19 +61,28 @@ for(feature_cnt in c(10,25,50,100))
 ##################################
 #     Predicting Daily Change    #
 
+
+#for(date_test in date_tests)
+#	print(sapply( select.ftypes.daily(test$daily, date_test), cross.val.queries))
+
 date_tests = sort(unique(test$daily$Date))[2:length(sort(unique(test$daily$Date)))]
-
-for(date_test in date_tests)
-	print(sapply( select.ftypes.daily(test$daily, date_test), cross.val.queries))
-
-result = list()
 test$daily$dNDCG5 = abs(test$daily$dNDCG5)
 train$daily$dNDCG5 = abs(train$daily$dNDCG5)
+train_daily = merge(train$daily, train$agg[,c(1,18,26,34,484:508)], by=c('QID'))
+test_daily  = merge(test$daily, test$agg[,c(1,18,26,34,484:508)], by=c('QID'))
+result = list()
 for(date_test in date_tests){
-	result_cur = cross.val.queries(select.ftypes.daily(train$daily, date_test, exclude=T)$k5,  select.ftypes.daily(test$daily, date_test)$k5, feature_cnt=NULL )
+	train_set = select.ftypes.daily(train_daily[is.na(train_daily$sfresh),], date_test, ft_2day = T,  exclude=T)$k5
+	test_set  = select.ftypes.daily(test_daily[is.na(test_daily$sfresh),], date_test)$k5
+	result_cur = cross.val.queries(train_set, test_set, method='lm' , feature_cnt=NULL )
 	result_cur$Date = date_test
 	result = rbind(result, result_cur)
 }
+
+# Debugging
+date_test = '6_26_2010'
+output = cross.val.queries(select.ftypes.daily(train_daily, date_test, exclude=T)$k5,  select.ftypes.daily(test_daily, date_test)$k5, feature_cnt=NULL, debug=T, output=T )
+analyze.table(select.ftypes.daily(test_daily, date_test, add_id=F)$k5, run_id='daily')
 
 # Within-period Cross-validation
 #test_m = merge(test$daily, test$agg, by='QID', suffixes=c('','.a')) # Merge daily data with aggregate data

@@ -40,6 +40,8 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 		overlaps = v_docs.map_cons(2).map{|e|(e[0] & e[1]).size/10.0}
 
 		# Cumulative Correlation
+		cTaus3 = v_docs[1..-1].map{|e|v_docs[0].kendalls_tau e, 2}
+		cTaus5 = v_docs[1..-1].map{|e|v_docs[0].kendalls_tau e, 4}
 		cTaus = v_docs[1..-1].map{|e|v_docs[0].kendalls_tau e}
 		cOverlaps = v_docs[1..-1].map{|e|(v_docs[0] & e).size/10.0}
 		
@@ -95,6 +97,7 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 			#results.collapse.sort_by{|e|e[C_URL]}.each{|e|f.puts e.join("\t")}
 			results.collapse.group_by{|e|e[C_URL]}.each{|k,v| f.puts [v[0][C_QID], v.map{|e|e[C_RANK].to_i}.range, v.map{|e|e[C_DS].to_f}.range, v.map{|e|e[C_RANK].to_i}.var, v.map{|e|e[C_DS].to_f}.var, 
 				C_FEATURES.to_a.map{|i| v.map{|e|e[i].to_f}.range}, k].flatten.join("\t")}
+			#results.collapse.group_by{|e|e[C_URL]}.each{|k,v| f.puts [v[0][C_QID], v.map{|e|e[C_RANK].to_i}.range, v.map{|e|e[C_DS].to_f}.range}, k].flatten.join("\t")}
 		} unless o[:skip_sdocs]
 		
 		# Daily Result
@@ -105,15 +108,15 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 					'NDCG3', 'dNDCG3', 'cNDCG3', 'dScore3' ,'drScr3',
 					'NDCG5', 'dNDCG5', 'cNDCG5', 'dScore5' ,'drScr5',
 					'Overlap1','Overlap3','Overlap5',"Tau3","Tau5",
-					"cTau",'cOvrlap','cIns','cSwap','cStable','Query'].join("\t")
+					"cTau3","cTau5","cTau",'cOvrlap','cIns','cSwap','cStable','Query'].join("\t")
 			values.each_with_index{|value,j|
 				cur_dcg1, cur_dcg3, cur_dcg5 = value[0][C_NDCG1].to_f.r3, value[0][C_NDCG3].to_f.r3, value[0][C_NDCG5].to_f.r3
-				f.puts [value[0][0], value[0][2], 
-					cur_dcg1, (j==0)? 0 : (cur_dcg1 - prev_dcg1), (j==0)? 0 : (cur_dcg1 - values[0][0][C_NDCG1].to_f.r3), value[1][C_URL].to_f.r3, value[1][11].to_f.r3, 
-					cur_dcg3, (j==0)? 0 : (cur_dcg3 - prev_dcg3), (j==0)? 0 : (cur_dcg3 - values[0][0][C_NDCG3].to_f.r3), value[3][C_URL].to_f.r3, value[3][11].to_f.r3, 
-					cur_dcg5, (j==0)? 0 : (cur_dcg5 - prev_dcg5), (j==0)? 0 : (cur_dcg5 - values[0][0][C_NDCG5].to_f.r3), value[5][C_URL].to_f.r3, value[5][11].to_f.r3, 
+				f.puts [value[0][0], value[0][C_DATE], 
+					cur_dcg1, (j==0)? 0 : (cur_dcg1 - prev_dcg1), (j==0)? 0 : (cur_dcg1 - values[0][0][C_NDCG1].to_f.r3), value[1][C_DS].to_f.r3, value[1][C_NDS].to_f.r3, 
+					cur_dcg3, (j==0)? 0 : (cur_dcg3 - prev_dcg3), (j==0)? 0 : (cur_dcg3 - values[0][0][C_NDCG3].to_f.r3), value[3][C_DS].to_f.r3, value[3][C_NDS].to_f.r3, 
+					cur_dcg5, (j==0)? 0 : (cur_dcg5 - prev_dcg5), (j==0)? 0 : (cur_dcg5 - values[0][0][C_NDCG5].to_f.r3), value[5][C_DS].to_f.r3, value[5][C_NDS].to_f.r3, 
 					(j==0)? 1 : overlaps1[j-1], (j==0)? 1 : overlaps3[j-1].r3, (j==0)? 1 : overlaps5[j-1].r3, (j==0)? 1 : taus3[j-1].r3, (j==0)? 1 : taus5[j-1].r3, 
-					(j==0)? 1 : cTaus[j-1].r3, (j==0)? 1 : cOverlaps[j-1].r3, qfs['ins'][j], qfs['swap'][j], (j==0)? 1 : overlaps[j-1], value[0][1] ].join("\t")
+					(j==0)? 1 : cTaus3[j-1].r3, (j==0)? 1 : cTaus5[j-1].r3, (j==0)? 1 : cTaus[j-1].r3, (j==0)? 1 : cOverlaps[j-1].r3, qfs['ins'][j], qfs['swap'][j], (j==0)? 1 : overlaps[j-1], value[0][1] ].join("\t")
 				prev_dcg1, prev_dcg3, prev_dcg5 = cur_dcg1, cur_dcg3, cur_dcg5
 			}
 		}
@@ -130,7 +133,7 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 			result.concat [C_FEATURES.to_a.map{|i| values.map{|value|value.map{|e|e[i].to_f}.range}.avg}, C_FEATURES.to_a.map{|i| values.map{|value|value.map{|e|e[i].to_f}.avg}.avg}] unless o[:skip_qurl_features]
 			result.concat [values[0][0][1]] unless o[:skip_query_text]
 			f.puts result.flatten.join("\t")
-		}
+		} unless o[:skip_agg]
 
 		i += 1
 		puts "Processed #{i}th query" if i % 1000 == 0
@@ -163,7 +166,7 @@ def build_output_files(batch_id, o = {})
 	system("cat result_sdocs_#{batch_id}.txt |awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$2,$3,$(NF)}' > result_sdocs_#{batch_id}.txt.short")
 end
 
-def build_topk_file(date)
-	system("find B06_raw -name '15*#{date}*'| xargs awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$3,$10,$15,$4,$5,$6,$7,$8,$9,$11}' > top10_#{date}.tmp")
+def build_topk_file(date, input_path)
+	system("find #{input_path} -name '15*#{date}*'| xargs awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {print $1,$3,$10,$15,$4,$5,$6,$7,$8,$9,$11}' > top10_#{date}.tmp")
 	system("cat top10_header.tsv top10_#{date}.tmp > top10_#{date}.tsv")
 end

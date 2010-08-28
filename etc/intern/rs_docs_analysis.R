@@ -1,5 +1,3 @@
-setwd("c:/data")
-source("c:/dev/lifidea/etc/intern/rs_import_data.R")
 source("c:/dev/lifidea/etc/intern/rs_library.R")
 
 # Documents dropped from 1

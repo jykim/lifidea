@@ -1,3 +1,6 @@
+##################################
+#  BATCH SCRIPT FOR C# PROGRAMS   #
+
 # Test Data
 .\bin\ExtractColumnsFromTSV.exe d:\B06\ c:\data\B06_raw_test\ FeatureValuesPerQueryPerDocument-1-18-28-04.2924031.tsv
 .\bin\ExtractColumnsFromTSV.exe FeatureValuesPerQueryPerDocument-1-06-25-27.7020138.tsv
@@ -27,30 +30,8 @@
 .\bin\ExtractColumnsFromTSV.exe d:\B06_sub\ c:\data\B06_raw_yaho\ queries_chk.txt.yahoo.20100801.res queries_chk.txt.yahoo.20100802.res queries_chk.txt.yahoo.20100803.res queries_chk.txt.yahoo.20100804.res queries_chk.txt.yahoo.20100805.res queries_chk.txt.yahoo.20100806.res queries_chk.txt.yahoo.20100807.res queries_chk.txt.yahoo.20100808.res queries_chk.txt.yahoo.20100809.res queries_chk.txt.yahoo.20100810.res queries_chk.txt.yahoo.20100811.res queries_chk.txt.yahoo.20100812.res queries_chk.txt.yahoo.20100813.res queries_chk.txt.yahoo.20100814.res queries_chk.txt.yahoo.20100815.res queries_chk.txt.yahoo.20100816.res queries_chk.txt.yahoo.20100817.res 
 .\bin\ExtractColumnsFromTSV.exe d:\B06_sub\ c:\data\B06_raw_bing\ queries_chk.txt.bing.20100801.res queries_chk.txt.bing.20100802.res queries_chk.txt.bing.20100803.res queries_chk.txt.bing.20100804.res queries_chk.txt.bing.20100805.res queries_chk.txt.bing.20100806.res queries_chk.txt.bing.20100807.res queries_chk.txt.bing.20100808.res queries_chk.txt.bing.20100809.res queries_chk.txt.bing.20100810.res queries_chk.txt.bing.20100811.res queries_chk.txt.bing.20100812.res queries_chk.txt.bing.20100813.res queries_chk.txt.bing.20100814.res queries_chk.txt.bing.20100815.res queries_chk.txt.bing.20100816.res queries_chk.txt.bing.20100817.res 
 
---------------
 
-# Count NA judgments
-cat B06_raw/*20100610*|awk -f count_na.awk
-cat B06_raw/*20100611*|awk -f count_na.awk
-cat B06_raw/*20100612*|awk -f count_na.awk
-cat B06_raw/*20100613*|awk -f count_na.awk
-cat B06_raw/*20100614*|awk -f count_na.awk
-cat B06_raw/*20100615*|awk -f count_na.awk
-cat B06_raw/*20100616*|awk -f count_na.awk
-cat B06_raw/*20100617*|awk -f count_na.awk
-cat B06_raw/*20100618*|awk -f count_na.awk
-cat B06_raw/*20100619*|awk -f count_na.awk
-
-# Clearing the datafiles
-find B06_all |xargs rm
-find B06_train |xargs rm
-find B06_test |xargs rm
-find B06_w1 |xargs rm
-find B06_w2 |xargs rm
-find B06_w3 |xargs rm
-find B06_w4 |xargs rm
-
-
+# Test Query Stability (from index team)
 .\TestQueryStability.exe "itchy virginia" http://www.funadvice.com/q/why_is_it_11806 
 
 .\TestQueryStability.exe "itchy virginia" http://www.womenanswers.org/womenshealth/3231-women-health-4.html

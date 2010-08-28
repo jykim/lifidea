@@ -67,6 +67,7 @@ rerank.queries	<- function(dtbl, work_date, topk_p, topk, train_dtbl = NULL, met
 }
 
 # Re-rank topk results by applying swas
+# - not implemented yet
 undo.del <- function( arg_topk , dtbl )
 {
 	if( nrow(dtbl) <= 1 )

@@ -5,12 +5,16 @@ library('earth')
 library('gam')
 library('ipred')
 library('nnet')
+source("c:/dev/lifidea/etc/intern/rs_library_analyze.R")
+source("c:/dev/lifidea/etc/intern/rs_library_predict.R")
+source("c:/dev/lifidea/etc/intern/rs_library_predict_swap.R")
+source("c:/dev/lifidea/etc/intern/rs_library_predict_stability.R")
+setwd("c:/data")
 
 # Import data from Ruby output
 # batch : ID of processing batch
-import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
+import_data <- function(batch, anno = NULL, ichk = NULL, sfcounts = NULL, skip_sdoc = FALSE)
 {
-
 	print('Aggregate results')
 	agg = read.table(paste('result_all_',batch,'.txt',sep=''),sep='\t',quote='',header=TRUE)
 
@@ -21,6 +25,12 @@ import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 	cdocs = read.table(paste('result_cdocs_',batch,'.txt.short',sep=''),sep='\t',quote='"',header=TRUE)
 	docs_a   = cdocs[cdocs$Type == 'add' | cdocs$Type == 'del',]   # Documents added / deleted
 	docs_s   = cdocs[cdocs$Type == 'swapP' | cdocs$Type == 'swapU' | cdocs$Type == 'swapN',]   # Documents swapped
+	
+	if( !is.null(ichk) | !is.null(sfcounts) ){
+		if( is.null(sfcounts) )
+			sfcounts = get.sfcounts(docs_a, ichk)
+		agg = merge(agg, sfcounts, by="QID", all.x=TRUE)
+	}
 	
 	if( !skip_sdoc ){
 		sdocs = read.table(paste('result_sdocs_',batch,'.txt.short',sep=''),sep='\t',quote='"',header=TRUE)
@@ -37,6 +47,15 @@ import_data <- function(batch, anno = NULL, skip_sdoc = FALSE)
 	}
 	list(agg=agg, daily=daily, cdocs=cdocs, add=docs_a, swap=docs_s, sdocs=a_sdocs)#
 }
+
+get.sfcounts <- function(docs_a, ichk)
+{
+	m_docs = merge(docs_a, ichk[ichk$Main == 0 & ichk$SFresh == 1,], by="URL")
+	sfcounts = aggregate( m_docs$SFresh, by=list(m_docs$QID), FUN = sum )
+	colnames(sfcounts) = c('QID', 'sfresh')
+	sfcounts
+}
+
 
 # Filter the query set by filter_table
 # filter_table : data.table( Group.1 / Group.2 / x )
@@ -55,14 +74,6 @@ filter.queries.by <- function(batch, ichk = NULL)
 	daily_rw1   = reshape(daily_rn, v.names='dNDCG1', idvar='QID', timevar='Date', direction='wide')
 	daily_rw1$x = NULL
 	agg_r = merge(batch$agg, filter_na_rows(daily_rw1), by.x='QID', by.y='QID')
-}
-
-get.sfindex.count <- function(batch, ichk)
-{
-	m_docs = merge(batch$add, ichk[ichk$Main == 0,], by="URL")
-	sfcounts = aggregate( m_docs$SFresh, by=list(m_docs$QID), FUN = sum )
-	m_sfcounts = merge(sfcounts, batch$agg[,c(1,483)], by.x='Group.1', by.y="QID")
-	m_sfcounts[order(m_sfcounts$x, decreasing=T),]
 }
 
 # Create a projection of given table 
@@ -157,9 +168,14 @@ sub_pair_a <- function(rows)
 	return( rows[3] - rows[4]);
 }
 
+#format_date <- function(arg)
+#{
+#	format( as.Date(arg, format="%m/%d/%Y"), "%Y_%m_%d")
+#}
+
 format_date <- function(arg)
 {
-	format( as.Date(arg, format="%m/%d/%Y"), "%Y_%m_%d")
+	as.Date(as.character(arg), format="%m_%d_%Y")
 }
 
 conv_to_date <- function(arg)

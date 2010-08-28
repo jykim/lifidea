@@ -1,8 +1,14 @@
 
 # Run k-fold cross-validation for regression models
+# - train : training data
+#  - By convention, first column contains unique ID for data / last column contains judgment / rest of them are features
 # - test : if specified, use this data for evaluation
-# - feature_cnt : no. of features 
-cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, label_set = NULL, method = 'lm', debug = FALSE, output = FALSE)
+# - feature_cnt : no. of features (if specified, perform a feature selection by correlation coefficient)
+# - row_cnt : no. of records used (if specified, perform a record selection by random sampling)
+# - label_set : truth judgment used for calculating prec/recall values
+# - debug : produce debug output
+# - output : produce prediction result (by default it output the performance numbers)
+cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, row_cnt = NULL, label_set = NULL, method = 'lm', debug = FALSE, output = FALSE)
 {
 	#LOG("Running %s with %d features...", method, feature_cnt)
 	if( is.null(test) ) test = train
@@ -26,7 +32,7 @@ cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, 
 		test_s  =  test[ test[,1] %in% qids[idx_s:idx_e],     -c(1)]
 		test_ids = test[ test[,1] %in% qids[idx_s:idx_e],1]
 
-		result_cur = train.and.test.queries(train_s, test_s, method = method, debug=debug)
+		result_cur = train.and.test.queries(train_s, test_s, method = method, feature_cnt = feature_cnt, row_cnt=row_cnt, debug=debug)
 
 		train.err = append( train.err, result_cur[['train.err']])
 		test.err  = append( test.err,  result_cur[['test.err']])
@@ -49,15 +55,29 @@ cross.val.queries <- function(train, test = NULL, fold = 3, feature_cnt = NULL, 
 	}
 }
 
-train.and.test.queries <- function(train, test = NULL, method = 'lm', feature_cnt = 50, debug = FALSE)
+# Train / Test Regression models
+# - train : training data
+#  - By convention, last column contains judgment / rest of them are features
+# - test : if specified, use this data for evaluation
+# - feature_cnt : no. of features (if specified, perform a feature selection by correlation coefficient)
+# - row_cnt : no. of records used (if specified, perform a record selection by random sampling)
+# - debug : produce debug output
+# - debug : return model (by default, prediction result is returned)
+train.and.test.queries <- function(train, test = NULL, method = 'lm', feature_cnt = 50, row_cnt = NULL, model = FALSE, debug = FALSE)
 {
 	if( is.null(test) )
 		test = train
-	
+
+	if( !is.null(row_cnt) ){
+		train = sample.tbl( train, row_cnt )
+		#print( "[train.and.test.queries] Feature selection done..." )
+	}
+		
 	if( !is.null(feature_cnt) ){
 		train = select.features( train, feature_cnt, add_id = F )
 		#print( "[train.and.test.queries] Feature selection done..." )
-	}
+	}	
+	
 	if( method == 'lm' )
 		mdl = lm( build.formula(train), data=train)
 	else if( method == 'glm' )
@@ -65,15 +85,20 @@ train.and.test.queries <- function(train, test = NULL, method = 'lm', feature_cn
 	else if( method == 'rpart' )
 		mdl = rpart( build.formula(train), data=train, method='anova')
 	else if( method == 'rf' )
-		mdl = randomForest( build.formula(train), data=train)
+		mdl = randomForest( build.formula(train), data=train, importance=TRUE)
 	else if( method == 'nnet' )
 		mdl = nnet( build.formula(train), data=train, size=12, skip=T, linout=T, decay=0.025)
 	else if( method == 'svm' )
 		mdl = svm( build.formula(train), data=train)
 	#print( "[train.and.test.queries] Model built..." )
-	predict.and.calc.rmse(method, mdl, train, test, last.col(train), debug=debug)
+	if( model )
+		mdl
+	else
+		predict.and.calc.rmse(method, mdl, train, test, last.col(train), debug=debug)
 }
 
+# Calculate RMSE and precision for given data
+# - by default, precision is calculated at 10% of data points
 predict.and.calc.rmse <- function(method, mdl, train, test, yval, debug=FALSE) 
 {
 	train.yhat <- predict(object=mdl, newdata=train)
@@ -85,12 +110,12 @@ predict.and.calc.rmse <- function(method, mdl, train, test, yval, debug=FALSE)
 	
 	topk = round(nrow(test)*0.10)
 	ti1 = topk.indices(test.yhat, topk) ; ti2 = topk.indices(test.y, topk)
-	test.prec = (sqrt(length(intersect(ti1, ti2)) / topk))
+	test.prec = length(intersect(ti1, ti2)) / topk
 	
 	if(debug == TRUE){
 		plot(test.y, test.yhat)
 		write.table(list(test.y, test.yhat), file = 'output_predicted_actual.txt')
-		#print(colnames(train))
+		print(colnames(train))
 		print(sprintf("features : %d / train_set : %d / test_set : %d",length(colnames(train)), nrow(train), nrow(test)))
 		print(sprintf("yhat : %d / y : %d / overlap : %d ",length(ti1), length(ti2), length(intersect(ti1, ti2))))
 	}
@@ -99,6 +124,7 @@ predict.and.calc.rmse <- function(method, mdl, train, test, yval, debug=FALSE)
 }
 
 # Calcuate prec & recall values
+# - optionally, plot prec/recall curve
 calc.precision <- function(arg, run_id = "" ,plottype = NULL)
 {
 	arg = arg[order(arg$predict, decreasing = T),]
