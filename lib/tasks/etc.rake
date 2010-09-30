@@ -1,5 +1,5 @@
 require 'ddl_include'
-require 'yard'
+#require 'yard'
 #require 'collector/rss_collector_helper'
 namespace :etc do
   desc "Run YARD documentation"

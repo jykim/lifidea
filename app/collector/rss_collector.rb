@@ -1,5 +1,5 @@
 require 'ddl_include'
-require 'feedzirra'
+#require 'feedzirra'
 
 # Collect from RSS Feed
 # 

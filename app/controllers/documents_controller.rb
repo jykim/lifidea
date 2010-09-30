@@ -8,7 +8,7 @@ class DocumentsController < ApplicationController
   sidebar :menu, :only=>[:index]
   sidebar :pagehunt_status, :only=>[:show, :start_search, :search, :request_document]
   sidebar :pagehunt_relevant_concepts, :only=>:show, :if=>:item_concept?
-  sidebar :linked_concepts, :only=>[:show], :unless=>:item_concept?
+  #sidebar :linked_concepts, :only=>[:show], :unless=>:item_concept?
   sidebar :pagehunt_scoreboard
   layout "doctrack"
   
@@ -23,7 +23,7 @@ class DocumentsController < ApplicationController
     @no_entry_item    =    10
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
     @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i
-    @ratio_game_type = {:sb=>0.5, :bd=>0.5}
+    @ratio_game_type = {:s=>1}#{:sb=>0.5, :bd=>0.5}
     @user_level_applied = false
     $document_list ||= Item.valid.documents.all.group_by{|e|e.itype}.map_hash{|k,v|[k,v.map{|e|e.id}]}
     $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}

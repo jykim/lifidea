@@ -1,5 +1,5 @@
 require 'ddl_include'
-require 'yard'
+#require 'yard'
 #require 'collector/rss_collector_helper'
 namespace :evaluate do
   task(:sim_search => :environment) do

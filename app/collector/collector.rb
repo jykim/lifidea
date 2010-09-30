@@ -1,7 +1,7 @@
 #require 'ddl_include' CHANGED : avoid including reference to the file which includes this file
 # Abstract collector framework
 require 'timeout.rb'
-require 'hpricot'
+#require 'hpricot'
 
 class Collector #< ApplicationController
   #include CollectorHelper

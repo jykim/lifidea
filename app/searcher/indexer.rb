@@ -1,5 +1,5 @@
 require 'ddl_include'
-require 'hpricot'
+#require 'hpricot'
 
 # 
 # = Indexer

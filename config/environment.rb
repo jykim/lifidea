@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-#RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.6' unless defined? RAILS_GEM_VERSION
 TIMEZONE = 'Eastern Time (US & Canada)'
 APP_ROOT = ""
 # Bootstrap the Rails environment, frameworks, and default configuration
@@ -17,19 +17,21 @@ Rails::Initializer.run do |config|
    $lgr = config.logger
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "bj"
-  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  # config.gem "sqlite3-ruby", :lib => "sqlite3"
-  # config.gem "aws-s3", :lib => "aws/s3"
-  #config.gem "daemon-spawn"
-  #config.gem 'rcov'
+  config.gem "hpricot"#, :version => '0.6', :source => "http://code.whytheluckystiff.net"
   config.gem 'daemons'
   #config.gem 'pauldix-feedzirra'
-  #config.gem 'yard'
+  config.gem 'yard'
   #config.gem 'openrain-action_mailer_tls'
   config.gem 'thoughtbot-shoulda', :lib => "shoulda", :source => "http://gems.github.com"
-  #config.gem 'mislav-will_paginate', :version => '~> 2.3.11', :lib => 'will_paginate', 
-  #  :source => 'http://gems.github.com'
   
+  config.gem 'feed-normalizer'
+  config.gem 'tmail'
+  config.gem 'ruby-debug'
+  config.gem 'fastercsv'
+  config.gem 'ri_cal'#'icalendar'
+  config.gem 'icalendar'#'icalendar'
+  config.gem 'memcache'
+
   config.gem 'sunspot', :lib => 'sunspot'
   config.gem 'sunspot_rails', :lib => 'sunspot/rails'
   
