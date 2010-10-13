@@ -1,7 +1,7 @@
 # Aggregate Results
 anno = read.table('annotationsB06_July.csv', sep=',',quote='',header=TRUE) # Query annotations
 ichk = read.table('docs_ichk_all.txt.result',sep='\t',quote='',header=TRUE) # Index check results
-source("c:/dev/lifidea/etc/intern/rs_library.R")
+source("code/rs_library.R")
 
 # Load Data
 train  = import_data('train', anno, ichk)
@@ -32,6 +32,9 @@ sapply( select.ftypes(train$agg, add_id=TRUE), cross.val.queries, fold=2) # all 
 sapply( select.ftypes(test$agg, add_id=TRUE),  cross.val.queries, fold=2) # all records
 
 analyze.table( select.ftypes(test$agg, ft_ndcg = F, ft_qurl = F, add_id=F)$k5, run_id='agg' )
+
+analyze.table( select.ftypes(test$agg, ft_ndcg = T, ft_qurl = T, add_id=F)$k5, run_id='agg' )
+
 
 ######################################
 #     Predicting Aggregate Change    #

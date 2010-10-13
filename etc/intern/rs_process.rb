@@ -11,15 +11,30 @@ process_data(files_all, '20100611', '20100625', 'train2', :skip_sdocs=>true,
 process_data(files_all, '20100611', '20100625', 'train2', :skip_sdocs=>true, 
 	:work_date=>['20100611','20100614','20100617','20100620','20100623'])
 
+process_data(files_all, '20100611', '20100709', 'beg2end', :work_date=>['20100611','20100709'])
+
 process_data(files_all, '20100611', '20100618', 'w1')
 process_data(files_all, '20100618', '20100625', 'w2')
 process_data(files_all, '20100625', '20100702', 'w3')
 process_data(files_all, '20100702', '20100709', 'w4')
 
-process_data(files_all, '20100611', '20100625', 'train', :skip_sdocs=>true, :skip_agg=>true)
-process_data(files_all, '20100625', '20100709', 'test', :skip_sdocs=>true, :skip_agg=>true)
+process_data(files_all, '20100611', '20100625', 'train')
+process_data(files_all, '20100625', '20100709', 'test')
 
 process_data(files_all, '20100611', '20100709', 'all')
+
+
+build_output_files('w1')
+build_output_files('w2')
+build_output_files('w3')
+build_output_files('w4')
+                   
+build_output_files('train')
+build_output_files('test')
+                   
+build_output_files('all')
+
+
 
 
 # Test Data (20 queries)
@@ -31,10 +46,10 @@ process_data(files_all, '20100611', '20100618', 'w1t')
 
 # Generate Top10 Rank list
 # - used for swap re-ranking experiments
-['20100611','20100612','20100613','20100614','20100615','20100616','20100617','20100618'].each{|e| build_topk_file(e, 'B06_raw')}
-['20100619','20100620','20100621','20100622','20100623','20100624','20100625'].each{|e| build_topk_file(e, 'B06_raw')}
-['20100626','20100627','20100628','20100629','20100630','20100701','20100702'].each{|e| build_topk_file(e, 'B06_raw')}
-['20100703','20100704','20100705','20100706','20100707','20100708','20100709'].each{|e| build_topk_file(e, 'B06_raw')}
+['20100611','20100612','20100613','20100614','20100615','20100616','20100617','20100618'].each{|e| build_topk_file(e, 'B06_raw_all')}
+['20100619','20100620','20100621','20100622','20100623','20100624','20100625'].each{|e| build_topk_file(e, 'B06_raw_all')}
+['20100626','20100627','20100628','20100629','20100630','20100701','20100702'].each{|e| build_topk_file(e, 'B06_raw_all')}
+['20100703','20100704','20100705','20100706','20100707','20100708','20100709'].each{|e| build_topk_file(e, 'B06_raw_all')}
 
 # Comparison of Stability for 3 Search Engines
 $work_path = "B06_raw_goog"

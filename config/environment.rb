@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.6' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
 TIMEZONE = 'Eastern Time (US & Canada)'
 APP_ROOT = ""
 # Bootstrap the Rails environment, frameworks, and default configuration
@@ -31,7 +31,8 @@ Rails::Initializer.run do |config|
   config.gem 'ri_cal'#'icalendar'
   config.gem 'icalendar'#'icalendar'
   config.gem 'memcache'
-
+  config.gem "memcache-client", :lib => "memcache"
+  
   config.gem 'sunspot', :lib => 'sunspot'
   config.gem 'sunspot_rails', :lib => 'sunspot/rails'
   
