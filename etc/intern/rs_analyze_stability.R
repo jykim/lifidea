@@ -39,6 +39,13 @@ result = lifetime.swap( train_swaptbl, cdocs_tr, '6_12_2010' )
 test_swaptbl = get.wide.swap.table( cdocs_te[cdocs_te$Type == 'swapP' | cdocs_te$Type == 'swapU' | cdocs_te$Type == 'swapN',] )
 result = lifetime.swap( test_swaptbl, cdocs_te, '6_26_2010' )
 
+# Feature Stability Analysis
+sdocs_agg = aggregate( test$sdocs_all$r.BM25F, by=list(test$sdocs_all$QID), FUN = sum)
+nrow( sdocs_agg[sdocs_agg$x > 0,] )
+
+sapply(colnames(test$sdocs_all)[6:229], analyze.feature, test$sdocs_all )
+
+
 #######################################
 # Analysis w.r.t. Rank Positions      #
 
