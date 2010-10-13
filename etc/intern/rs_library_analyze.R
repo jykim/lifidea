@@ -7,6 +7,14 @@ daily.cdocs <- function( docs )
 	reshape(result, v.names='x', idvar='Group.1', timevar='Group.2',direction='wide')
 }
 
+# Analyze the instability of feature values
+analyze.feature <- function( fname, sdocs )
+  {
+    values = with(sdocs,get(fname))
+    list( mean = mean(values), max = max(values), pzero = length(values[values == 0])/length(values) )
+  }
+
+
 # Aggregate statistics of daily change
 daily.change <- function( arg_daily )
 {

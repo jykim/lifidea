@@ -1,15 +1,15 @@
 library(DAAG)
 library(randomForest)
-library('e1071')
-library('earth')
-library('gam')
-library('ipred')
-library('nnet')
-source("c:/dev/lifidea/etc/intern/rs_library_analyze.R")
-source("c:/dev/lifidea/etc/intern/rs_library_predict.R")
-source("c:/dev/lifidea/etc/intern/rs_library_predict_swap.R")
-source("c:/dev/lifidea/etc/intern/rs_library_predict_stability.R")
-setwd("c:/data")
+#library('e1071')
+#library('earth')
+#library('gam')
+#library('ipred')
+#library('nnet')
+source("code/rs_library_analyze.R")
+source("code/rs_library_predict.R")
+source("code/rs_library_predict_swap.R")
+source("code/rs_library_predict_stability.R")
+setwd(".")
 
 # Import data from Ruby output
 # batch : ID of processing batch
@@ -33,7 +33,7 @@ import_data <- function(batch, anno = NULL, ichk = NULL, sfcounts = NULL, skip_s
 	}
 	
 	if( !skip_sdoc ){
-		sdocs = read.table(paste('result_sdocs_',batch,'.txt.short',sep=''),sep='\t',quote='"',header=TRUE)
+		sdocs = read.table(paste('result_sdocs_',batch,'.txt',sep=''),sep='\t',quote='"',header=TRUE)
 		# Aggregate Stable Docs Result by Query
 		a_sdocs = cbind( aggregate( sdocs$rRank , by=list(sdocs$QID), FUN = mean), aggregate( sdocs$rScore , by=list(sdocs$QID), FUN = mean))[,c(1,2,4)]
 		colnames(a_sdocs) = c('QID', 'rRank','rScore')
@@ -45,7 +45,7 @@ import_data <- function(batch, anno = NULL, ichk = NULL, sfcounts = NULL, skip_s
 		agg = merge(agg, anno, by.x='QID', by.y='QueryID')
 		agg = merge(agg, a_sdocs, by='QID')
 	}
-	list(agg=agg, daily=daily, cdocs=cdocs, add=docs_a, swap=docs_s, sdocs=a_sdocs)#
+	list(agg=agg, daily=daily, cdocs=cdocs, add=docs_a, swap=docs_s, sdocs=a_sdocs, sdocs_all=sdocs )#
 }
 
 get.sfcounts <- function(docs_a, ichk)

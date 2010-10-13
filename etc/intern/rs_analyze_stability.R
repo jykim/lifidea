@@ -1,4 +1,4 @@
-source("c:/dev/lifidea/etc/intern/rs_library.R")
+source("code/rs_library.R")
 anno = read.table('annotationsB06_July.csv', sep=',',quote='',header=TRUE) # Query annotations
 ichk = read.table('docs_ichk_all.txt.result',sep='\t',quote='',header=TRUE) # Index check results
 
@@ -35,6 +35,13 @@ train_swaptbl = get.wide.swap.table( cdocs_tr[cdocs_tr$Type == 'swapP' | cdocs_t
 result = lifetime.swap( train_swaptbl, cdocs_tr, '6_12_2010' )
 test_swaptbl = get.wide.swap.table( cdocs_te[cdocs_te$Type == 'swapP' | cdocs_te$Type == 'swapU' | cdocs_te$Type == 'swapN',] )
 result = lifetime.swap( test_swaptbl, cdocs_te, '6_26_2010' )
+
+# Feature Stability Analysis
+sdocs_agg = aggregate( test$sdocs_all$r.BM25F, by=list(test$sdocs_all$QID), FUN = sum)
+nrow( sdocs_agg[sdocs_agg$x > 0,] )
+
+sapply(colnames(test$sdocs_all)[6:229], analyze.feature, test$sdocs_all )
+
 
 #######################################
 #  Comparison of Top3 Search Engines  #
