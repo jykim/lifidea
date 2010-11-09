@@ -11,7 +11,8 @@ daily.cdocs <- function( docs )
 analyze.feature <- function( fname, sdocs )
   {
     values = with(sdocs,get(fname))
-    list( mean = mean(values), max = max(values), pzero = length(values[values == 0])/length(values) )
+    rscore = with(sdocs,get('rScore'))
+    list( mean = mean(values), max = max(values), pzero = length(values[values == 0])/length(values), cor = cor(values, rscore) )
   }
 
 

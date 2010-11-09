@@ -35,5 +35,6 @@ require 'learner/weight_learner'
 
 $lgr_e = Logger.new( File.expand_path(File.dirname(__FILE__) + "/../log/#{ENV["RAILS_ENV"]}_error.log") )
 
-#require 'memcache'
+require 'memcache'
+#require 'memcache-client'
 CACHE = MemCache.new('127.0.0.1') #if defined? MemCache

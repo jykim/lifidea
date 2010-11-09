@@ -44,6 +44,7 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 		taus3 = v_docs.map_cons(2).map{|e|e[0].kendalls_tau e[1], 2}
 		overlaps3 = v_docs.map_cons(2).map{|e|(e[0][0..2] & e[1][0..2]).size/3.0}
 		taus5 = v_docs.map_cons(2).map{|e|e[0].kendalls_tau e[1], 4}
+		taus = v_docs.map_cons(2).map{|e|e[0].kendalls_tau e[1]}
 		overlaps5 = v_docs.map_cons(2).map{|e|(e[0][0..4] & e[1][0..4]).size/5.0}
 		overlaps = v_docs.map_cons(2).map{|e|(e[0] & e[1]).size/10.0}
 		samepos = v_docs.map_cons(2).map{|e|(e[0].calc_samepos e[1])/10.0}
@@ -117,7 +118,7 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 					'NDCG1', 'dNDCG1', 'cNDCG1', 'dScore1' ,'drScr1',
 					'NDCG3', 'dNDCG3', 'cNDCG3', 'dScore3' ,'drScr3',
 					'NDCG5', 'dNDCG5', 'cNDCG5', 'dScore5' ,'drScr5',
-					'Overlap1','Overlap3','Overlap5',"Tau3","Tau5",
+					'Overlap1','Overlap3','Overlap5',"Tau3","Tau5","Tau",
 					"cTau3","cTau5","cTau",'cOvrlap','samepos','cSamepos','cIns','cSwap','cStable','Query'].join("\t")
 			values.each_with_index{|value,j|
 				cur_dcg1, cur_dcg3, cur_dcg5 = value[0][C_NDCG1].to_f.r3, value[0][C_NDCG3].to_f.r3, value[0][C_NDCG5].to_f.r3
@@ -125,7 +126,8 @@ def	process_data( files_all, start_date, end_date, batch_id, o = {})
 					cur_dcg1, (j==0)? 0 : (cur_dcg1 - prev_dcg1), (j==0)? 0 : (cur_dcg1 - values[0][0][C_NDCG1].to_f.r3), value[1][C_DS].to_f.r3, value[1][C_NDS].to_f.r3, 
 					cur_dcg3, (j==0)? 0 : (cur_dcg3 - prev_dcg3), (j==0)? 0 : (cur_dcg3 - values[0][0][C_NDCG3].to_f.r3), value[3][C_DS].to_f.r3, value[3][C_NDS].to_f.r3, 
 					cur_dcg5, (j==0)? 0 : (cur_dcg5 - prev_dcg5), (j==0)? 0 : (cur_dcg5 - values[0][0][C_NDCG5].to_f.r3), value[5][C_DS].to_f.r3, value[5][C_NDS].to_f.r3, 
-					(j==0)? 1 : overlaps1[j-1], (j==0)? 1 : overlaps3[j-1].r3, (j==0)? 1 : overlaps5[j-1].r3, (j==0)? 1 : taus3[j-1].r3, (j==0)? 1 : taus5[j-1].r3, 
+					(j==0)? 1 : overlaps1[j-1], (j==0)? 1 : overlaps3[j-1].r3, (j==0)? 1 : overlaps5[j-1].r3, 
+                                        (j==0)? 1 : taus3[j-1].r3, (j==0)? 1 : taus5[j-1].r3, (j==0)? 1 : taus[j-1].r3, 
 					(j==0)? 1 : cTaus3[j-1].r3, (j==0)? 1 : cTaus5[j-1].r3, (j==0)? 1 : cTaus[j-1].r3, (j==0)? 1 : cOverlaps[j-1].r3, 
 					(j==0)? 1 : samepos[j-1].r3, (j==0)? 1 : cSamepos[j-1].r3, qfs['ins'][j], qfs['swap'][j], (j==0)? 1 : overlaps[j-1], value[0][1] ].join("\t")
 				prev_dcg1, prev_dcg3, prev_dcg5 = cur_dcg1, cur_dcg3, cur_dcg5

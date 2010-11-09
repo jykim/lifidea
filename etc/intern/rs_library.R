@@ -40,6 +40,7 @@ import_data <- function(batch, anno = NULL, ichk = NULL, sfcounts = NULL, skip_s
 	}
 	else{
 		a_sdocs = NULL
+                sdocs = NULL
 	}
 	if( !is.null(anno) ){
 		agg = merge(agg, anno, by.x='QID', by.y='QueryID')
