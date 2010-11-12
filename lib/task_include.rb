@@ -5,6 +5,7 @@ $cache = {} if !$cache
 #puts "Running on #$renv environment..."
 require 'ddl_include'
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+CACHE = Memcache.new('127.0.0.1') #if defined? MemCache
 $start_at = if ENV['all']
   "20010101"
 else

@@ -37,4 +37,4 @@ $lgr_e = Logger.new( File.expand_path(File.dirname(__FILE__) + "/../log/#{ENV["R
 
 require 'memcache'
 #require 'memcache-client'
-CACHE = MemCache.new('127.0.0.1') #if defined? MemCache
+#CACHE = Memcache.new('127.0.0.1') #if defined? MemCache
