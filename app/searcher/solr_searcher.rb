@@ -12,6 +12,7 @@ class SolrSearcher < Searcher
   # - 2) document scoring
   # - merging 1) and 2) into final score
   def search_by_keyword(query, o={})
+    #debugger
     result = Sunspot.search(Item) do
       keywords query
       if o[:doc_only]

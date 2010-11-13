@@ -36,15 +36,16 @@ class ItemsController < ApplicationController
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
     begin
+      #debugger
       @rank_list = search_local('k', @query)
       #error "Ranklist : #{@rank_list.inspect}"      
     rescue Exception => e
-      error "Search failed!!"
+      error "Search failed!!", e
     end
     #@docs = Item.find(@rank_list.map{|e|e[0]}).map_hash{|d|[d.id, d]}
     #debugger
     @query_doc = Item.find_or_create(@query, 'query', :uri=>request.url, 
-     :content=>@rank_list.map{|e|e[0].title}.join("\n"))
+     :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
   end
   
   def click

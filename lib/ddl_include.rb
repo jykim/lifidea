@@ -2,15 +2,6 @@
 $LOAD_PATH << "#{RAILS_ROOT}/rubylib" <<"#{RAILS_ROOT}/app" <<"#{RAILS_ROOT}/lib"
 #debugger
 require "rubylib_include.rb"
-#require 'feed-normalizer'
-#require 'tmail'
-#require 'ruby-debug'
-#require 'fastercsv'
-#require 'ri_cal'#'icalendar'
-#require 'icalendar'#'icalendar'
-#require 'sunspot'
-#require 'sunspot/rails'
-
 require "searcher/pd_lib.rb"
 require 'ddl_extensions'
 require 'ddl_global'
@@ -35,6 +26,5 @@ require 'learner/weight_learner'
 
 $lgr_e = Logger.new( File.expand_path(File.dirname(__FILE__) + "/../log/#{ENV["RAILS_ENV"]}_error.log") )
 
-require 'memcache'
 #require 'memcache-client'
 #CACHE = Memcache.new('127.0.0.1') #if defined? MemCache

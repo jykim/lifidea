@@ -1,5 +1,7 @@
-#!/usr/bin/ruby -I lib -I app -I rubylib
 ENV['RAILS_ENV'] = $rails_env = ARGV[1] || 'production'
+#require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+#require 'rubygems'
+#require 'ruby-debug'
 require File.dirname(__FILE__) + '/config/boot'
 require 'ddl_include.rb'
 $command = ARGV[0]
@@ -17,7 +19,7 @@ when 'start'
   `memcached -d -P #{memcached_pid}` if !File.exists?(memcached_pid)
   #`lib/daemons/collector_ctl start  #{$rails_env}`
   `rake sunspot:solr:start RAILS_ENV=#$rails_env`
-  `script/server -d -p #{$server_port} -e #{$rails_env}`
+#  `script/server -d -p #{$server_port} -e #{$rails_env}`
   #Rake::Task['sunspot:solr:start'].execute
 #  `lib/daemons/indexer_ctl start`
 #  `lib/daemons/searcher_ctl start`

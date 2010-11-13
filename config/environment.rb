@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.6' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.9' unless defined? RAILS_GEM_VERSION
 TIMEZONE = 'Eastern Time (US & Canada)'
 APP_ROOT = ""
 # Bootstrap the Rails environment, frameworks, and default configuration
@@ -17,24 +17,24 @@ Rails::Initializer.run do |config|
    $lgr = config.logger
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "bj"
-  config.gem "hpricot"#, :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  config.gem 'daemons'
-  #config.gem 'pauldix-feedzirra'
-  config.gem 'yard'
-  #config.gem 'openrain-action_mailer_tls'
-  config.gem 'thoughtbot-shoulda', :lib => "shoulda", :source => "http://gems.github.com"
-  
-  config.gem 'feed-normalizer'
-  config.gem 'tmail'
-  config.gem 'ruby-debug'
-  config.gem 'fastercsv'
-  config.gem 'ri_cal'#'icalendar'
-  config.gem 'icalendar'#'icalendar'
-  config.gem 'memcache'
-  config.gem "memcache-client", :lib => "memcache"
-  
-  config.gem 'sunspot', :lib => 'sunspot'
-  config.gem 'sunspot_rails', :lib => 'sunspot/rails'
+  #config.gem "hpricot"#, :version => '0.6', :source => "http://code.whytheluckystiff.net"
+  #config.gem 'daemons'
+  ##config.gem 'pauldix-feedzirra'
+  #config.gem 'yard'
+  ##config.gem 'openrain-action_mailer_tls'
+  #config.gem 'thoughtbot-shoulda', :lib => "shoulda", :source => "http://gems.github.com"
+  #
+  #config.gem 'feed-normalizer'
+  #config.gem 'tmail'
+  #config.gem 'ruby-debug'
+  #config.gem 'fastercsv'
+  #config.gem 'ri_cal'#'icalendar'
+  #config.gem 'icalendar'#'icalendar'
+  #config.gem 'memcache'
+  #config.gem "memcache-client", :lib => "memcache"
+  #
+  #config.gem 'sunspot', :lib => 'sunspot'
+  #config.gem 'sunspot_rails', :lib => 'sunspot/rails'
   
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
@@ -64,3 +64,4 @@ end
 #$lgr = ActiveRecord::Base.logger
 ActiveRecord::Base.logger.level = Logger::WARN if ENV['RAILS_ENV'] == 'production'
 require 'ddl_include'
+CACHE = MemCache.new('127.0.0.1') #if defined? MemCache

@@ -1,0 +1,74 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    actionmailer (2.3.9)
+      actionpack (= 2.3.9)
+    actionpack (2.3.9)
+      activesupport (= 2.3.9)
+      rack (~> 1.1.0)
+    activerecord (2.3.9)
+      activesupport (= 2.3.9)
+    activeresource (2.3.9)
+      activesupport (= 2.3.9)
+    activesupport (2.3.9)
+    builder (2.1.2)
+    columnize (0.3.2)
+    daemons (1.1.0)
+    escape (0.0.4)
+    fastercsv (1.5.3)
+    feed-normalizer (1.5.2)
+      hpricot (>= 0.6)
+      simple-rss (>= 1.1)
+    hpricot (0.8.3)
+    icalendar (1.1.5)
+    linecache (0.43)
+    memcache (1.2.13)
+    mysql (2.8.1)
+    rack (1.1.0)
+    rails (2.3.9)
+      actionmailer (= 2.3.9)
+      actionpack (= 2.3.9)
+      activerecord (= 2.3.9)
+      activeresource (= 2.3.9)
+      activesupport (= 2.3.9)
+      rake (>= 0.8.3)
+    rake (0.8.7)
+    ri_cal (0.8.7)
+    rsolr (0.12.1)
+      builder (>= 2.1.2)
+    ruby-debug (0.10.4)
+      columnize (>= 0.1)
+      ruby-debug-base (~> 0.10.4.0)
+    ruby-debug-base (0.10.4)
+      linecache (>= 0.3)
+    simple-rss (1.2.3)
+    smtp_tls (1.0.3)
+    sunspot (1.1.0)
+      escape (= 0.0.4)
+      rsolr (= 0.12.1)
+    sunspot_rails (1.1.0)
+      sunspot (= 1.1.0)
+    thoughtbot-shoulda (2.11.1)
+    tmail (1.2.7.1)
+    yard (0.6.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  daemons
+  fastercsv
+  feed-normalizer
+  hpricot
+  icalendar
+  memcache
+  mysql
+  rails (= 2.3.9)
+  ri_cal
+  ruby-debug
+  smtp_tls
+  sunspot
+  sunspot_rails
+  thoughtbot-shoulda
+  tmail
+  yard
