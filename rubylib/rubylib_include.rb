@@ -8,6 +8,7 @@ $KCODE = "u"
 
 #require 'test/unit'
 require 'extensions/extensions.rb'
+#require 'extensions/open-uri.rb'
 require 'extensions/exceptions.rb'
 require 'extensions/table.rb'
 require 'globals/globals.rb'

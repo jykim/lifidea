@@ -23,13 +23,55 @@ class Indexer
     ch
   end
   
-  
   # Check for target item
   # - condition : new(updated) items not indexed yet
   def find_target_items
     last_job_at = Time.parse(get_config("TIME_LAST_INDEX_JOB") || Time.now.yesterday.to_s)
     debug "last_job_at = #{last_job_at}"
     Item.valid.all(:conditions=>["indexed_at is null or (updated_at > ? and updated_at > indexed_at)",last_job_at])
+  end
+  
+  
+  # Index a set of items
+  # @param [Bool] o[:download] : decide whether to read & parse files or not
+  def index_item_set(all_items, o={})
+    puts "Indexing #{all_items.size} items..." ; cur_docs = 0
+    #Searcher.load_features() if !$clf
+    all_items.in_groups_of(FileCollector::FILES_IN_BATCH) do |batch|
+      items = batch.find_all{|d|d}
+
+      #read contents
+      if o[:download]
+        $idx.read_files(items.find_all{|d|d.itype =~ /file/ && !d.content})
+        items.each{|d| $idx.read_webpage(d) if d.itype =~ /webpage|concept/ && d.uri =~ /^http/}
+      end
+      #run indexing
+      items.each{|d|$idx.index_item(d)}
+      cur_docs += batch.size
+      puts "#{cur_docs} / #{all_items.size} finished"
+    end
+  end
+    
+  # Index target item
+  # - build term vector
+  # - extract concepts
+  # - extract concept links (occurrences)
+  def index_item(item)
+    #debug "[index_item] Indexing #{item.title}(#{item.id})"
+
+    if item.content.blank?
+      item.update_attributes! :content=>item.link_items[0..25].find_all{|e|e.document?}.map{|e|e.to_s(true)}.join("\n")
+    end
+    # Extract concept occurrences
+    concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}
+    #debug "[index_item] concepts in  #{item.title} = #{concepts.uniq.inspect}" if concepts.size > 0
+    concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>1) }
+    
+    # Extract concept co-occurrence
+    # - count increases whenever the item is re-indexed!
+    concepts.uniq.to_comb.each do |pair|
+      Link.find_or_create(pair[0],pair[1],"o", :add=>1)
+    end
   end
   
   # Parse target docs with Apache Tika and fill title & contents
@@ -76,54 +118,6 @@ class Indexer
     end
   end
   
-  # Index a set of items
-  def index_item_set(all_items, o={})
-    puts "Indexing #{all_items.size} items..." ; cur_docs = 0
-    #Searcher.load_features() if !$clf
-    all_items.in_groups_of(FileCollector::FILES_IN_BATCH) do |batch|
-      items = batch.find_all{|d|d}
-
-      #read contents
-      if o[:download]
-        $idx.read_files(items.find_all{|d|d.itype =~ /file/ && !d.content})
-        items.each{|d| $idx.read_webpage(d) if d.itype =~ /webpage|concept/ && d.uri =~ /^http/}
-      end
-      #run indexing
-      items.each{|d|$idx.index_item(d)}
-      cur_docs += batch.size
-      puts "#{cur_docs} / #{all_items.size} finished"
-    end
-  end
-    
-  # Index target item
-  # - build term vector
-  # - extract concepts
-  # - extract concept links (occurrences)
-  def index_item(item)
-    #debug "[index_item] Indexing #{item.title}(#{item.id})"
-    #if item.content
-    #  item.create_index
-    #else
-    #  #debug "[index_item] using content from #{item.link_items[0..9].map{|e|e.id}.inspect}"
-    #  content = item.link_items[0..25].map{|d|d.get_index.get_flm([:title,:uri,:tag]).f}.merge_by_sum
-    #  #puts content.inspect
-    #  item.create_index(:title=>LanguageModel.new(item.title), :tag=>LanguageModel.new(item.tag_titles.join(",")), 
-    #  :content => LanguageModel.new(content), :uri => LanguageModel.new(item.uri))
-    #end
-    if item.content.blank?
-      item.update_attributes! :content=>item.link_items[0..25].find_all{|e|e.document?}.map{|e|e.to_s(true)}.join("\n")
-    end
-    # Extract concept occurrences
-    concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}
-    #debug "[index_item] concepts in  #{item.title} = #{concepts.uniq.inspect}" if concepts.size > 0
-    concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>1) }
-    
-    # Extract concept co-occurrence
-    # - count increases whenever the item is re-indexed!
-    concepts.uniq.to_comb.each do |pair|
-      Link.find_or_create(pair[0],pair[1],"o", :add=>1)
-    end
-  end
   
   # Index target concept
   # - build term vector

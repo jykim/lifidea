@@ -1,4 +1,4 @@
-
+# @todo Update to use Item  
 class ConceptExtractor
   PTN_EMAIL = /([\w \-]+?) \<(.*)\>/ # $1 : name , $2 : email
   

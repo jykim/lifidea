@@ -1,7 +1,6 @@
-#require 'ddl_include' CHANGED : avoid including reference to the file which includes this file
 # Abstract collector framework
 require 'timeout.rb'
-#require 'hpricot'
+require 'open-uri'
 
 class Collector #< ApplicationController
   #include CollectorHelper
@@ -13,6 +12,9 @@ class Collector #< ApplicationController
     @docs_read = {} # List of documents already collected
   end
   
+  #
+  # - @param [Boolean] o[:force] : force collection regardless of sync interval
+  # - @param [Integer] o[:times] : no. of repeated collection
   def collect(o = {})
     return 0 if !@src.sync_now? && !o[:force]
     error "[run_collector] Working on #{@src.title}"
@@ -45,7 +47,7 @@ class Collector #< ApplicationController
   end
   
   # Save given documents to database
-  # = Minimizing documents to be saved
+  # - Minimizing documents to be saved
   # 
   def save_docs(docs, o = {})
     return 0 if !docs || docs.size == 0
@@ -91,10 +93,12 @@ class Collector #< ApplicationController
     []
   end
   
+  # (stub)
   def open_source()
     
   end
   
+  # Abstract
   def close_source()
     nil
   end
@@ -106,7 +110,7 @@ class Collector #< ApplicationController
     else
       src.uri + postfix
     end
-    puts uri
+    #puts uri
     if src.o[:id]
       open_opt = {:ssl_verify => false,  :http_basic_authentication=>[src.o[:id], src.o[:password]]}
     else

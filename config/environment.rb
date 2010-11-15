@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.9' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
 TIMEZONE = 'Eastern Time (US & Canada)'
 APP_ROOT = ""
 # Bootstrap the Rails environment, frameworks, and default configuration
@@ -13,6 +13,7 @@ Rails::Initializer.run do |config|
    #config.action_controller.session_store = ActionController::Session::PStore
   # Add additional load paths for your own custom dirs
    config.load_paths += %W( #{RAILS_ROOT}/test)
+   #autoload_paths
    config.logger = Logger.new(config.log_path, 10, 10 * (2 ** 20)) 
    $lgr = config.logger
   # Specify gems that this application depends on and have them installed with rake gems:install
@@ -35,6 +36,9 @@ Rails::Initializer.run do |config|
   #
   #config.gem 'sunspot', :lib => 'sunspot'
   #config.gem 'sunspot_rails', :lib => 'sunspot/rails'
+  
+  #config.gem "inherited_resources", :version => "1.0.0"
+  #config.gem "responders", :version => "0.4.0"
   
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true

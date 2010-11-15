@@ -37,7 +37,7 @@ class FileCollector < Collector
       if @src.o[:trec]
         content = IO.read(fp)
         did = content.find_tag("DOCNO")[0]
-        title = content.find_tag("title")[0]
+        title = content.find_tag("title")[0] || content.find_tag("Subject")[0]
       elsif fp =~ /\.(FILE_FORMAT_TEXT)$/i
         debug "Content read for #{fp}"
         content = IO.read(fp)

@@ -9,25 +9,26 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091205172650) do
+ActiveRecord::Schema.define(:version => 20091024024026) do
 
-  create_table "data_documents", :force => true do |t|
-    t.string   "did"
-    t.string   "uri",            :limit => 512
-    t.string   "dtype"
+  create_table "concepts", :force => true do |t|
+    t.string   "cid"
+    t.string   "uri"
+    t.string   "ctype"
     t.string   "title"
-    t.integer  "source_id"
-    t.text     "content"
+    t.string   "remark"
+    t.string   "judgment"
     t.text     "metadata"
-    t.text     "concept_titles"
     t.text     "textindex"
-    t.datetime "basetime"
-    t.boolean  "hidden_flag",                   :default => false
-    t.boolean  "modified_flag",                 :default => false
+    t.boolean  "hidden_flag",   :default => false
+    t.boolean  "modified_flag", :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "indexed_at"
+    t.integer  "synonym_id"
+    t.boolean  "private_flag"
   end
+
+  add_index "concepts", ["cid"], :name => "index_concepts_on_cid", :unique => true
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -53,7 +54,8 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.datetime "finish_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "feedback"
+    t.integer  "level"
+    t.boolean  "hidden_flag", :default => false
   end
 
   create_table "histories", :force => true do |t|
@@ -65,36 +67,61 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.datetime "updated_at"
     t.string   "item_id"
     t.string   "src_item_id"
+    t.integer  "game_id"
   end
 
   add_index "histories", ["basetime"], :name => "index_histories_on_basetime"
 
   create_table "items", :force => true do |t|
     t.string   "did"
-    t.string   "uri",            :limit => 512
+    t.string   "uri",           :limit => 512
     t.string   "itype"
     t.string   "title"
     t.integer  "source_id"
     t.text     "content"
     t.text     "metadata"
-    t.text     "tag_titles_bak"
-    t.text     "textindex"
+    t.text     "textindex",     :limit => 16777215
     t.datetime "basetime"
-    t.boolean  "hidden_flag",                   :default => false
-    t.boolean  "modified_flag",                 :default => false
+    t.boolean  "hidden_flag",                       :default => false
+    t.boolean  "modified_flag",                     :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "indexed_at"
     t.boolean  "private_flag"
+    t.boolean  "query_flag"
+    t.integer  "user_id"
     t.text     "remark"
+    t.string   "tags_saved"
+    t.string   "query_group",   :limit => 20
   end
 
   add_index "items", ["did"], :name => "index_documents_on_did", :unique => true
 
+  create_table "items_export", :id => false, :force => true do |t|
+    t.integer  "id",                                :default => 0,     :null => false
+    t.string   "did"
+    t.string   "uri",           :limit => 512
+    t.string   "itype"
+    t.datetime "created_at"
+    t.string   "title"
+    t.integer  "source_id"
+    t.text     "content"
+    t.text     "metadata"
+    t.text     "textindex",     :limit => 16777215
+    t.datetime "basetime"
+    t.boolean  "hidden_flag",                       :default => false
+    t.boolean  "modified_flag",                     :default => false
+    t.datetime "updated_at"
+    t.datetime "indexed_at"
+    t.boolean  "private_flag"
+    t.boolean  "user_id"
+    t.text     "remark"
+  end
+
   create_table "links", :force => true do |t|
     t.string   "lid"
-    t.integer  "out_id"
-    t.integer  "in_id"
+    t.string   "in_id"
+    t.string   "out_id"
     t.string   "remark"
     t.string   "judgment"
     t.float    "weight"
@@ -128,8 +155,18 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "occurrences", ["oid"], :name => "index_occurrences_on_oid", :unique => true
+  
+  create_table "queries", :force => true do |t|
+    t.string   "query_text"
+    t.integer  "user_id"
+    t.integer  "game_id"
+    t.integer  "query_id"
+    t.integer  "item_id"
+    t.integer  "position"
+    t.integer  "query_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "rules", :force => true do |t|
     t.string   "rid"
@@ -140,12 +177,21 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.string   "value"
     t.text     "condition"
     t.text     "option"
-    t.boolean  "inactive_flag", :default => false
+    t.boolean  "active_flag", :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "rules", ["rid"], :name => "index_rules_on_rid", :unique => true
+
+  create_table "scores", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "document_id"
+    t.integer  "position"
+    t.text     "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "sources", :force => true do |t|
     t.string   "title"
@@ -156,7 +202,7 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.text     "option"
     t.text     "filter"
     t.datetime "sync_at"
-    t.boolean  "active_flag",   :default => false
+    t.boolean  "active_flag",   :default => true
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -183,16 +229,6 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.datetime "updated_at"
   end
 
-  create_table "taggings", :force => true do |t|
-    t.integer  "tag_id"
-    t.integer  "taggable_id"
-    t.string   "taggable_type"
-    t.datetime "created_at"
-  end
-
-  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
-  add_index "taggings", ["taggable_id", "taggable_type"], :name => "index_taggings_on_taggable_id_and_taggable_type"
-
   create_table "tags", :force => true do |t|
     t.string   "tid"
     t.string   "uri"
@@ -213,10 +249,6 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
 
   add_index "tags", ["tid"], :name => "index_concepts_on_cid", :unique => true
 
-  create_table "tags_old", :force => true do |t|
-    t.string "name"
-  end
-
   create_table "users", :force => true do |t|
     t.string   "uid"
     t.string   "utype"
@@ -227,6 +259,8 @@ ActiveRecord::Schema.define(:version => 20091205172650) do
     t.text     "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "admin_flag"
+    t.integer  "level"
   end
 
 end

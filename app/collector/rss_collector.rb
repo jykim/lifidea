@@ -57,7 +57,7 @@ class RSSCollector < Collector
     end
   end
 
-  # Parse feed_text using FeedNormalizer
+  # Parse feed_text using Feedzirra
   # - this provides additional option to fetch more of metadata
   # @return [Array<Hash>] list of parsed feeditems
   def parse_by_feedzirra(feed_text, src)
