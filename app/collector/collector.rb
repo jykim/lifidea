@@ -13,8 +13,8 @@ class Collector #< ApplicationController
   end
   
   #
-  # - @param [Boolean] o[:force] : force collection regardless of sync interval
-  # - @param [Integer] o[:times] : no. of repeated collection
+  # @param [Boolean] o[:force] : force collection regardless of sync interval
+  # @param [Integer] o[:times] : no. of repeated collection
   def collect(o = {})
     return 0 if !@src.sync_now? && !o[:force]
     error "[run_collector] Working on #{@src.title}"
