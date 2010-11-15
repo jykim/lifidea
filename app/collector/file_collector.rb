@@ -37,7 +37,12 @@ class FileCollector < Collector
       if @src.o[:trec]
         content = IO.read(fp)
         did = content.find_tag("DOCNO")[0]
-        title = content.find_tag("title")[0] || content.find_tag("Subject")[0]
+      elsif @src.o[:enron]
+        content = IO.read(fp).find_tag("body")[0]
+        did = content.find_tag("DOCNO")[0].strip
+        title = content.find_tag("Subject")[0].strip
+        metadata = {:from=>content.find_tag("From")[0].strip, 
+          :to=>content.find_tag("To")[0].strip, :date=>content.find_tag("Date")[0].strip}
       elsif fp =~ /\.(FILE_FORMAT_TEXT)$/i
         debug "Content read for #{fp}"
         content = IO.read(fp)
@@ -47,7 +52,7 @@ class FileCollector < Collector
       tag_list = File.dirname(filename).gsub("/", ",") if @src.o[:path_as_tag]      
       did  ||= filename ; title ||= filename
       result << {:itype=>@src.itype, :title=>title,:did=>did, :uri=>fp, :basetime=>mtime, :content=>content,
-        :metadata=>{:filename=>filename, :tag_list=>tag_list}}
+        :metadata=>(metadata || {:filename=>filename, :tag_list=>tag_list})}
       @docs_read[fp] = mtime
     end#find
     result
