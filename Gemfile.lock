@@ -40,7 +40,7 @@ GEM
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
     mysql (2.8.1)
-    nokogiri (1.4.3.1)
+    nokogiri (1.4.4)
     rack (1.1.0)
     rails (2.3.8)
       actionmailer (= 2.3.8)
@@ -76,7 +76,7 @@ GEM
       sunspot (= 1.1.0)
     thoughtbot-shoulda (2.11.1)
     tmail (1.2.7.1)
-    yard (0.6.1)
+    yard (0.6.2)
 
 PLATFORMS
   ruby

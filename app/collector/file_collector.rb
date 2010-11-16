@@ -2,7 +2,7 @@ require 'ddl_include'
 
 # Collect from Files
 class FileCollector < Collector
-  FILES_IN_BATCH = 50 # Max. no of files processsed at a time
+  FILES_IN_BATCH = 50000 # Max. no of files processsed at a time
   MAX_FILE_LENGTH = 5000
   FILE_FORMAT_TEXT = "html|xml|txt|tex"
   FILE_FORMAT_BINARY = "pdf|doc|ppt|xls|pptx|docx|xlsx"
@@ -31,18 +31,20 @@ class FileCollector < Collector
       #puts filename
       #debugger
       next if (@docs_read[fp] && @docs_read[fp] >= mtime) || (File.dirname(fp) == /\./) ||
-        (!@src.o[:trec] && !(File.extname(fp) =~ /\.(#{@src.o[:file_format] || INDEX_FILE_FORMAT})/i))
+        ((!@src.o[:trec] && !@src.o[:enron]) && !(File.extname(fp) =~ /\.(#{@src.o[:file_format] || INDEX_FILE_FORMAT})/i))
       break if file_count >= FILES_IN_BATCH ; file_count += 1
       debug "[FileCollector#read_from_source] Working on #{fp}" # #{@docs_read[fp]} >= #{mtime}
       if @src.o[:trec]
         content = IO.read(fp)
         did = content.find_tag("DOCNO")[0]
       elsif @src.o[:enron]
-        content = IO.read(fp).find_tag("body")[0]
-        did = content.find_tag("DOCNO")[0].strip
-        title = content.find_tag("Subject")[0].strip
-        metadata = {:from=>content.find_tag("From")[0].strip, 
-          :to=>content.find_tag("To")[0].strip, :date=>content.find_tag("Date")[0].strip}
+        #puts 'Enron Type!'
+        content = IO.read(fp)
+        did = content.find_tag("DOCNO")[0]#.strip
+        title = content.find_tag("Subject")[0]#.strip
+        metadata = {:from=>content.find_tag("From")[0], 
+          :to=>content.find_tag("To")[0], :date=>content.find_tag("Date")[0]}
+        content = content.find_tag("body")[0]
       elsif fp =~ /\.(FILE_FORMAT_TEXT)$/i
         debug "Content read for #{fp}"
         content = IO.read(fp)

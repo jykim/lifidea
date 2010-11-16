@@ -22,11 +22,13 @@ def get_collector(src)
 end
 
 def run_collector(o = {})
+  #debugger
   counts = {}
   Source.active.each do |src|
     next if (o[:source] && o[:source].to_i != src.id)   ||
             (o[:itype]  && o[:itype] != src.itype)      || src.uri.blank?
     collector = get_collector(src)
+
     begin
       counts[src.title] = collector.collect(o)
     rescue Exception => e
