@@ -28,7 +28,8 @@ class SolrSearcher < Searcher
   # Search based on similarity
   # - Find target document
   # - Evaluate similarity query
-  # @param item <Int> : id of item sought for
+  # @param [int] item : id of item sought for
+  # @param [Array<int>] :working_set : subset of items to run retrieval
   def search_by_item(item, type ,o={})
     query_item = Item.find(item.to_i)
     return nil if !query_item

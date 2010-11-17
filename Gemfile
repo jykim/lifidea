@@ -31,6 +31,6 @@ gem 'sunspot_rails', :require => 'sunspot/rails'
 # Test & Deployment
 gem 'yard'
 #gem 'shoulda'
-gem 'thoughtbot-shoulda'#, :require => "shoulda", :git => "http://gems.github.com"
+#gem 'thoughtbot-shoulda'#, :require => "shoulda", :git => "http://gems.github.com"
 gem 'rspec'
 #gem 'rspec-rails'

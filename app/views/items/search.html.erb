@@ -7,11 +7,11 @@
   </tr>
 	<% @rank_list.each do |e| %>
 	  <tr>
-	    <td><%= check_box_tag("checked_docs[]", e[0].id) %><% e[1].round_at(3) %></td>
-	    <td><%= e[0].itype %></td>
-	    <td><%= link_to e[0].title, {:controller=>'items', :action=>'click', :htype=>'qry_doc', :id=>e[0].id, :src_item_id=>@query_doc.id} %></td>
-	    <td><%= link_to 'Edit', edit_item_path(e[0]) %></td>
-	    <td><%= link_to 'Destroy', e[0], :confirm => 'Are you sure?', :method => :delete %></td>
+	    <td><%= check_box_tag("checked_docs[]", e[:item].id) %><% e[:score].round_at(3) %></td>
+	    <td><%= e[:item].itype %></td>
+	    <td><%= link_to e[:item].title, {:controller=>'items', :action=>'click', :htype=>'qry_doc', :id=>e[:item].id, :src_item_id=>@query_doc.id} %></td>
+	    <td><%= link_to 'Edit', edit_item_path(e[:item]) %></td>
+	    <td><%= link_to 'Destroy', e[:item], :confirm => 'Are you sure?', :method => :delete %></td>
 	  </tr>
 	<% end %>
 </table>

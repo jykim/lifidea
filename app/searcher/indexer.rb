@@ -53,9 +53,9 @@ class Indexer
   end
     
   # Index target item
-  # - build term vector
-  # - extract concepts
-  # - extract concept links (occurrences)
+  # - build term vector for concept
+  # - extract concept occurrence
+  # - extract occurrences
   def index_item(item)
     #debug "[index_item] Indexing #{item.title}(#{item.id})"
 
@@ -75,7 +75,7 @@ class Indexer
   end
   
   # Parse target docs with Apache Tika and fill title & contents
-  # @param [Array<Document>] docs : array of items
+  # @param [Array<Item>] docs : array of items
   def read_files(docs)
     return if docs.size == 0
     tika_cmd = "java -jar #{TIKA_PATH} #{docs.map{|e|"\""+e.uri+"\""}.join(" ")}"
@@ -98,7 +98,6 @@ class Indexer
   end
   
   # Read webpage content from URI
-  # 
   def read_webpage(doc)
     return if doc.uri =~ /\.(pdf|ps|eps|doc|ppt|xls|mov|avi|jpg|png|jpeg|gif|tif)$/i
     begin
@@ -117,29 +116,4 @@ class Indexer
       error "[read_webpage] Other Error! #{e.inspect}"
     end
   end
-  
-  
-  # Index target concept
-  # - build term vector
-  #def index_concept(con)
-  #  #debugger
-  #  index_doc = IR::Document.new(con.id, con.cid, {
-  #    :title => LanguageModel.new(con.title), 
-  #    :content => LanguageModel.new(con.document_lists('e').map{|d|(d.index.lm)? d.index.lm.f : {}}.merge_by_sum)})
-  #  con.write_attribute(:textindex, index_doc.to_yaml)
-  #  con.write_attribute(:indexed_at, Time.now.in_time_zone(TIMEZONE))
-  #  con.save!
-  #end
-  
-  # IR::Index all files from path
-  #def index_path(path, o={}) # yield IR::Document
-  #  Dir.entries(path).each do |fn|
-  #    fp = File.join(path, fn)
-  #    next if ['.','..'].include?(fn) || File.directory?(fp)
-  #    doc_file = IO.read(fp)
-  #    did = doc_file.find_tag('DOCNO')[0].strip
-  #    #debugger
-  #    yield IR::Document.new(did, doc_file, o)
-  #  end
-  #end
 end

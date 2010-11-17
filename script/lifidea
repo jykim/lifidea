@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 ENV['RAILS_ENV'] = $rails_env = ARGV[1] || 'development'
-require File.dirname(__FILE__) + '/config/boot'
+require File.dirname(__FILE__) + '/../config/boot'
 require 'ddl_include.rb'
 $command = ARGV[0]
 memcached_pid = File.join(RAILS_ROOT, "tmp/pids/memcached_#$rails_env.pid")
@@ -10,14 +10,13 @@ when 'test' : 3001
 when 'production' : 3002
 end
 
-
 case $command
 when 'start'
   `rake tmp:pids:clear`
   `memcached -d -P #{memcached_pid}` if !File.exists?(memcached_pid)
-  #`lib/daemons/collector_ctl start  #{$rails_env}`
+  #{}`lib/daemons/collector_ctl start  #{$rails_env}`
   `rake sunspot:solr:start RAILS_ENV=#$rails_env`
-  #`script/server -d -p #{$server_port} -e #{$rails_env}`
+  `script/server -d -p #{$server_port} -e #{$rails_env}`
   #Rake::Task['sunspot:solr:start'].execute
 #  `lib/daemons/indexer_ctl start`
 #  `lib/daemons/searcher_ctl start`
@@ -31,9 +30,15 @@ when 'stop'
   require 'daemons/manager'
 when 'status'
   require 'daemons/manager'
+when 'log'
+  puts "==== OUTPUT ===="
+  puts `tail log/#{$rails_env}.log`
+  puts "==== ERRORS ===="
+  puts `tail log/#{$rails_env}_error.log`
 when 'install'
 when 'commit'
   `git commit -a -m '#{ARGV[1..-1].join(" ")}'`
+  `git push`
 when 'update'
   `git pull`
 end

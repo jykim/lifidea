@@ -11,7 +11,7 @@ GEM
     activeresource (2.3.8)
       activesupport (= 2.3.8)
     activesupport (2.3.8)
-    builder (2.1.2)
+    builder (3.0.0)
     cgi_multipart_eof_fix (2.5.0)
     columnize (0.3.2)
     curb (0.7.8)
@@ -40,7 +40,7 @@ GEM
       fastthread (>= 1.0.1)
       gem_plugin (>= 0.2.3)
     mysql (2.8.1)
-    nokogiri (1.4.3.1)
+    nokogiri (1.4.4)
     rack (1.1.0)
     rails (2.3.8)
       actionmailer (= 2.3.8)
@@ -74,9 +74,8 @@ GEM
       rsolr (= 0.12.1)
     sunspot_rails (1.1.0)
       sunspot (= 1.1.0)
-    thoughtbot-shoulda (2.11.1)
     tmail (1.2.7.1)
-    yard (0.6.1)
+    yard (0.6.2)
 
 PLATFORMS
   ruby
@@ -97,6 +96,5 @@ DEPENDENCIES
   smtp_tls
   sunspot
   sunspot_rails
-  thoughtbot-shoulda
   tmail
   yard

@@ -31,6 +31,13 @@
 	</table>
 </p>
 
+<p>
+  <b>Content:</b> <br>
+		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="500" style="border: none;"></iframe>
+		(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
+</p>
+
+
 <% if @item.document? %>
 	<h2>Relevant Documents</h2>
 	<table class="sortable" id="sortabletable">
@@ -68,10 +75,5 @@
 	</table>
 <% end %>
 
-<p>
-  <b>Content:</b> <br>
-		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="500" style="border: none;"></iframe>
-		(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
-</p>
 <%= link_to 'Edit', edit_item_path(@item) %> |
 <%= link_to 'Back', items_path %>

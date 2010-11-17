@@ -38,6 +38,8 @@ class WeightLearner
     [result.values.mean, weights].flatten
   end
   
+  # Get collection-level score 
+  # @param [Array<String>] input_line : each line of input_data
   def self.get_col_scores(input_line, weights)
     $cols.map_hash{|col|
       [col, ($cs_types || Searcher::CS_TYPES).map_with_index{|cs_type,i|input_line[[cs_type, col].join('_').to_sym].to_f * weights[i] }.sum]}

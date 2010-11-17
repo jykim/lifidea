@@ -3,7 +3,7 @@ class Searcher
   CON_FEATURES = [:title, :content, :tag, :time, :topic, :string, :cooc, :occur]
   DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :type, :concept]
     
-  # @param [Array<IR::Index>] cols : target collections
+  # Initialize cache / index
   def initialize(o = {})
     @debug = o[:debug] || false
     $items = {} if !$items
@@ -19,7 +19,7 @@ class Searcher
     end
   end
   
-  # Implement this
+  # Prepare index for searching
   def open_index(o={})
     @clf = cache_data('clf', Searcher.load_features())
     @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con', Conf.weight_con))
@@ -36,12 +36,12 @@ class Searcher
     #debugger
   end
   
-  # Imprement this
+  # (stub) Keyword Search
   def search_by_keyword(keyword, o = {})
     
   end
   
-  # Implement this
+  # (stub) Similarity Search
   def search_by_item(item, o = {})
     
   end
@@ -76,6 +76,7 @@ class Searcher
     clf
   end
   
+  # Calculate Reciprocal Rank
   def self.recip_rank(rank_list, rel)
     #p rank_list,rel
     result = 0.0

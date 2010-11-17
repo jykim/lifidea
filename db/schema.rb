@@ -96,27 +96,9 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
   end
 
   add_index "items", ["did"], :name => "index_documents_on_did", :unique => true
-
-  create_table "items_export", :id => false, :force => true do |t|
-    t.integer  "id",                                :default => 0,     :null => false
-    t.string   "did"
-    t.string   "uri",           :limit => 512
-    t.string   "itype"
-    t.datetime "created_at"
-    t.string   "title"
-    t.integer  "source_id"
-    t.text     "content"
-    t.text     "metadata"
-    t.text     "textindex",     :limit => 16777215
-    t.datetime "basetime"
-    t.boolean  "hidden_flag",                       :default => false
-    t.boolean  "modified_flag",                     :default => false
-    t.datetime "updated_at"
-    t.datetime "indexed_at"
-    t.boolean  "private_flag"
-    t.boolean  "user_id"
-    t.text     "remark"
-  end
+  add_index "items", ["query_flag"], :name => "index_documents_on_qflag"
+  add_index "items", ["hidden_flag"], :name => "index_documents_on_hflag"
+  add_index "items", ["itype"], :name => "index_documents_on_itype"
 
   create_table "links", :force => true do |t|
     t.string   "lid"

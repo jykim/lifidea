@@ -10,8 +10,8 @@
   <tr>
     <td><%= i+1 %></td>
     <td><%= e[:item].itype %></td>
-    <td><%= link_to(e[:item].title, {:action=>'show', :id=>e[:id]}) %></td>
-    <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
+    <td><%= link_to(e[:item].title, {:action=>'show', :id=>e[:item].id}) %></td>
+    <td><%= "<font color='#ff0000'>target document!</font>" if e[:item].id == session[:target_document].to_i %></td>
   </tr>
 <% end %>
 </table>
