@@ -52,53 +52,6 @@ namespace :etc do
     end
   end
   
-  def split_file(filename, data, o={})
-    result_train, result_test = [o[:header]], [o[:header]]
-    data.each_with_index do |e,i|
-      #puts rand(), train_ratio
-      if o[:test_set]
-        if !o[:test_set].include?(i)
-          if o[:train_ratio] && (o[:random] ? rand() : i.to_f / data.size) > o[:train_ratio].to_f
-            next
-          else
-            result_train << e
-          end
-        else
-          result_test << e
-        end
-      elsif o[:train_ratio]
-        if (o[:random] ? rand() : i.to_f / data.size) >= o[:train_ratio].to_f
-          result_test << e
-        else
-          result_train << e
-        end
-      else
-        puts "No parameter specified!"
-      end
-    end
-    File.open(filename+"#{o[:train_ratio]}.train",'w'){|f|f.puts result_train.find_valid.join}
-    File.open(filename+"#{o[:train_ratio]}.test" ,'w'){|f|f.puts result_test.find_valid.join}
-  end
-  
-  def conv_file(filename, method)
-    col_hash = $cols.map_hash_with_index{|e,i|[e, i+1]}
-    result = []
-    read_csv(filename,:output=>:array).each_with_index do |l,i|
-      rel_col = l[6]
-      case method
-      when 'liblinear'
-        result << [col_hash[rel_col]].concat(l[7..-1].map_with_index{|e,j|[j+1,e].join(":")})
-      when 'ranksvm'
-        raise DataError, "Col size not consistent! #{l[7..-1].size}!=#{$cols.size * RubySearcher::CS_TYPES.size}" if l[7..-1].size != $cols.size * RubySearcher::CS_TYPES.size
-        values_col = l[7..-1].map_with_index{|e,j|[e,j]}.group_by{|e|e[1]/RubySearcher::CS_TYPES.size}
-        result.concat values_col.map{|col,features|
-          [((col+1 == col_hash[rel_col])? 2 : 1), "qid:#{i+1}", features.map_with_index{|e,j|[j+1,e[0]].join(":")}].flatten
-          }.sort_by{|e|e[0]}.reverse
-      end
-    end
-    File.open(filename.gsub(/grid/,method), 'w'){|f|f.puts result.map{|e|e.join(" ")}.join("\n")}
-  end
-  
   desc "Split Input file into Train & Test"
   task(:split_file => :environment) do
     total_ratio = ENV['total_ratio'] || 1
@@ -118,7 +71,7 @@ namespace :etc do
     #debugger
     error "[split_file] Data is blank!" if data.blank?
     if !ENV['folds']
-      split_file(filename, data, :train_ratio=>ENV['train_ratio'])
+      Evaluator.split_file(filename, data, :train_ratio=>ENV['train_ratio'])
     else
       raw_data = (0...data.size).to_a
       raw_data = raw_data.shuffle if ENV['random_split']
@@ -131,13 +84,13 @@ namespace :etc do
       1.upto(ENV['folds'].to_i) do |i|
         puts "#{test_sets[i-1].size} / #{data.size}"
         $fold = "-k#{ENV['folds']}-#{i}"
-        split_file(get_learner_input_file(), data, 
+        Evaluator.split_file(get_learner_input_file(), data, 
           :random=>ENV['random_split'], :header=>header, :train_ratio=>ENV['train_ratio'], :test_set=>test_sets[i-1])
         if $type == 'csel' && $method == 'grid'
-          conv_file(get_learner_input_file()+'.train', 'ranksvm')
-          conv_file(get_learner_input_file()+'.test', 'ranksvm')
-          conv_file(get_learner_input_file()+'.train', 'liblinear')
-          conv_file(get_learner_input_file()+'.test', 'liblinear')
+          Evaluator.conv_file(get_learner_input_file()+'.train', 'ranksvm')
+          Evaluator.conv_file(get_learner_input_file()+'.test', 'ranksvm')
+          Evaluator.conv_file(get_learner_input_file()+'.train', 'liblinear')
+          Evaluator.conv_file(get_learner_input_file()+'.test', 'liblinear')
         end
       end
     end

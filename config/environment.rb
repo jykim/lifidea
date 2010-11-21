@@ -68,4 +68,4 @@ end
 #$lgr = ActiveRecord::Base.logger
 ActiveRecord::Base.logger.level = Logger::WARN if ENV['RAILS_ENV'] == 'production'
 require 'ddl_include'
-CACHE = MemCache.new('127.0.0.1') #if defined? MemCache
+CACHE = MemCache.new("localhost:#{Conf.memcached_port}") #if defined? MemCache

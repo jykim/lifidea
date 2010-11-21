@@ -1,21 +1,20 @@
 #!/usr/bin/env ruby
-require 'rubygems'
+require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 require "daemons"
 require 'yaml'
 require 'erb'
 ENV["RAILS_ENV"] = ARGV[1] || "development"
 puts "Running in #{ENV["RAILS_ENV"]}"
 
-file_name = File.dirname(__FILE__) + "/../../vendor/rails/activesupport/lib/active_support.rb"
-
-if(File.exists?(file_name))
-  require file_name
-else
-rails_version = File.new(File.dirname(__FILE__)+ "/../../config/environment.rb").read.scan(/^ *RAILS_GEM_VERSION.*=.*['|"](.*)['|"]/)[0].to_s
-
-#gem 'activesupport', rails_version
-require 'active_support'
-end
+#file_name = File.dirname(__FILE__) + "/../../vendor/rails/activesupport/lib/active_support.rb"
+#
+#if(File.exists?(file_name))
+#  require file_name
+#else
+#  rails_version = File.new(File.dirname(__FILE__)+ "/../../config/environment.rb").read.scan(/^ *RAILS_GEM_VERSION.*=.*['|"](.*)['|"]/)[0].to_s
+#  gem 'activesupport', rails_version
+#  require 'active_support'
+#end
 
 options = YAML.load(
   ERB.new(

@@ -10,7 +10,7 @@ module RuleHelper
         end
         #debugger
         #info "[process_rules] Tag #{r[:value]} applied"
-        add_tags(r[:value], "r")
+        create_and_link(r[:value], 'tag' , "t")
         save!
         #debug "[concepts.size] #{concepts.size} / #{occurrences.size}"
       end
@@ -22,7 +22,7 @@ module RuleHelper
     raise ArgumentError if target.class != Symbol
     if target == :tag
       #debug "[text_in] concept_titles : #{concept_titles.join(",")}"
-      tag_titles.join(",")
+      con_titles.join(",")
     elsif Item.col_lists.include?(target.to_s)
       send(target.to_s)
     else

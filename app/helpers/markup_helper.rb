@@ -14,7 +14,8 @@ module MarkupHelper
         if ptn.size > 0
           m[ptn[0][0].to_sym] = parse_value(ptn[0][1])
         else
-          add_tags(element, "m")
+          create_and_link(element, 'tag' , "t")
+          #add_tags(element, "m")
         end
       end#scan
     end#each

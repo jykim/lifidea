@@ -1,25 +1,19 @@
 #!/usr/bin/env ruby
 ENV['RAILS_ENV'] = $rails_env = ARGV[1] || 'development'
-require File.dirname(__FILE__) + '/../config/boot'
+#require File.dirname(__FILE__) + '/../config/boot'
+require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'ddl_include.rb'
 $command = ARGV[0]
 memcached_pid = File.join(RAILS_ROOT, "tmp/pids/memcached_#$rails_env.pid")
-$server_port = case $rails_env
-when 'development' : 3000
-when 'test' : 3001
-when 'production' : 3002
-end
-
+#debugger
 case $command
 when 'start'
   `rake tmp:pids:clear`
-  `memcached -d -P #{memcached_pid}` if !File.exists?(memcached_pid)
-  #{}`lib/daemons/collector_ctl start  #{$rails_env}`
+  `memcached -d -p #{Conf.memcached_port} -P #{memcached_pid}` if !File.exists?(memcached_pid)
   `rake sunspot:solr:start RAILS_ENV=#$rails_env`
-  `script/server -d -p #{$server_port} -e #{$rails_env}`
-  #Rake::Task['sunspot:solr:start'].execute
-#  `lib/daemons/indexer_ctl start`
-#  `lib/daemons/searcher_ctl start`
+  `script/server -d -p #{Conf.webserver_port} -e #{$rails_env}`
+  #{}`script/collector.sh`
+#  `nohup script/runner app/collector/collector_daemon.rb #$rails_env &`
 when 'stop'
   File.unlink(memcached_pid)  if File.exists?(memcached_pid)
   `lib/daemons/collector_ctl stop  #{$rails_env}`
@@ -41,4 +35,6 @@ when 'commit'
   `git push`
 when 'update'
   `git pull`
+when 'test'
+  
 end

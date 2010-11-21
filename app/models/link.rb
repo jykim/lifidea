@@ -13,10 +13,6 @@ class Link < ActiveRecord::Base
     lid
   end
   
-  def self.links_with_items()
-    #all(:joins=>{:occurrences=>{:document=>:source}}, :conditions=>cond)
-  end
-  
   # Create or find DocumentLink instance
   # - d_id1 is always smaller than d_id2
   def self.find_or_create(d_id1, d_id2, ltype, o={})

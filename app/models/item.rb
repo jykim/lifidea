@@ -1,9 +1,9 @@
 #require 'searcher/more_like_this'
 
 class Item < ActiveRecord::Base
-  include TagHelper, IndexHelper
+  #include TagHelper#, IndexHelper
   include MetadataHelper, RuleHelper, MarkupHelper
-  ITYPE_CONCEPT = ['concept','person']
+  ITYPE_CONCEPT = ['tag','person','query']
   ITYPE_DOCUMENT = ['webpage','bookmark_webpage','email','email_memo','paper','blog','tweet','pub']
   #ITYPE_QUERY = ['concept','person']
   
@@ -14,7 +14,7 @@ class Item < ActiveRecord::Base
   has_many :outitems, :through=>:outlinks
 
   has_many :occurrences , :dependent => :destroy
-  has_many :tags, :through => :occurrences # @todo : use links instead of occurrences?
+  #has_many :tags, :through => :occurrences # @todo : use links instead of occurrences?
   #has_and_belongs_to_many :tags
 
   has_many :links , :dependent => :destroy
@@ -37,11 +37,11 @@ class Item < ActiveRecord::Base
 
   named_scope :unmodified, {:conditions=>{:modified_flag=>false}}
   
-  named_scope :indexed, {:conditions=>["textindex is not null"]}
+  #named_scope :indexed, {:conditions=>["textindex is not null"]}
   
-  named_scope :concepts, {:conditions=>{:itype=>'concept'}}
+  named_scope :concepts, {:conditions=>{:itype=>ITYPE_CONCEPT}}
   named_scope :queries, {:conditions=>{:itype=>['query']}}
-  named_scope :documents, {:conditions=>["itype != ? and itype != ?",'query', 'concept']}
+  named_scope :documents, {:conditions=>["itype != ? and itype != ? and itype != ?",'tag','query', 'concept']}
   named_scope :searchables, {:conditions=>["itype != ?",'query']}
   
   # Sunspot/Solr search indexing  
@@ -51,6 +51,9 @@ class Item < ActiveRecord::Base
     string :itype_str do
       itype.to_s.squeeze.downcase
     end
+    #text :fulltext do
+    #  [title, content, uri, metadata].join(" ")
+    #end
     #more_like_this :title, :content, :uri, :itype
   end
   
@@ -63,7 +66,6 @@ class Item < ActiveRecord::Base
   end
   
   def link_items
-    #[inlinks.map{|l|[l, l.initem]}, outlinks.map{|l|[l, l.outitem]}].collapse
     [initems,outitems].flatten
   end
   
@@ -71,8 +73,16 @@ class Item < ActiveRecord::Base
     link_items.find_all{|e|e.concept?}
   end
   
+  def tagged_with?(item_title)
+    link_cons.include?(item_title)
+  end
+  
   def con_titles
     link_cons.uniq.map{|e|e.title}
+  end
+  
+  def tag_titles
+    con_titles
   end
 
   def link_docs
@@ -95,29 +105,13 @@ class Item < ActiveRecord::Base
     false
   end
   
-  # 
-  def concept_similarity(doc)
+  # Create a new item and link with this
+  def create_and_link(title, itype, ltype, o={})
+    item = Item.find_or_create(title, itype, o)
+    Link.find_or_create(item.id, id, ltype, o)
+  end
     
-  end
-  
-  # Create new document from given query
-  # @param [String] did : unique ID
-  #def self.create_from_query(did, doc)
-  #  doc_db = Document.find_or_initialize_by_did(did)
-  #  doc_db.update_attributes!(doc.merge(:source_id=>1, :basetime=>Time.now(), :metadata=>{}))
-  #  doc_db
-  #end
-  
-  def self.count_docs
-    @count_docs ||= Item.all.size - find_all_by_itype([ITYPE_CONCEPT,'query'].flatten).size
-  end
-  
-  
-  def self.count_cons
-    @count_cons ||= find_all_by_itype(ITYPE_CONCEPT).size
-  end
-  
-  # Initialize new document
+  # Find an item, otherwise create a new item
   def self.find_or_create(title, itype, o={})
     #debugger
     did = o[:did] || title.to_id
@@ -125,6 +119,15 @@ class Item < ActiveRecord::Base
     item.update_attributes!(o.merge(:title=>title, :did=>did, :itype=>itype, :source_id=>(o[:source_id] || 1), 
       :basetime=>(o[:basetime] || Time.now.in_time_zone(TIMEZONE))))
     item
+  end
+  
+  def self.count_docs
+    @count_docs ||= Item.documents.size
+  end
+  
+  
+  def self.count_cons
+    @count_cons ||= find_all_by_itype(ITYPE_CONCEPT).size
   end
 
   def self.find_by_dids( dids )
@@ -139,18 +142,3 @@ class Item < ActiveRecord::Base
     @@itypes ||=  find(:all, :select=>'distinct(itype)').map{|e|e.itype}
   end
 end
-
-#Sunspot.setup(Item) do 
-#   text :title, :content, :uri 
-#   more_like_this :title, :content, :uri
-#end
-
-#Sunspot.setup(Item) do 
-#   text :title, :content, :uri 
-#   more_like_this do 
-#      fields :title, :content, :uri 
-#      min_document_frequency 10 
-#      boost true 
-#      max_query_terms 10 
-#    end 
-#end

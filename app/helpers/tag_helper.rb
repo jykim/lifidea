@@ -1,13 +1,11 @@
 module TagHelper
-  # Create tags & occurrences
+  # Create tags & links
   # @param titles [String] comma-separated string of tags
   # @param otype [String] type of occurrences
-  def add_tags(titles, otype = "u")
-    tags = sanitize_input(titles).map{|t|Tag.find_or_create(t.strip)}    
+  def add_tags(titles, otype = "t")
+    tags = sanitize_input(titles).map{|t|Item.find_or_create(t.strip, 'tag')}    
     #debug "[add_tags] titles = [#{titles}] otype = #{otype} (#{@tag_titles})"
-    tags.each{|c|Occurrence.find_or_create(self.id, c.id, otype)}
-    #@tag_titles = [tag_titles,titles].flatten.uniq.join(",")
-    #update_attributes!(:tag_titles=>@tag_titles)
+    tags.each{|c|Link.find_or_create(self.id, c.id, otype)}
   end
   
   def sanitize_input(titles)
@@ -23,30 +21,24 @@ module TagHelper
   end
   
   # Replace existing tags with given tags
-  def replace_tags(titles, otype = 'u')
+  def replace_tags(titles, otype = 't')
     clear_tags()
     add_tags(titles, otype)
   end
   
-  #def tag_titles()
-  #  Tag.all(:joins=>{:occurrences=>:tag}, :conditions=>{:occurrences=>{:item_id=>id}}).map(&:title)
-  #end
-  
   # Read tag titles & update cache
-  def tag_titles(otype = nil)
-    #read_attribute(:concept_titles)|| []
+  def tag_titles(otype = 't')
     if tags_saved
       tags_saved.split(",")
     else
-      cond = otype ? {:occurrences=>{:otype=>otype, :item_id=>id}} : {:occurrences=>{:item_id=>id}}
-      result = Tag.all(:joins=>{:occurrences=>:tag}, :conditions=>cond).map(&:title)
+      cond = otype ? {:links=>{:otype=>otype, :in_id=>id}} : {:links=>{:in_id=>id}}
+      result = Item.all(:joins=>{:links=>:item}, :conditions=>cond).map(&:title)
       update_attributes!(:tags_saved=>result.join(","))
       result
     end
-      
   end
   
   def tagged_with?(tag)
-    tag_titles.include?(tag)
+    tag_titles.split(",").include?(tag)
   end
 end

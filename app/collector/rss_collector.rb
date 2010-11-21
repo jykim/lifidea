@@ -11,20 +11,34 @@ class RSSCollector < Collector
       IO.read("#{RAILS_ROOT}/test/fixtures/sources/#{@src.itype}.xml")
     else read_uri(@src, (o[:postfix]||''))
     end
-    #puts feed_text
-    feed_text.gsub!(/prism:category/,"category") if @src.uri =~ /citeulike/
-    #debugger
     return nil if !@src.update_sync_content(feed_text) && !o[:force]
+    
+    # Getting ready for source-specific processing
+    feed_text.gsub!(/prism:category/,"category") if @src.uri =~ /citeulike/
+    query_text, result_count = nil, 0
+
     feed_data = parse_by_feedzirra(feed_text, @src) #
     feed_data.reverse.map_with_index do |e,i|
+      #puts e.inspect
+      #debugger
       # source-specific processing
       itype = case @src.title
       when 'Web History'
-        e.delete(:content)
-        e[:metadata][:tag_list].gsub!(" ","_")
-        case e[:metadata][:tag_list]
-        when /query/ : "query"
+        type, content = e[:metadata][:tag_list], e[:content]
+        e[:metadata][:tag_list] = "" ; e.delete(:content)
+        case type
+        when /query/
+          if content =~ /(\d+) result\(s\)/
+            query_text, result_count = e[:title], ($1).to_i
+            e[:did] = e[:title].to_id
+          end
+          "query"
         else
+          if result_count > 0
+            #puts "query : #{query_text}"
+            e[:metadata][:query] = query_text
+            result_count -= 1
+          end
           "webpage"
         end
       else

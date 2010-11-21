@@ -81,6 +81,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  builder
   daemons
   fastercsv
   feedzirra

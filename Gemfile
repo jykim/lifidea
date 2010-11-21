@@ -34,3 +34,4 @@ gem 'yard'
 #gem 'thoughtbot-shoulda'#, :require => "shoulda", :git => "http://gems.github.com"
 gem 'rspec'
 #gem 'rspec-rails'
+gem 'builder'

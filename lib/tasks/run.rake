@@ -70,14 +70,14 @@ namespace :run do
     input = ENV['input'] || get_learner_input_file($method)
     #puts input
     weights = ENV['weights'] || get_learner_output_file($method)
-    learner = WeightLearner.new
+    learner = Learner.new
     case $method
     when 'ranksvm' : learner.learn_by_ranksvm(input, weights)
     when 'liblinear' : learner.learn_by_liblinear(input, weights, :ll_type=>ENV['ll_type'])
     when 'libsvm' : learner.learn_by_libsvm(input, weights, :ls_type=>ENV['ls_type'])
     when 'grid'
       input_data = case $type
-      when /con|doc/ : WeightLearner.parse_ranksvm_input((ENV['input'] || get_learner_input_file('ranksvm'))+"#{ENV['train_ratio']}.train")
+      when /con|doc/ : Learner.parse_ranksvm_input((ENV['input'] || get_learner_input_file('ranksvm'))+"#{ENV['train_ratio']}.train")
       when "csel" : read_csv(input+"#{ENV['train_ratio']}.train")
       end
       #debugger
@@ -91,6 +91,13 @@ namespace :run do
   task(:searcher => :environment) do
     $profile = true if ENV['profile']
     require 'lib/daemons/searcher'
+  end
+
+  
+  desc "Run Searcher"
+  task(:extractor => :environment) do
+    te = TaxonomyExtractor.new
+    te.extract
   end
 
   task(:searcher_client => :environment) do

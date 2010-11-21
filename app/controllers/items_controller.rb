@@ -20,7 +20,7 @@ class ItemsController < ApplicationController
     conditions = {:hidden_flag=>false}
     conditions.merge!({:source_id=>params[:source]}) if params[:source] && !params[:source].include?("-1")
     conditions.merge!({:itype=>params[:itype]}) if params[:itype] && !params[:itype].include?("all")
-    @items = Item.searchables.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
+    @items = Item.documents.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
     #Item.all(:conditions=>["basetime > ?",Time.now - 86400], :order=>"basetime desc")
     
     respond_to do |format|
@@ -38,7 +38,7 @@ class ItemsController < ApplicationController
     begin
       #debugger
       @rank_list = search_local('k', @query)
-      #error "Ranklist : #{@rank_list.inspect}"      
+      error "Ranklist : #{@rank_list.inspect}"      
     rescue Exception => e
       error "Search failed!!", e
     end
@@ -48,6 +48,8 @@ class ItemsController < ApplicationController
      :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
   end
   
+  # - Create History & Link
+  # - Log pairwise preference 
   def click
     #debug(params)
     #process_click(params)
@@ -151,9 +153,7 @@ class ItemsController < ApplicationController
     #  @concept = Concept.find(params[:source_id])
     when 'Query'
       content = Item.find(params[:checked_docs]).map{|e|e.to_s(true)}.join("\n") if !params[:checked_docs].blank?
-      @item = Item.find_or_create(params[:query].gsub(/[^\s\w]+/,''), 'concept', :uri=>params[:uri], :content=>content)
-      @item.replace_tags(params[:tags]) if !params[:tags].blank?
-      #puts params.inspect
+      @item = Item.find_by_did(params[:query].to_id)
       params[:checked_docs].each do |dno|
         Link.find_or_create(dno.to_i, @item.id, 'u')
       end

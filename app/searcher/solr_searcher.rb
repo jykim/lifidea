@@ -22,10 +22,23 @@ class SolrSearcher < Searcher
       end
       without :hidden_flag, '1'
     end
+    #debugger
     result.hits.map{|e|{:item=>e.instance, :id=>e.instance.id, :score=>e.score}}
   end
   
-  # Search based on similarity
+  def calc_df(query, tplus = nil, tminus = nil)
+    #debugger
+    #puts query
+    result = Sunspot.search(Item) do
+      keywords query
+      without :itype_str, Item::ITYPE_CONCEPT
+      tplus.each{|e| with :fulltext, "#{e}"} if tplus
+      tminus.each{|e| without :fulltext, "\"#{e}\""} if tminus
+    end
+    result.total
+  end
+  
+  # Search items based on similarity
   # - Find target document
   # - Evaluate similarity query
   # @param [int] item : id of item sought for
@@ -40,13 +53,7 @@ class SolrSearcher < Searcher
     filter_qry = o[:working_set].map{|e|"id_text:#{e}"}.join(" || ") if o[:working_set]
     #debugger
     #puts "[search_by_item] features/weights = #{features.inspect}/#{weights.inspect}"
-    result = if o[:no_cache]
-      calc_sim_features(query_item, type, filter_qry, o)
-    elsif cache_data([item, type, 'result'].join("_"))
-      cache_data([item, type, 'result'].join("_"))
-    else
-      cache_data([item, type, 'result'].join("_"), calc_sim_features(query_item, type, filter_qry, o))
-    end    #weights.map!{|e|Math.max(e,0.0)}
+    result = calc_sim_features(query_item, type, filter_qry, o)
     final_result = result.sort_by{|fts|
       fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
       #fts[0], fts[1] = fts[:id], fts[:score]
@@ -55,44 +62,29 @@ class SolrSearcher < Searcher
     final_result
   end
   
-  # Calculate Indirect Concept Similarity
-  def get_concept_feature(doc1, doc2)
-    result = []
-    @clf.read_links('e',doc1).each do |k,v|
-      @clf.read_links('e',doc2).each do |k2,v2|
-        if k == k2 
-          result << 3 * v * v2
-        else
-          result << @clf.read('k',k,k2) * v * v2
-        end
-      end
-    end
-    #p result
-    result.mean
-  end
-  
-  # Get tag or concept overlap feature
-  def get_overlap_feature(ltype, item1, item2)
-    @clf.read_links(ltype, item1.id).keys.overlap(@clf.read_links(ltype, item2.id).keys)
-  end
-  
+  # Calculate similarity feature values 
+  # - Connect to Solr for feature value calculation
+  # - Cache the results
+  # @param [Bool] :no_cache : disble result cacheing
   def calc_sim_features(query_item, type, filter_qry, o={})
     #puts "[calc_sim_features] query_item = #{query_item} #{filter_qry}"
-    #debugger
-    result = []
+    
+    if !o[:no_cache] && cache_data([query_item, type, 'result'].join("_"))
+      return cache_data([query_item, type, 'result'].join("_"))
+    end
+
     # Initial Solr Query
+    result = []
     solr = RSolr.connect :url=>Conf.solr_server
-    #puts "Connect to #{Conf.solr_server}"
     begin
-      solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , 
-        "mlt.fl" => "title_text,content_text,metadata_text,uri_text,itype_text", "mlt.mintf" => 1, "mlt.mindf" => 5, "mlt.boost"=>true, "rows" => (o[:rows] || 50)
+      solr_result = solr.request "/mlt", :q => "id:\"Item #{query_item.id}\"",:fl => "*,score", :fq =>filter_qry , "rows" => (o[:rows] || 50), 
+        "mlt.fl" => "title_text,content_text,metadata_text,uri_text,itype_text", "mlt.mintf" => 1, "mlt.mindf" => 5, "mlt.boost"=>true
       Item.find(solr_result['response']['docs'].map{|e|e["id"].split(" ")[1]}).
         each{|i| $items[i.id] = cache_data("item_#{i.id}", i)}  
     rescue Exception => e
       error "[search_by_item] Error in Calling Solr", e
       return result
     end
-    #puts "Solr Result for : #{solr_result['response']['docs'].map{|e|e["id"]}.inspect}"
     
     # Feature Vector generation
     solr_result['response']['docs'].each do |e|
@@ -103,7 +95,7 @@ class SolrSearcher < Searcher
         item = $items[e["id"].to_i]
         #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
         fts = {:id=>item.id, :content=>(e["score"]/2)}
-        fts[:tag]   = item.tag_titles.overlap(query_item.tag_titles) #get_overlap_feature('s', item, query_item)
+        #fts[:tag]   = item.tag_titles.overlap(query_item.tag_titles) #get_overlap_feature('s', item, query_item)
         fts[:title] = (item.title || "").word_sim(query_item.title || "")
         fts[:time]  = (item.basetime - query_item.basetime ).normalize_time
         case type
@@ -128,26 +120,11 @@ class SolrSearcher < Searcher
       rescue Exception => e
         error "[search_by_item] Error in #{query_item} -> #{item}", e
         next
-      end
+      end#begin
       result << fts
-    end
-    result
-  end
-  
-  def log_preference(query_item, type, click_position, o={})
-    $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt", 'a')
+    end#each
     
-    result = search_by_item(query_item, type)
-    last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i
-    #debugger
-    log = result[0..(click_position-1)].reverse.map_with_index{|e,i|
-      [((i==0)? 2 : 1), "qid:#{last_query_no}", e, "# #{query_item} -> #{e[:id]}" ]
-    }
-    if !o[:export_mode]
-      #$clf.increment('c', dnos[0], dnos[1])
-      SysConfig.find_by_title("LAST_QUERY_NO").update_attributes(:content=>(last_query_no+1)) 
-    end
-    $f_li.puts log.map{|e|e.join(" ")}.join("\n") if log.size > 1
-    $f_li.flush
+    cache_data([query_item, type, 'result'].join("_"), result) if !o[:no_cache]
+    return result
   end
 end

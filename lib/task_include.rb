@@ -1,5 +1,5 @@
 #ENV['RAILS_ENV'] = 'production' if ARGV.find_all{|e|e=='--p'}.size > 0
-$renv = ENV['RAILS_ENV']
+$renv = ENV['RAILS_ENV'] ||= 'development'
 $task_flag = true
 $cache = {} if !$cache
 #puts "Running on #$renv environment..."

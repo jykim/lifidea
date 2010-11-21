@@ -69,7 +69,9 @@ class Collector #< ApplicationController
           warn "[collect] Document #{doc_db.did} filtered out!"
           doc_db.destroy
         else
-          doc_db.add_tags(doc[:metadata][:tag_list], "s") unless doc[:metadata][:tag_list].blank?
+          doc[:metadata][:tag_list].split(",").each{|e|doc_db.create_and_link(e, 'tag','t')} unless doc[:metadata][:tag_list].blank?
+          doc_db.create_and_link(doc[:metadata][:query], 'query','q') if doc[:metadata][:query]
+          #doc_db.add_tags(doc[:metadata][:tag_list], "s") unless doc[:metadata][:tag_list].blank?
           doc_db.process_all
           saved_count += 1
           doc_db.save

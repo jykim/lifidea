@@ -1,60 +1,9 @@
-class WeightLearner
+class Learner
   LL_TYPE_DEF = 5
   LS_TYPE_DEF = 0
   
   def initialize()
     
-  end
-  
-  def self.evaluate_sim_search_with(input_data, type, weights, o={})
-    result = {}
-    #puts weights.inspect
-    searcher = SolrSearcher.new
-    #debugger
-    input_data.each do |ids|
-      query, rel = ids[0].to_i, ids[1].to_i
-      #puts "Query : #{query} -> Rel : #{rel}"
-      #debugger
-      rank_list = searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
-      #puts rank_list.inspect
-      result[query] = Searcher.recip_rank(rank_list, rel)
-    end
-    [result.values.mean, weights].flatten
-  end
-  
-  def self.evaluate_keyword_search_with(input_data, weights = nil, o={})
-    result = {}
-    if !$searcher
-      $searcher = Searcher.new(o)
-      $searcher.load_documents()
-    end
-    $searcher.parse_rule(o[:rule]) if o[:rule]
-    input_data.each do |l|
-      o.merge!(:col_scores=>WeightLearner.get_col_scores(l, weights)) if weights
-      rank_list = $searcher.search_by_keyword(l[:query], o)
-      result[l[:qid]] = Searcher.recip_rank(rank_list, l[:did])
-      debug "Q[#{l[:qid]}] #{result[l[:qid]]} (#{o[:rule]} / #{l[:query]} )"
-    end
-    [result.values.mean, weights].flatten
-  end
-  
-  # Get collection-level score 
-  # @param [Array<String>] input_line : each line of input_data
-  def self.get_col_scores(input_line, weights)
-    $cols.map_hash{|col|
-      [col, ($cs_types || Searcher::CS_TYPES).map_with_index{|cs_type,i|input_line[[cs_type, col].join('_').to_sym].to_f * weights[i] }.sum]}
-  end
-  
-  # @param [Array] input_data : parsed csv of input_learner_col*
-  def self.evaluate_csel_with(input_data, weights, o={})
-    result = {}
-    col_scores = []
-    input_data.each_with_index do |l,i|
-      col_scores[i] = WeightLearner.get_col_scores(l, weights)
-      #p values_col.max_pair
-      result[l[:qid]] = (l[:itype] == col_scores[i].max_pair[0])? 1.0 : 0.0
-    end
-    [result.values, weights, col_scores]#.flatten
   end
   
   def self.parse_ranksvm_input(filename)
@@ -91,8 +40,8 @@ class WeightLearner
     search_method.search(3) do |xvals , yvals , type , remote|
       #do_retrieval_at(xvals , yvals.map{|e|(e.to_s.scan(/e/).size>0)? 0.0 : e} , $o.merge(:remote_query=>remote))[$opt_for]
       results << case $type
-      when /con|doc/ : WeightLearner.evaluate_sim_search_with(input_data, $type, yvals, o)
-      when 'csel': WeightLearner.evaluate_csel_with(input_data, yvals, o)
+      when /con|doc/ : Evaluator.evaluate_sim_search_with(input_data, $type, yvals, o)
+      when 'csel': Evaluator.evaluate_csel_with(input_data, yvals, o)
       end
       #puts results.inspect
       #puts "[learn_by_grid_search] perf = #{results[-1][0]} at #{yvals.inspect}"

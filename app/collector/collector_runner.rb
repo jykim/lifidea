@@ -37,3 +37,4 @@ def run_collector(o = {})
   warn "[run_collector] #{counts.values.sum} collected (#{counts.inspect})"
   counts.values.sum
 end
+#puts File.basename(__FILE__)

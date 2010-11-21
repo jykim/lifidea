@@ -63,15 +63,15 @@ class Indexer
       item.update_attributes! :content=>item.link_items[0..25].find_all{|e|e.document?}.map{|e|e.to_s(true)}.join("\n")
     end
     # Extract concept occurrences
-    concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}
+    #concepts = @ch.find_concepts(item.index_fields.values.join(" ")).map{|c|c[0]}
     #debug "[index_item] concepts in  #{item.title} = #{concepts.uniq.inspect}" if concepts.size > 0
-    concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>1) }
+    #concepts.group_by{|c|c}.each{|k,v| Link.find_or_create(item.id, k, "e", :weight=>1) }
     
     # Extract concept co-occurrence
     # - count increases whenever the item is re-indexed!
-    concepts.uniq.to_comb.each do |pair|
-      Link.find_or_create(pair[0],pair[1],"o", :add=>1)
-    end
+    #concepts.uniq.to_comb.each do |pair|
+    #  Link.find_or_create(pair[0],pair[1],"o", :add=>1)
+    #end
   end
   
   # Parse target docs with Apache Tika and fill title & contents
@@ -106,6 +106,7 @@ class Indexer
         open(doc.uri) do |f|
           #puts "Content : #{f.read}"
           doc.write_attribute(:content,clear_webpage(f.read))
+          doc.save!
         end
         #debugger
       end

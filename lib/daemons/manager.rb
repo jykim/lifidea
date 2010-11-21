@@ -10,7 +10,7 @@ while($running) do
     row = e.split(/\s+/)
     procs[row[1]] = {:user=>row[0],:cpu=>row[2],:pmem=>row[3],:time=>row[4],:cmd=>row[5..-1].join(" ")}
   end
-  target_procs = procs.find_all{|k,v|v[:user] == ENV['USER'] && v[:cmd] =~ /#{$rails_env}/ && (v[:cmd] =~ /#$app_id/ || v[:cmd] =~ /-p #$server_port/)}
+  target_procs = procs.find_all{|k,v|v[:user] == ENV['USER'] && v[:cmd] =~ /#{$rails_env}/ && (v[:cmd] =~ /#$app_id/ || v[:cmd] =~ /-p #{Conf.webserver_port}/)}
   #(v[:cmd] =~ /\.rb/ || v[:cmd] =~ /memcache/ || v[:cmd] =~ /solr/ || v[:cmd] =~ /ruby.*?server/) && !(v[:cmd] =~ /manager\.rb|_monitor/)
   target_procs.each do |e|
     if $command == 'killall'

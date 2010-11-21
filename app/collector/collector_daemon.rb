@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + "/../../lib/daemon_include.rb"
-require File.dirname(__FILE__) + "/../../app/collector/collector_runner.rb"
+require 'collector/collector_runner'
 
 while($running) do
   $lgr.info "[collector.rb] Job started at #{Time.now}.\n"
