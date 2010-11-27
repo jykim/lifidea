@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-ENV['RAILS_ENV'] = $rails_env = ARGV[1] || 'development'
+$rails_env = ARGV[1] || ENV['RAILS_ENV']
 #require File.dirname(__FILE__) + '/../config/boot'
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'ddl_include.rb'

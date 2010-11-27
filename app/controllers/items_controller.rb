@@ -61,7 +61,7 @@ class ItemsController < ApplicationController
                    :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
 
     @facet[:source_id] = $searcher.process_request('k', @query, params.merge(:facet=>:source_id)).
-                          map{|e|["#{e.instance.title} (#{e.count})", e.value]}    
+                          find_all{|e|e.instance}.map{|e|["#{e.instance.title} (#{e.count})", e.value]}    
 
     @facet[:itype_str] = $searcher.process_request('k', @query, params.merge(:facet=>:itype_str)).
                           map{|e|["#{e.value} (#{e.count})", e.value]}

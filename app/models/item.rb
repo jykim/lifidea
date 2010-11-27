@@ -63,13 +63,19 @@ class Item < ActiveRecord::Base
     integer(:source_id, :references=>Source) { source_id }
     # Index metadata fields
     Item.metadata_fields.each do |field,type|
-      case type
-      when :multi_string : string(field, :multiple=>true) { (metadata||{}).fetch(field,"").split(',') }
-      when :string       : string(field) { (metadata||{}).fetch(field,"") }
-      when :integer      : integer(field){ (metadata||{}).fetch(field,"") }
-      when :float        : float(field)  { (metadata||{}).fetch(field,"") }
-      when :time         : time(field)   { (metadata||{}).fetch(field,"") }
-      end
+      begin
+        case type
+        when :multi_string : string(field, :multiple=>true) { 
+          ((metadata||{}).fetch(field,"")||"").split(',') }
+        when :string       : string(field) { (metadata||{}).fetch(field,"") }
+        when :integer      : integer(field){ (metadata||{}).fetch(field,"") }
+        when :float        : float(field)  { (metadata||{}).fetch(field,"") }
+        when :time         : time(field)   { (metadata||{}).fetch(field,"") }
+        end        
+      rescue Exception => e
+        puts "[searchable] #{e}"
+        next
+      end#begin
     end
   end
   
