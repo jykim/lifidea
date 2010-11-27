@@ -27,7 +27,7 @@
 <p>
   <b>Metadata:</b> <br>
 	<table border='1' cellspacing=0 cellpadding=2>
-  <%= (@item.metadata||{}).find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
+  <%= raw (@item.metadata||{}).find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
 	</table>
 </p>
 
@@ -44,7 +44,7 @@
 	<tr>
 		<% header = ['time','type','title'] %>
 		<% (header << 'score').concat(Searcher::DOC_FEATURES) if (Conf.debug || params[:debug]) %>
-		<%= header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
+		<%= raw header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 	</tr>
 	<% @rel_docs.each_with_index do |e,i| %>
 		<% item = cache_data("item_#{e[:id]}") %>

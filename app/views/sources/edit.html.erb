@@ -17,7 +17,7 @@
   </p>
   <p>
     <%= f.label :option %><br />
-    <%= f.text_area :option %>
+    <%= text_area_tag "source[option]", @source.option.to_yaml, :size=>'30x10' %>
   </p>
   <p>
     <%= f.label :active_flag %><br />

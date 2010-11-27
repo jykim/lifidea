@@ -1,4 +1,5 @@
 require 'ddl_include'
+
 class ItemsController < ApplicationController
   before_filter :authorize, :except => [:login, :index, :show_content, :search, :click]
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
@@ -11,12 +12,13 @@ class ItemsController < ApplicationController
   def source_given?
     params && params[:source]
   end
-  
+
   # GET /items
   # GET /items.xml
-  def index
+  def index_old
     @start_at = params[:start_at] || Time.now.years_ago(1).to_date.to_s
     @end_at = params[:end_at] || (Date.tomorrow+1).to_s
+    #@options = 
     conditions = {:hidden_flag=>false}
     conditions.merge!({:source_id=>params[:source]}) if params[:source] && !params[:source].include?("-1")
     conditions.merge!({:itype=>params[:itype]}) if params[:itype] && !params[:itype].include?("all")
@@ -29,23 +31,51 @@ class ItemsController < ApplicationController
     end
   end
   
+  # GET /items
+  # GET /items.xml
+  def index
+    redirect_to :action=>:search, :query=>TEXT_DUMMY, :order=>:recency, :doc_only=>true
+  end
+  
   # Process search action
   # - add query as item
   def search
+    info params.inspect
     @query = params[:query]
-    info "Query : #{@query}"
-    @query_did = [get_user_id(),@query].join(" ").to_id
+    $searcher = SolrSearcher.new
+    @facet = {}
+    @page_title = if @query == TEXT_DUMMY
+      "All Documents"
+    else
+      "Search Result for '#{@query}'"
+    end
     begin
       #debugger
-      @rank_list = search_local('k', @query)
-      error "Ranklist : #{@rank_list.inspect}"      
+      @search_results = $searcher.process_request('k', @query, params)
+      error "search_results : #{@search_results.inspect}"      
     rescue Exception => e
       error "Search failed!!", e
     end
+    @rank_list = @search_results.hits.map{|e|{:item=>e.instance, :id=>e.instance.id, :score=>e.score}}
+    @query_doc = Item.find_or_create(@query, 'query', :uri=>request.url, 
+                   :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
+
+    @facet[:source_id] = $searcher.process_request('k', @query, params.merge(:facet=>:source_id)).
+                          map{|e|["#{e.instance.title} (#{e.count})", e.value]}    
+
+    @facet[:itype_str] = $searcher.process_request('k', @query, params.merge(:facet=>:itype_str)).
+                          map{|e|["#{e.value} (#{e.count})", e.value]}
+    
+    @facet[:basedate] = $searcher.process_request('k', @query, params.merge(:facet=>:basedate)).
+                          find_all{|e|Time.now - e.value < 86400*7}.map{|e|["#{e.value.to_date} (#{e.count})", e.value]}.reverse
+
+    #debugger
+    Item.metadata_fields(params[:facet_itype_str]).each do |field, type|
+      @facet[field] = $searcher.process_request('k', @query, params.merge(:facet=>field)).
+                        map{|e|["#{e.value} (#{e.count})", e.value]}
+    end
     #@docs = Item.find(@rank_list.map{|e|e[0]}).map_hash{|d|[d.id, d]}
     #debugger
-    @query_doc = Item.find_or_create(@query, 'query', :uri=>request.url, 
-     :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
   end
   
   # - Create History & Link
@@ -62,13 +92,14 @@ class ItemsController < ApplicationController
       $searcher.log_preference(params[:src_item_id].to_i, params[:htype] , params[:position].to_i)
       #search_remote('c', "#{params[:src_item_id]}|#{params[:skipped_items]}", :jtype=>'log')
     end
-    redirect_to :action=>:show
+    redirect_to :action=>:show, :id=>params[:id]
   end
 
   # GET /items/1
   # GET /items/1.xml
   def show
     @item = Item.find(params[:id])
+    @page_title = @item.title
     @link_docs, @link_cons = [], []
     $items = {}
     #if @item.concept?

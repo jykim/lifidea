@@ -2,6 +2,7 @@ class SolrSearcher < Searcher
   attr_accessor :items
   def initialize(o={})
     super(o)
+    nil
   end
   
   def open_index(o={})
@@ -16,14 +17,25 @@ class SolrSearcher < Searcher
     result = Sunspot.search(Item) do
       keywords query
       if o[:doc_only]
-        without :itype_str, ['query','concept']
-      else
-        without :itype_str, 'query'
+        without :itype_str, ['query','concept','tag']
       end
+      #debugger
+      o.find_all{|k,v|k.to_s =~ /^facet\_/}.each do |e|
+        #debugger
+        with (e[0].to_s.split('_')[1..-1].join('_')).to_sym, e[1] if [e[1]].flatten.first != '-1'
+      end
+      #debugger
+      order_by(:basetime, :desc) if o[:order] == "recency"
+      paginate(:page => o[:page]) if o[:page]
+      facet(o[:facet]) if o[:facet]
       without :hidden_flag, '1'
     end
     #debugger
-    result.hits.map{|e|{:item=>e.instance, :id=>e.instance.id, :score=>e.score}}
+    if o[:facet]
+      result.facet(o[:facet]).rows
+    else
+      result
+    end
   end
   
   def calc_df(query, tplus = nil, tminus = nil)

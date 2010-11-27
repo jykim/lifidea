@@ -1,26 +1,26 @@
 <p>
   <b>Title:</b>
-  <%=h @source.title %>
+  <%= @source.title %>
 </p>
 
 <p>
   <b>Dtype:</b>
-  <%=h @source.itype %>
+  <%= @source.itype %>
 </p>
 
 <p>
   <b>Uri:</b>
-  <%=h @source.uri %>
+  <%= @source.uri %>
 </p>
 
 <p>
   <b>Option:</b>
-  <%=h @source.option %>
+  <%= simple_format @source.option.to_yaml %>
 </p>
 
 <p>
   <b>Active:</b>
-  <%=h @source.active_flag %>
+  <%= @source.active_flag %>
 </p>
 
 

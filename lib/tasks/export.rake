@@ -5,7 +5,7 @@ require 'extractor/stat_extractor'
 def extract_fixture_from(table_name, o = {})
   i = "000"
   sql = "SELECT * FROM %s"
-  path = o[:path] || "#{RAILS_ROOT}/db/backup_#{Time.now.ymd}"
+  path = o[:path] || "#{Rails.root}/db/backup_#{Time.now.ymd}"
   Dir.mkdir( path ) if !File.exist?( path )
   debug "[extract_fixture_from] exporting to #{path}/#{table_name}.yml"
   File.open("#{path}/#{table_name}.yml", 'w') do |file| 
@@ -18,11 +18,12 @@ def extract_fixture_from(table_name, o = {})
 end
 
 namespace :export do
+  
   desc "Export Documents into Text File"
   task(:docs => :environment) do
     path = ENV['dirname'] || "data/docs"
-    annotation = ENV['annotation'] || true
-    ch = Indexer.init_concept_hash() if annotation
+    #annotation = ENV['annotation'] || true
+    #ch = Indexer.init_concept_hash() if annotation
     Dir.mkdir( path ) if !File.exist?( path )
     Item.valid.documents.between($start_at, $end_at).all(:conditions=>{:itype=>Item.itype_lists}).each_with_index do |d,i|
       next if ENV['id'] && ENV['id'].to_i != d.id
@@ -40,6 +41,18 @@ namespace :export do
       File.open("#{path}/doc_#{d.itype}_#{d.id}_#$renv.txt",'w'){|f|f.puts str}
       puts str if ENV['id']
     end
+  end
+  
+  desc "Export Qrels into Text File"
+  task(:qrels => :environment) do
+    filename = ENV['filename'] || "data/items_#$renv.csv"
+    result = []
+    itype = ENV['itype'] || 'all'
+    Item.valid.between($start_at, $end_at).itype(itype).each_with_index do |e,i|
+      puts "#{i}th item processed..." if i % 50 == 0 && i > 0
+      result << [e.id, e.basetime, e.itype, e.title, e.did, e.uri, e.hidden_flag_before_type_cast, e.query_flag_before_type_cast, e.tag_titles.sort.join(",")]
+    end
+    write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'query_flag' ,'tags']
   end
   
   desc "Export Items along with Tags into Text File"

@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + "/../../lib/daemon_include.rb"
 
 $rails_env ||= (ARGV[1] || "production")
 $command ||= ARGV[0]
-$app_id = File.basename(RAILS_ROOT)#Conf.app_id || 
+$app_id = File.basename(Rails.root)#Conf.app_id || 
 puts "[#$command] :: #{$app_id} in #$rails_env"
 while($running) do
   procs = {}

@@ -1,5 +1,6 @@
 #require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-$LOAD_PATH << "#{RAILS_ROOT}/rubylib" <<"#{RAILS_ROOT}/app" <<"#{RAILS_ROOT}/lib"
+$LOAD_PATH << "#{::Rails.root.to_s}/rubylib" <<"#{::Rails.root.to_s}/app" <<"#{::Rails.root.to_s}/lib"
+TEXT_DUMMY = 'dummydummy'
 #debugger
 require "rubylib_include.rb"
 #require "searcher/pd_lib.rb"
@@ -26,8 +27,7 @@ require 'searcher/searcher_client'
 require 'learner/learner'
 require 'learner/evaluator'
 
-$lgr_e = Logger.new( File.expand_path(File.dirname(__FILE__) + "/../log/#{ENV["RAILS_ENV"]}_error.log") )
-
+#ENV['RAILS_ENV'] = Rails.env
 # For graceful termination of daemon processes
 $running = true
 Signal.trap("TERM") do 

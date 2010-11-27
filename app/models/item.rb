@@ -1,7 +1,8 @@
 #require 'searcher/more_like_this'
 
 class Item < ActiveRecord::Base
-  #include TagHelper#, IndexHelper
+  include IndexHelper
+  #include TagHelper
   include MetadataHelper, RuleHelper, MarkupHelper
   ITYPE_CONCEPT = ['tag','person','query']
   ITYPE_DOCUMENT = ['webpage','bookmark_webpage','email','email_memo','paper','blog','tweet','pub']
@@ -27,34 +28,49 @@ class Item < ActiveRecord::Base
 
   attr_accessor :score
   
-  named_scope :between, lambda{|start_at, end_at| {:conditions=>
-    ["basetime >= ? and basetime < ?", start_at, end_at]}}
+  scope :between, lambda{|start_at, end_at| where("basetime >= ? and basetime < ?", start_at, end_at)}
     
-  named_scope :itype, lambda{|itype| {:conditions=>
-      ((itype=='all')? [] : ["itype = ?", itype])}}
+  scope :itype, lambda{|itype| where((itype=='all')? [] : ["itype = ?", itype])}
   
-  named_scope :valid, {:conditions=>{:hidden_flag=>false}}
+  scope :valid, where(:hidden_flag=>false)
 
-  named_scope :unmodified, {:conditions=>{:modified_flag=>false}}
+  scope :unmodified, where(:modified_flag=>false)
   
-  #named_scope :indexed, {:conditions=>["textindex is not null"]}
+  scope :concepts, where(:itype=>ITYPE_CONCEPT)
+  scope :queries, where(:itype=>['query'])
+  scope :documents, where("itype != ? and itype != ? and itype != ?",'tag','query', 'concept')
+  scope :searchables, where("itype != ?",'query')
   
-  named_scope :concepts, {:conditions=>{:itype=>ITYPE_CONCEPT}}
-  named_scope :queries, {:conditions=>{:itype=>['query']}}
-  named_scope :documents, {:conditions=>["itype != ? and itype != ? and itype != ?",'tag','query', 'concept']}
-  named_scope :searchables, {:conditions=>["itype != ?",'query']}
+  # List metadata fields 
+  def self.metadata_fields(itype = 'all')
+    #result = {:tag_list=>:multi_string}#size
+    result = {}
+    result.merge! :from=>:string, :to=>:string if ['email', 'all'].include? itype
+    result.merge! :start_at=>:time if ['calendar', 'all'].include? itype
+    result.merge! :tag_list=>:multi_string, :pub_year=>:string, :author=>:string if ['paper', 'all'].include? itype
+    result.merge! :tag_list=>:multi_string if ['webpage', 'all'].include? itype
+    result
+  end
   
   # Sunspot/Solr search indexing  
   searchable do
     text :title, :content, :uri, :itype, :metadata, :id
+    text(:dummy) {TEXT_DUMMY}
     string :hidden_flag
-    string :itype_str do
-      itype.to_s.squeeze.downcase
+    time :basetime
+    time(:basedate) {basetime.to_date}
+    string(:itype_str) { itype.to_s.squeeze.downcase }
+    integer(:source_id, :references=>Source) { source_id }
+    # Index metadata fields
+    Item.metadata_fields.each do |field,type|
+      case type
+      when :multi_string : string(field, :multiple=>true) { (metadata||{}).fetch(field,"").split(',') }
+      when :string       : string(field) { (metadata||{}).fetch(field,"") }
+      when :integer      : integer(field){ (metadata||{}).fetch(field,"") }
+      when :float        : float(field)  { (metadata||{}).fetch(field,"") }
+      when :time         : time(field)   { (metadata||{}).fetch(field,"") }
+      end
     end
-    #text :fulltext do
-    #  [title, content, uri, metadata].join(" ")
-    #end
-    #more_like_this :title, :content, :uri, :itype
   end
   
   def concept?
@@ -62,7 +78,7 @@ class Item < ActiveRecord::Base
   end
   
   def document?
-    !['concept','person','query'].include?(itype)#ITYPE_DOCUMENT.include?(itype)
+    !['concept','person','query'].include?(itype)
   end
   
   def link_items
@@ -119,6 +135,12 @@ class Item < ActiveRecord::Base
     item.update_attributes!(o.merge(:title=>title, :did=>did, :itype=>itype, :source_id=>(o[:source_id] || 1), 
       :basetime=>(o[:basetime] || Time.now.in_time_zone(TIMEZONE))))
     item
+  end
+  
+  def process_all
+    process_metadata
+    process_markup if source && source.o[:use_markup]
+    process_rules(Rule.tag_rules)
   end
   
   def self.count_docs

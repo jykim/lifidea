@@ -11,7 +11,7 @@ class LogCollector < Collector
   FILES_IN_BATCH = 50 # Max. no of files processsed at a time
   
   def self.get_fixture_file(file_name, folder_name = "sources")
-    File.join(RAILS_ROOT, "test", "fixtures", folder_name ,file_name)
+    File.join(Rails.root, "test", "fixtures", folder_name ,file_name)
   end
   
   def read_from_source(o = {})

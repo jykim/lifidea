@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # You might want to change this
-ENV["RAILS_ENV"] ||= "production"
+scope ||= "production"
 
 require File.dirname(__FILE__) + "/../../config/environment"
 

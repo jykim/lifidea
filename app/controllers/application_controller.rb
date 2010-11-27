@@ -1,10 +1,8 @@
-# Filters added to this controller apply to all controllers in the application.
-# Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
+  protect_from_forgery
   include AdminHelper, ItemsHelper
   layout "default"
-  before_filter :init_controller
+  #before_filter :init_controller
   helper :all # include all helpers, all the time
   #before_filter :authorize, :except => :login 
 
@@ -29,16 +27,5 @@ protected
 
   def item_concept?
     Item.find(params[:id]).concept?
-  end
-  
-  def init_controller
-    #error "[init_controller] initializing... #{cache_data("exists")}"
-    #if !cache_data("exists")
-    #  #debugger
-    #  error "[init_controller] searcher initializd..."
-    #  $searcher = SolrSearcher.new
-    #  $searcher.open_index()
-    #  cache_data("exists", "true")
-    #end
   end
 end

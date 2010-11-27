@@ -55,7 +55,7 @@ class Searcher
     end
     
     begin
-      weight_hash = IO.read(read_recent_file_in(RAILS_ROOT+"/data/learner_output", :filter=>/#{ENV['RAILS_ENV']}.*#{type}.*#{rank}/)).
+      weight_hash = IO.read(read_recent_file_in(Rails.root+"/data/learner_output", :filter=>/#{ENV['RAILS_ENV']}.*#{type}.*#{rank}/)).
         split("\n")[0].split(" ")[1..-1].map_hash{|e|r = e.split(":") ; [r[0].to_i, r[1].to_f]}
       result = [] ; 1.upto(features.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0)}
     rescue Exception => e
@@ -73,7 +73,6 @@ class Searcher
     info "[load_features] done!"
     clf
   end
-  
   
   # Calculate Indirect Concept Similarity
   def get_concept_feature(doc1, doc2)
@@ -98,7 +97,7 @@ class Searcher
   
   # 
   def log_preference(query_item, type, click_position, o={})
-    $f_li = File.open(RAILS_ROOT + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt", 'a')
+    $f_li = File.open(Rails.root + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt", 'a')
     
     result = search_by_item(query_item, type)
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i

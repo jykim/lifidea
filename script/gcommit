@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-msg = ARGV.join(" ")
-system("git commit -a -m '#{msg}'")
-system("git push")

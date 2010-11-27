@@ -4,7 +4,7 @@ require 'active_record/fixtures'
 namespace :import do
   desc "Import Rules from File"
   task(:rules => :environment) do
-    read_csv(ENV['path'] || "#{RAILS_ROOT}/data/rules_jykim.csv").each do |r|
+    read_csv(ENV['path'] || "#{Rails.root}/data/rules_jykim.csv").each do |r|
       #debugger
       next unless r[:rid]
       rule = Rule.find_or_initialize_by_rid(r[:rid])
@@ -14,7 +14,7 @@ namespace :import do
   
   desc "Import Items from File"
   task(:items => :environment) do
-    read_csv(ENV['path'] || "#{RAILS_ROOT}/data/items_#$renv.csv").each_with_index do |e,i|
+    read_csv(ENV['path'] || "#{Rails.root}/data/items_#$renv.csv").each_with_index do |e,i|
       #debugger
       next unless e[:id]
       begin
@@ -46,7 +46,7 @@ namespace :import do
   
   desc "Import Links from File"
   task(:links => :environment) do
-    read_csv(ENV['path'] || read_recent_file_in("#{RAILS_ROOT}/data/links", :filter=>/#{ENV['RAILS_ENV']}/)).each do |c|
+    read_csv(ENV['path'] || read_recent_file_in("#{Rails.root}/data/links", :filter=>/#{ENV['RAILS_ENV']}/)).each do |c|
       #debugger
       puts c.inspect
       next unless c[:in_id]
@@ -68,7 +68,7 @@ namespace :import do
   
   desc "Import Documents from File"
   task(:docs => :environment) do
-    read_csv(ENV['path'] || "#{RAILS_ROOT}/data/docs_#$renv.csv").each_with_index do |e,i|
+    read_csv(ENV['path'] || "#{Rails.root}/data/docs_#$renv.csv").each_with_index do |e,i|
       #debugger
       next unless e[:id]
       begin
@@ -83,7 +83,7 @@ namespace :import do
   
   task(:tables => :environment) do
     if ENV['name']
-      fixture_path = ENV['path'] || "#{RAILS_ROOT}/test/fixtures"
+      fixture_path = ENV['path'] || "#{Rails.root}/test/fixtures"
       begin
         Fixtures.create_fixtures(fixture_path, ENV['name'])        
       rescue Exception => e

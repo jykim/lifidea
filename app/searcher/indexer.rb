@@ -8,7 +8,7 @@ class Indexer
   INDEX_FIELD_LIMIT = 20000
   TIMEOUT = 5
   attr_accessor :ch
-  TIKA_PATH = File.join(RAILS_ROOT, "vendor", "tika-0.3-standalone.jar")
+  TIKA_PATH = File.join(::Rails.root.to_s, "vendor", "tika-0.3-standalone.jar")
   
   # Load concept lists in ConceptHash
   def initialize()

@@ -8,7 +8,7 @@ class RSSCollector < Collector
   # @todo refactor source-specific processing
   def read_from_source(o = {})
     feed_text = if ENV['RAILS_ENV'] == 'test'
-      IO.read("#{RAILS_ROOT}/test/fixtures/sources/#{@src.itype}.xml")
+      IO.read("#{Rails.root}/test/fixtures/sources/#{@src.itype}.xml")
     else read_uri(@src, (o[:postfix]||''))
     end
     return nil if !@src.update_sync_content(feed_text) && !o[:force]
@@ -53,7 +53,7 @@ class RSSCollector < Collector
     result = []
     item_per_page = 50
     0.upto(o[:times].to_i) do |i|
-      result_current = read_from_source(o.merge(:postfix=>"start-index=#{i*item_per_page+1}&max-results=#{item_per_page}"))
+      result_current = read_from_source(o.merge(:postfix=>"&start-index=#{i*item_per_page+1}&max-results=#{item_per_page}"))
       result.concat result_current
       break if result_current.size < item_per_page
     end

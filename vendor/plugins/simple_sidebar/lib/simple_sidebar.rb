@@ -29,7 +29,7 @@ module SimpleSidebar
       @sidebars = (obj ? obj.compact : [])
     end    
     def sidebars_path #:nodoc:
-      @@sidebars_path ||= "#{RAILS_ROOT}/app/views/sidebars"
+      @@sidebars_path ||= "#{Rails.root}/app/views/sidebars"
     end
     
     def sidebars_path=(obj) #:nodoc:

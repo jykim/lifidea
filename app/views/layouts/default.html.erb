@@ -13,7 +13,7 @@
 </head>
 <body>
 	<div id="header">
-		<h1>LiFiDeA <%= controller.action_name %> <%= get_cur_env %></h1>
+		<h1><%= @page_title %></h1>
 		<% if flash[:notice] -%> 
 		<h2><%= flash[:notice] %></h2>
 		<% end -%> 
@@ -21,6 +21,10 @@
 		<ul>
 			<li><%= link_to 'Items', :controller => 'items' %></li>
 			<li><%= link_to 'Tags', :controller => 'tags' %></li>
+			<% if session[:admin_flag] %> 
+				<li><%= link_to 'Users', :controller => 'users' %></li>
+				<li><%= link_to 'Sources', :controller => 'sources' %></li>
+			<% end %>
 			<% if session[:user_id] %> 
 			<li><%= link_to 'Logout', :controller => 'admin', :action => 'logout' %> </li>
 			<% else %>
@@ -38,7 +42,7 @@
 					<%= yield :left %>
 				</div>
 				<div class="col3">
-				  <%= render_sidebars %>
+				  <%= raw(render_sidebars) %>
 				</div>
 			</div>
 		</div>

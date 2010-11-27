@@ -1,6 +1,6 @@
 class Stat < ActiveRecord::Base
   
-  named_scope :between, lambda{|start_at, end_at| {:conditions=>
+  scope :between, lambda{|start_at, end_at| {:conditions=>
     ["basedate >= ? and basedate < ?", start_at, end_at]}}
   
   # Weight-averaged value of statistics with given pattern

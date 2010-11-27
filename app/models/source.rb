@@ -4,7 +4,7 @@ class Source < ActiveRecord::Base
   has_many :item
   serialize :option, Hash
   serialize :filter, Hash  
-  named_scope :active, {:conditions=>{:active_flag=>true}}
+  scope :active, {:conditions=>{:active_flag=>true}}
   attr_accessor :last_sync_at
   
   def initialize

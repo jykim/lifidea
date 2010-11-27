@@ -1,7 +1,4 @@
-# Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
-  #include TagsHelper
-
   def clickable_tag_list(tag_list)
     out = []
     tag_list.each do |tag|
@@ -11,6 +8,15 @@ module ApplicationHelper
   end
   
   def get_cur_env
-     " / #{ENV["RAILS_ENV"]}" unless ENV["RAILS_ENV"] == 'production'
+     " / #{Rails.env}" unless Rails.env.production?
+  end
+  
+  def f(arg, o={})
+    case arg.class.to_s
+    when "String"
+      arg[0..o[:limit]] if o[:limit]
+    when "NilClass"
+      ""
+    end
   end
 end

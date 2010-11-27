@@ -49,15 +49,15 @@ def cache_data(key, value = "none")
   trial = 0
   if value == "none"
     if $task_flag
-      $cache[ENV['RAILS_ENV']+'_'+key]
+      $cache[Rails.env+'_'+key]
     else
-      CACHE.get(ENV['RAILS_ENV']+'_'+key)
+      CACHE.get(Rails.env+'_'+key)
     end
   else
     if $task_flag
-      $cache[ENV['RAILS_ENV']+'_'+key] = value
+      $cache[Rails.env+'_'+key] = value
     else
-      CACHE.set(ENV['RAILS_ENV']+'_'+key, value)
+      CACHE.set(Rails.env+'_'+key, value)
     end
     value
   end

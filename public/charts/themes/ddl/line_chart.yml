@@ -1,3 +1,0 @@
-<%= chart :column %>
-  <%=comp :axis_category %>
-    color: ff0000

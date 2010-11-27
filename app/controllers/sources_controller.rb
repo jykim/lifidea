@@ -1,4 +1,5 @@
 class SourcesController < ApplicationController
+  include ApplicationHelper
   # GET /sources
   # GET /sources.xml
   def index

@@ -4,8 +4,8 @@ class Tag < ActiveRecord::Base
   #has_and_belongs_to_many :items
   attr_accessor :occurrence_count
   
-  named_scope :valid, {:conditions=>{:hidden_flag=>false}}
-  named_scope :unmodified, {:conditions=>{:modified_flag=>false}}
+  scope :valid, {:conditions=>{:hidden_flag=>false}}
+  scope :unmodified, {:conditions=>{:modified_flag=>false}}
   
   # Initialize new tag
   def self.find_or_create(title)

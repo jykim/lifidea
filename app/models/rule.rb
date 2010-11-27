@@ -8,11 +8,11 @@ class Rule < ActiveRecord::Base
   end
   
   def self.stat_rules(unit = "")
-    @stat_rules ||= Rule.find(:all, :conditions=>["rtype != 'tag' and (unit = 'all' or unit like ?)","%#{unit}%"])
+    @stat_rules ||= Rule.where("rtype != 'tag' and (unit = 'all' or unit like ?)","%#{unit}%")
   end
   
   def self.tag_rules
-    @tag_rules ||= Rule.find(:all, :conditions=>["rtype = 'tag'"])
+    @tag_rules ||= Rule.where("rtype = 'tag'")
   end
   
   def match_itype(target)

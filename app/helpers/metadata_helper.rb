@@ -4,19 +4,14 @@ module MetadataHelper
     raise DataError, "Invalid textindex #{textindex.inspect}" if metadata.class.to_s != "Hash"
   end
   
-  def process_all
-    process_metadata
-    process_markup if source && source.o[:use_markup]
-    process_rules(Rule.tag_rules)
-  end
-  
+  # Extract different metadata for each item type
   def process_metadata()
     m.merge!(:type=>itype)
     result = case itype
     when 'calendar'
       calendar_metadata_handler
-    when 'todo'
-      todo_metadata_handler
+    #when 'todo'
+    #  todo_metadata_handler
     when 'email'
       email_metadata_handler
     else
@@ -53,6 +48,6 @@ module MetadataHelper
   
   def email_metadata_handler()
     #debugger
-    #metadata = metadata.find_all{|k,v|[:from,:date,:to].include?(k)}.map_hash{|e|[e[0].to_sym,e[1]]}
+    metadata = metadata.find_all{|k,v|[:from,:date,:to].include?(k)}.map_hash{|e|[e[0].to_sym,e[1]]}
   end
 end

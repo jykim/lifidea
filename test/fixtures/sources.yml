@@ -173,12 +173,12 @@ sources_012:
 sources_008: 
   updated_at: 2009-09-11 20:53:54
   sync_at: 2009-09-11 20:53:54
-  uri: file://<%= RAILS_ROOT %>/test/fixtures/sources/app_log.txt
+  uri: file://<%= Rails.root %>/test/fixtures/sources/app_log.txt
   sync_interval: 
   sync_content: 
   option: "--- \n\
     :unit: :item\n\
-    :copy_daily_from: <%= RAILS_ROOT %>/test/fixtures/sources_bak\n"
+    :copy_daily_from: <%= Rails.root %>/test/fixtures/sources_bak\n"
   title: App Log
   itype: app_log
   active_flag: "0"
@@ -188,7 +188,7 @@ sources_008:
 sources_013: 
   updated_at: 2009-09-11 20:53:54
   sync_at: 
-  uri: file://<%= RAILS_ROOT %>/test/fixtures/docs/trec
+  uri: file://<%= Rails.root %>/test/fixtures/docs/trec
   sync_interval: 
   sync_content: 
   option: "--- \n\
@@ -204,7 +204,7 @@ sources_013:
 sources_015: 
   updated_at: 2009-09-11 20:53:54
   sync_at: 2009-09-11 20:53:54
-  uri: file://<%= RAILS_ROOT %>/test/fixtures/docs/others
+  uri: file://<%= Rails.root %>/test/fixtures/docs/others
   sync_interval: 
   sync_content: 
   option: "--- \n\

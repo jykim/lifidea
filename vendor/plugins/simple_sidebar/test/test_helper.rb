@@ -1,6 +1,6 @@
 def __DIR__; File.dirname(__FILE__); end
 
-RAILS_ROOT = File.join(File.dirname(__FILE__), '..')
+Rails.root = File.join(File.dirname(__FILE__), '..')
 
 $:.unshift(__DIR__ + '/../lib')
 begin

@@ -13,8 +13,7 @@
   <tr>
     <td><%=h source.title %></td>
     <td><%=h source.itype %></td>
-    <td><%=h source.uri %></td>
-    <td><%=h source.option %></td>
+    <td><%=f source.uri, :limit=>20 %></td>
     <td><%=h source.active_flag %></td>
     <td><%= link_to 'Show', source %></td>
     <td><%= link_to 'Edit', edit_source_path(source) %></td>

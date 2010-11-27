@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>LiFiDeA</title>
+ 	<%= javascript_include_tag 'jquery' %>
+ 	<%= javascript_include_tag 'jquery.layout' %>
+ 	<%= javascript_include_tag 'jquery.ui.all' %>
+	<script type="text/javascript">
+
+	var myLayout; // a var is required because this page utilizes: myLayout.allowOverflow() method
+
+	$(document).ready(function () {
+		myLayout = $('body').layout({
+			// enable showOverflow on west-pane so popups will overlap north pane
+			west__showOverflowOnHover: true
+
+		//,	west__fxSettings_open: { easing: "easeOutBounce", duration: 750 }
+		});
+ 	});
+
+	</script>
+ <%= stylesheet_link_tag 'jquery_layout' %>
+</head>
+<body>
+
+<!-- manually attach allowOverflow method to pane -->
+<div class="ui-layout-north" onmouseover="myLayout.allowOverflow('north')" onmouseout="myLayout.resetOverflow(this)">
+	<h2>LiFiDeA <%= controller.action_name %> <%= get_cur_env %></h2>
+	<% if flash[:notice] -%> 
+	<h2><%= flash[:notice] %></h2>
+	<% end %>
+</div>
+
+<!-- allowOverflow auto-attached by option: west__showOverflowOnHover = true -->
+<div class="ui-layout-west">
+	
+	<%= yield :left %>
+
+	<p><a href="#" onClick="showOptions(myLayout,'defaults.fxSettings_open');showOptions(myLayout,'west.fxSettings_close')">Show Options.Defaults</a></p>
+
+</div>
+
+<div class="ui-layout-south">
+	This is the south pane, closable, slidable and resizable &nbsp;
+	<button onclick="myLayout.toggle('north')">Toggle North Pane</button>
+</div>
+
+<div class="ui-layout-east">
+	  <%= raw(render_sidebars) %>
+</div>
+
+<div class="ui-layout-center">
+	  <%= yield %>
+</div>
+
+</body>
+</html>

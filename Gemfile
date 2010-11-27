@@ -2,7 +2,7 @@ source :rubygems
 
 
 # System
-gem 'rails', '2.3.8'
+gem 'rails', '3.0.1'
 gem "hpricot"
 gem 'daemons'
 gem 'mysql'
@@ -23,15 +23,20 @@ gem 'ri_cal'#'icalendar'
 gem 'icalendar'#'icalendar'
 
 # Searcher
-gem 'memcache'
+gem 'dalli'
+#gem 'memcache'
 #gem "memcache-client", :lib => "memcache"
 gem 'sunspot'#, :lib => 'sunspot'
-gem 'sunspot_rails', :require => 'sunspot/rails'
+gem 'sunspot_rails', '1.2.rc4' 
+
+# User Interface
+
+gem 'will_paginate', ">=3.0.pre2"
+gem 'jquery-rails'
 
 # Test & Deployment
 gem 'yard'
 #gem 'shoulda'
-#gem 'thoughtbot-shoulda'#, :require => "shoulda", :git => "http://gems.github.com"
+gem 'thoughtbot-shoulda'#, :require => "shoulda", :git => "http://gems.github.com"
 gem 'rspec'
 #gem 'rspec-rails'
-gem 'builder'
