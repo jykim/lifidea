@@ -48,6 +48,6 @@ module MetadataHelper
   
   def email_metadata_handler()
     #debugger
-    metadata = metadata.find_all{|k,v|[:from,:date,:to].include?(k)}.map_hash{|e|[e[0].to_sym,e[1]]}
+    #metadata = metadata.find_all{|k,v|[:from,:date,:to].include?(k)}.map_hash{|e|[e[0].to_sym,e[1]]}
   end
 end

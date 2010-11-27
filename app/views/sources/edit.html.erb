@@ -16,6 +16,10 @@
     <%= f.text_field :uri %>
   </p>
   <p>
+    <%= f.label :sync_at %><br />
+    <%= f.date_select :sync_at %>
+  </p>
+  <p>
     <%= f.label :option %><br />
     <%= text_area_tag "source[option]", @source.option.to_yaml, :size=>'30x10' %>
   </p>

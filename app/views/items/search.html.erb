@@ -1,22 +1,5 @@
 <% debug(request.url)%>
 
-<% content_for :left do %>
-	<% debug(params)%>
-	<% form_tag '', :method => 'GET'do %> 
-	<h3>Type:</h3>
-		<%= select_tag(:facet_itype_str, options_with_all(params[:facet_itype_str], @facet[:itype_str]),  :onchange => 'this.form.submit()')%>
-	<h3>Source:</h3>
-		<%= select_tag(:facet_source_id, options_with_all(params[:facet_source_id], @facet[:source_id]),  :onchange => 'this.form.submit()')%>
-	<h3>Date:</h3>
-		<%= select_tag(:facet_basedate, options_with_all(params[:facet_basedate], @facet[:basedate]),  :onchange => 'this.form.submit()')%>
-	<% Item.metadata_fields(params[:facet_itype_str]).each do |field, type| %>
-		<h3> <%= field %> </h3>
-		<%= select_for_facet(params, "facet_#{field}".to_sym, @facet[field]) %>
-	<% end %>
-		<%= hidden_field_tag :query, @query %>
-		<%= submit_tag('Filter') %>
-	<% end %> 
-<% end %>
 
 <% form_tag :action => 'create_concept', :method => 'POST' do %> 
 <table>

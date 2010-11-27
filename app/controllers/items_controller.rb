@@ -4,6 +4,7 @@ class ItemsController < ApplicationController
   before_filter :authorize, :except => [:login, :index, :show_content, :search, :click]
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :search
+  sidebar :filter
   sidebar :concept_cloud, :if=>:source_given?
   sidebar :relevant_concepts, :only=>:show, :if=>:item_concept?
   sidebar :linked_concepts, :only=>:show

@@ -38,9 +38,9 @@ class IMAPCollector < Collector
   
   def close_source()
     begin
+      @src.update_attributes!(:sync_at=>Time.now)
       @imap.logout
       @imap.disconnect
-      @src.update_attributes!(:sync_at=>Time.now)
     rescue Exception => e
       error "[IMAPCollector::close_source] #{e.inspect}"
     end

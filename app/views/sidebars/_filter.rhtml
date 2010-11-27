@@ -1,0 +1,14 @@
+<div class="sidebar">
+  <div class="title">Filter</div>
+	<% form_tag '', :method => 'GET' do %> 
+		<%= select_for_facet(params, 'itype_str') %>
+		<%= select_for_facet(params, 'source_id') %>
+		<%= select_for_facet(params, 'basedate') %>
+	<% Item.metadata_fields(params[:facet_itype_str]).each do |field, type| %>
+		<%= select_for_facet(params, field) %>
+	<% end %>
+		<br>
+		<%= hidden_field_tag :query, @query %>
+		<%= submit_tag('Filter') %>
+	<% end %>
+</div>
