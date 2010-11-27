@@ -3,8 +3,8 @@ require 'rubygems'
 require "daemons"
 require 'yaml'
 require 'erb'
-ENV["RAILS_ENV"] = ARGV[1] || "production"
-#puts "Running in #{ENV["RAILS_ENV"]}"
+scope = ARGV[1] || "production"
+#puts "Running in #{scope}"
 
 file_name = File.dirname(__FILE__) + "/../../vendor/rails/activesupport/lib/active_support.rb"
 

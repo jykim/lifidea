@@ -10,9 +10,9 @@ class User < ActiveRecord::Base
   has_one :registration
   has_one :profile, :through => :registration
 
-  named_scope :old,      :conditions => "age > 50"
-  named_scope :eighteen, :conditions => { :age => 18 }
-  named_scope :recent,   lambda {|count| { :limit => count } }
+  scope :old,      :conditions => "age > 50"
+  scope :eighteen, :conditions => { :age => 18 }
+  scope :recent,   lambda {|count| { :limit => count } }
 
   def self.recent_via_method(count)
     scoped(:limit => count)

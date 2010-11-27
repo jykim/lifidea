@@ -475,11 +475,11 @@ module Shoulda # :nodoc:
       #
       # Example:
       #
-      #   should_have_named_scope :visible, :conditions => {:visible => true}
+      #   should_have_scope :visible, :conditions => {:visible => true}
       #
       # Passes for
       #
-      #   named_scope :visible, :conditions => {:visible => true}
+      #   scope :visible, :conditions => {:visible => true}
       #
       # Or for
       #
@@ -489,11 +489,11 @@ module Shoulda # :nodoc:
       #
       # You can test lambdas or methods that return ActiveRecord#scoped calls:
       #
-      #   should_have_named_scope 'recent(5)', :limit => 5
-      #   should_have_named_scope 'recent(1)', :limit => 1
+      #   should_have_scope 'recent(5)', :limit => 5
+      #   should_have_scope 'recent(1)', :limit => 1
       #
       # Passes for
-      #   named_scope :recent, lambda {|c| {:limit => c}}
+      #   scope :recent, lambda {|c| {:limit => c}}
       #
       # Or for
       #
@@ -501,8 +501,8 @@ module Shoulda # :nodoc:
       #     scoped(:limit => c)
       #   end
       #
-      def should_have_named_scope(scope_call, find_options = nil)
-        matcher = have_named_scope(scope_call).finding(find_options)
+      def should_have_scope(scope_call, find_options = nil)
+        matcher = have_scope(scope_call).finding(find_options)
         should matcher.description do
           assert_accepts matcher.in_context(self), subject
         end

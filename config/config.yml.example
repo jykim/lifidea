@@ -6,20 +6,21 @@
 common:
   collector_sync_interval: 30
   hour_daybreak: 4
-  rule_searcher: "method:jm,lambda:0.1"
   debug: true
   weight_con: uniform
   weight_doc: uniform
-#  rule_searcher: "method:dirichlet,mu:100"
   
 development:
-  searcher_port: 3200
-  solr_server: http://localhost:8982/solr
+  webserver_port: 3000
+  memcached_port: 3100
+  solr_server: http://localhost:3200/solr
   
 test:
-  searcher_port: 3201
-  solr_server: http://localhost:8981/solr
+  webserver_port: 3001
+  memcached_port: 3101
+  solr_server: http://localhost:3201/solr
   
 production:
-  searcher_port: 3202
-  solr_server: http://localhost:8983/solr
+  webserver_port: 3002
+  memcached_port: 3102
+  solr_server: http://localhost:3202/solr

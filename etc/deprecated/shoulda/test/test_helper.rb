@@ -13,7 +13,7 @@ silence_warnings { RAILS_ENV = ENV['RAILS_ENV'] }
 
 # Run the migrations
 ActiveRecord::Migration.verbose = false
-ActiveRecord::Migrator.migrate("#{RAILS_ROOT}/db/migrate")
+ActiveRecord::Migrator.migrate("#{Rails.root}/db/migrate")
 
 # Setup the fixtures path
 ActiveSupport::TestCase.fixture_path =

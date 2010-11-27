@@ -2,5 +2,5 @@
 db/*.sqlite3
 log/*.log
 tmp/**/*
-etc/deprecated
-solr/data
+etc/deprecated/**/*
+solr/data/**/*

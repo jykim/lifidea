@@ -75,7 +75,7 @@ else
         end
       end
 
-      insert('config.load_paths += Dir["#{RAILS_ROOT}/vendor/gems/*/lib"]',
+      insert('config.load_paths += Dir["#{Rails.root}/vendor/gems/*/lib"]',
              "config/environment.rb",
              /Rails::Initializer\.run/)
     end

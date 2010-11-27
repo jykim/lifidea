@@ -17,12 +17,12 @@ module Shoulda # :nodoc:
       #
       # Example:
       #
-      #   it { should have_named_scope(:visible).
+      #   it { should have_scope(:visible).
       #                 finding(:conditions => {:visible => true}) }
       #
       # Passes for
       #
-      #   named_scope :visible, :conditions => {:visible => true}
+      #   scope :visible, :conditions => {:visible => true}
       #
       # Or for
       #
@@ -32,11 +32,11 @@ module Shoulda # :nodoc:
       #
       # You can test lambdas or methods that return ActiveRecord#scoped calls:
       #
-      #   it { should have_named_scope('recent(5)').finding(:limit => 5) }
-      #   it { should have_named_scope('recent(1)').finding(:limit => 1) }
+      #   it { should have_scope('recent(5)').finding(:limit => 5) }
+      #   it { should have_scope('recent(1)').finding(:limit => 1) }
       #
       # Passes for
-      #   named_scope :recent, lambda {|c| {:limit => c}}
+      #   scope :recent, lambda {|c| {:limit => c}}
       #
       # Or for
       #
@@ -44,8 +44,8 @@ module Shoulda # :nodoc:
       #     scoped(:limit => c)
       #   end
       #
-      def have_named_scope(scope_call)
-        warn "[DEPRECATION] should_have_named_scope is deprecated."
+      def have_scope(scope_call)
+        warn "[DEPRECATION] should_have_scope is deprecated."
         HaveNamedScopeMatcher.new(scope_call).in_context(self)
       end
 
