@@ -5,7 +5,7 @@
 		<%= select_for_facet(params, 'source_id') %>
 		<%= select_for_facet(params, 'basedate') %>
 	<% Item.metadata_fields(params[:facet_itype_str]).each do |field, type| %>
-		<%= select_for_facet(params, field) %>
+		<%= select_for_facet(params, field.to_s) %>
 	<% end %>
 		<br>
 		<%= hidden_field_tag :query, @query %>
