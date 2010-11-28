@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+ <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+ <title>LiFiDeA - <%= params['controller']%> <%= get_cur_env %></title>
+ <%= javascript_include_tag :defaults %>
+ <%= javascript_include_tag "sortable_2" %>
+ <%= image_tag "ajax-loader.gif", :id=>'spinner', :style=>"display:none; float:right;"%>
+ <%= stylesheet_link_tag '2col' %>
+ <%= stylesheet_link_tag 'plugins' %>
+ <%= csrf_meta_tag %>  
+</head>
+<body>
+	<div id="header">
+		<h1><%= @page_title || 'LiFiDeA' %></h1>
+		<% if flash[:notice] -%> 
+		<h2><%= flash[:notice] %></h2>
+		<% end -%> 
+
+		<ul>
+			<li><%= link_to 'Items', :controller => 'items' %></li>
+			<li><%= link_to 'Tags', :controller => 'tags' %></li>
+			<% if session[:admin_flag] %> 
+				<li><%= link_to 'Users', :controller => 'users' %></li>
+				<li><%= link_to 'Sources', :controller => 'sources' %></li>
+			<% end %>
+			<% if session[:user_id] %> 
+			<li><%= link_to 'Logout', :controller => 'admin', :action => 'logout' %> </li>
+			<% else %>
+			<li><%= link_to 'Login', :controller => 'admin', :action => 'logout' %> </li>
+			<% end %> 
+		</ul>
+	</div>
+	<div class="colmask leftmenu">
+		<div class="colleft">
+			<div class="col1">
+				  <%= yield %>
+			</div>
+			<div class="col2">
+				<%= render :partial => 'menu_search' %>
+				<%= render :partial => 'menu_filter' if @facet %>
+				<%= render :partial => 'menu_browse' if @link_cons %>
+				
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+			  <%= yield :bottom %>
+	</div>
+</body>
+</html>

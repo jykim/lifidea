@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   include AdminHelper, ItemsHelper
-  layout "default"
+  layout "default_2col"
+  #layout "jquery"
   #before_filter :init_controller
   helper :all # include all helpers, all the time
   #before_filter :authorize, :except => :login 

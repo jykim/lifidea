@@ -11,10 +11,6 @@
     <%= f.text_field :did %>
   </p>
   <p>
-    <%= f.label :tags %> : 
-    <%= text_field_tag :tags, @item.tags.map{|e|e.title}.join(",") %>
-  </p>
-  <p>
     <%= f.label :uri %> : 
     <%= f.text_field :uri %>
   </p>

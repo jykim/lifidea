@@ -5,17 +5,16 @@ Ddl::Application.routes.draw do
   resources :concepts
   resources :documents do
     collection do
-  get :links
-  get :concepts
-  post :save_judgment
-  get :search
-  end
+      get :links
+      get :concepts
+      post :save_judgment
+      get :search
+    end
     member do
-  get :start
-  get :click
-  get :show_in_frame
-  end
-  
+      get :start
+      get :click
+      get :show_in_frame
+    end
   end
 
   resources :users

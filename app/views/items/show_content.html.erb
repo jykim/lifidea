@@ -1,1 +1,8 @@
-<%= @item.content.gsub("\n","<br/>") if @item.content %>
+<p>
+  <b>Metadata:</b> <br>
+	<table border='1' cellspacing=0 cellpadding=2>
+  <%= raw (@item.metadata||{}).find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
+	</table>
+</p>
+
+<%= raw @item.content.gsub("\n","<br/>") if @item.content %>

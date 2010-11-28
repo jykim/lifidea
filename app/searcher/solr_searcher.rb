@@ -25,7 +25,7 @@ class SolrSearcher < Searcher
         with (e[0].to_s.split('_')[1..-1].join('_')).to_sym, e[1] if [e[1]].flatten.first != '-1'
       end
       #debugger
-      order_by(:basetime, :desc) if o[:order] == "recency"
+      order_by(:basetime, :desc) if o[:order] == "recency" || query == TEXT_DUMMY
       paginate(:page => o[:page]) if o[:page]
       facet(o[:facet]) if o[:facet]
       without :hidden_flag, '1'
@@ -81,8 +81,8 @@ class SolrSearcher < Searcher
   def calc_sim_features(query_item, type, filter_qry, o={})
     #puts "[calc_sim_features] query_item = #{query_item} #{filter_qry}"
     
-    if !o[:no_cache] && cache_data([query_item, type, 'result'].join("_"))
-      return cache_data([query_item, type, 'result'].join("_"))
+    if !o[:no_cache] && cache_data([query_item.id, type, 'result'].join("_"))
+      return cache_data([query_item.id, type, 'result'].join("_"))
     end
 
     # Initial Solr Query
@@ -136,7 +136,7 @@ class SolrSearcher < Searcher
       result << fts
     end#each
     
-    cache_data([query_item, type, 'result'].join("_"), result) if !o[:no_cache]
+    cache_data([query_item.id, type, 'result'].join("_"), result) if !o[:no_cache]
     return result
   end
 end

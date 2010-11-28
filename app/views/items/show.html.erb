@@ -1,79 +1,43 @@
-<p>
-  <b>Title:</b>
-  <%=h @item.title %>
-</p>
 
-<p>
-  <b>Tags:</b>
-	<%=  @item.link_cons.map{|e|e.title}.join(",") if @item.link_cons %>
-</p>
+<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="100%" height="80%" style="border: none;"></iframe>
 
-
-<p>
-  <b>Type:</b>
-  <%=h @item.itype %>
-</p>
-
-<p>
-  <b>URL:</b>
-  <%= link_to @item.uri, @item.uri %>
-</p>
-
-<p>
-  <b>PubTime:</b>
-  <%= @item.basetime %>
-</p>
-
-<p>
-  <b>Metadata:</b> <br>
-	<table border='1' cellspacing=0 cellpadding=2>
-  <%= raw (@item.metadata||{}).find_all{|k,v|!v.blank?}.map{|e|"<tr><td>#{e[0]}</td><td>#{e[1]}</td></tr>"}.join("\n") %>
-	</table>
-</p>
-
-<p>
-  <b>Content:</b> <br>
-		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="500" style="border: none;"></iframe>
-		(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
-</p>
-
-
-<% if @item.document? %>
-	<h2>Relevant Documents</h2>
-	<table class="sortable" id="sortabletable">
-	<tr>
-		<% header = ['time','type','title'] %>
-		<% (header << 'score').concat(Searcher::DOC_FEATURES) if (Conf.debug || params[:debug]) %>
-		<%= raw header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
-	</tr>
-	<% @rel_docs.each_with_index do |e,i| %>
-		<% item = cache_data("item_#{e[:id]}") %>
+<% content_for :bottom do %>
+	
+	<% if @item.document? %>
+		<h2>Relevant Documents</h2>
+		<table class="sortable" id="sortabletable">
 		<tr>
-		  <td width='80'><%= item.basetime.to_date %></td>
-		  <td><%= item.itype %></td>
-		  <td><%= link_to item.title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
-		<% if Conf.debug || params[:debug] %>
-			<%=[:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
-		<% end %>
+			<% header = ['time','type','title'] %>
+			<% (header << 'score').concat(Searcher::DOC_FEATURES) if (Conf.debug || params[:debug]) %>
+			<%= raw header.map{|f|"<td>#{f.to_s.capitalize}</td>"}%>
 		</tr>
+		<% @rel_docs.each_with_index do |e,i| %>
+			<% item = cache_data("item_#{e[:id]}") %>
+			<tr>
+			  <td width='80'><%= item.basetime.to_date %></td>
+			  <td><%= item.itype %></td>
+			  <td><%= link_to item.title, {:controller=>'items', :action=>'click', :htype=>'doc', :id=>e[:id], :src_item_id=>@item.id, :position=>(i+1), :skipped_items=>@rel_docs[0..i].reverse.map{|e2|e2[:id]}.join("|")} %></td>
+			<% if Conf.debug || params[:debug] %>
+				<%=raw [:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
+			<% end %>
+			</tr>
+		<% end %>
+		</table>
 	<% end %>
-	</table>
-<% end %>
 
-<% if @link_docs %>
-	<h2>Linked Documents</h2>
-	<table>
-	<% @link_docs[0..14].each do |item| %>
-	  <tr>
-	    <td width='80'><%= item.basetime.to_date %></td>
-	    <td><%= item.itype %></td>
-	    <td><%= link_to item.title, item_path(item), :title=>item.to_s %></td>
-	    <td><%= link_to 'Edit', edit_item_path(item) %></td>
-	    <td><%= link_to 'Del', del_item_path(item) %></td>
-	  </tr>
+	<% if @link_docs %>
+		<h2>Linked Documents</h2>
+		<table>
+		<% @link_docs[0..14].each do |item| %>
+		  <tr>
+		    <td width='80'><%= item.basetime.to_date %></td>
+		    <td><%= item.itype %></td>
+		    <td><%= link_to item.title, item_path(item), :title=>item.to_s %></td>
+		    <td><%= link_to 'Edit', edit_item_path(item) %></td>
+		    <td><%= link_to 'Del', del_item_path(item) %></td>
+		  </tr>
+		<% end %>
+		</table>
 	<% end %>
-	</table>
-<% end %>
 
-<%= link_to 'Edit', edit_item_path(@item) %> |
-<%= link_to 'Back', items_path %>
+<% end %>

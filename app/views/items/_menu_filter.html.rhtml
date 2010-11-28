@@ -1,3 +1,4 @@
+
 <div class="sidebar">
   <div class="title">Filter</div>
 	<ul>
@@ -6,7 +7,7 @@
 		<li><%= select_for_facet(params, 'source_id') %></li>
 		<li><%= select_for_facet(params, 'basedate') %></li>
 	<% Item.metadata_fields(params[:facet_itype_str]).each do |field, type| %>
-		<li><%= select_for_facet(params, field) %></li>
+		<li><%= select_for_facet(params, field.to_s) %></li>
 	<% end %>
 		<%= hidden_field_tag :query, @query %>
 		<li><%= submit_tag('Filter') %></li>
