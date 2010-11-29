@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
-$rails_env = ARGV[1] || ENV['RAILS_ENV']
-#require File.dirname(__FILE__) + '/../config/boot'
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'ddl_include.rb'
+
 $command = ARGV[0]
+$opt = ARGV[1..-1].map_hash{|e|e.split('=')}
+$rails_env = $opt['env'] || ENV['RAILS_ENV'] || 'development'
 memcached_pid = File.join(Rails.root, "tmp/pids/memcached_#$rails_env.pid")
 #debugger
 case $command
@@ -11,7 +12,9 @@ when 'start'
   `rake tmp:pids:clear`
   `memcached -d -p #{Conf.memcached_port} -P #{memcached_pid}` if !File.exists?(memcached_pid)
   `rake sunspot:solr:start RAILS_ENV=#$rails_env`
-  `rails server -d -p #{Conf.webserver_port} -e #{$rails_env}`
+  unless $opt['nosvr']
+    `rails server -d -p #{Conf.webserver_port} -e #{$rails_env}`
+  end
   #{}`script/collector.sh`
 #  `nohup script/runner app/collector/collector_daemon.rb #$rails_env &`
 when 'stop'

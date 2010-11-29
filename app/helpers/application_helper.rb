@@ -19,4 +19,23 @@ module ApplicationHelper
       ""
     end
   end
+  
+  def display_url(item)
+    case item.uri
+    when /\.(#{FileCollector::FILE_FORMAT_BINARY})$/
+      "http://docs.google.com/viewer?url=#{url_encode(item.uri.strip)}&embedded=true"
+    when /^http/
+      if item.uri =~ /wikipedia/
+        item.uri + "?printable=true"
+      elsif item.itype == 'blog'
+        url_for :action=>:show_content, :id=>item.id
+      elsif item.itype == 'query'
+        url_for :action=>:show_content, :id=>item.id, :layout=>nil
+      else
+        item.uri
+      end
+    else
+      url_for :action=>:show_content, :id=>item.id, :layout=>nil
+    end
+  end
 end

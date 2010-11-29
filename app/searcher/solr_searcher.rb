@@ -38,14 +38,17 @@ class SolrSearcher < Searcher
     end
   end
   
-  def calc_df(query, tplus = nil, tminus = nil)
+  def calc_df(query, tplus = [], tminus = [])
     #debugger
     #puts query
+    splus = tplus.map{|e|"+\"#{e}\""}.join(" ")
+    sminus = tminus.map{|e|"-\"#{e}\""}.join(" ")#
+    
     result = Sunspot.search(Item) do
-      keywords query
+      keywords "\"#{query} #{splus} #{sminus}\""
       without :itype_str, Item::ITYPE_CONCEPT
-      tplus.each{|e| with :fulltext, "#{e}"} if tplus
-      tminus.each{|e| without :fulltext, "\"#{e}\""} if tminus
+      #tplus.each{|e| with :fulltext, "\"#{e}\""} if tplus
+      #tminus.each{|e| without :fulltext, "\"#{e}\""} if tminus
     end
     result.total
   end
@@ -58,33 +61,34 @@ class SolrSearcher < Searcher
   def search_by_item(item, type ,o={})
     query_item = Item.find(item.to_i)
     return nil if !query_item
-    case type
-    when 'con' : features, weights, filter_qry = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights), "itype_text:concept -itype_text:query"
-    when 'doc' : features, weights, filter_qry = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights), "-itype_text:concept -itype_text:query"
-    end
-    filter_qry = o[:working_set].map{|e|"id_text:#{e}"}.join(" || ") if o[:working_set]
+    result = calc_sim_scores(query_item, type, o)
     #debugger
-    #puts "[search_by_item] features/weights = #{features.inspect}/#{weights.inspect}"
-    result = calc_sim_features(query_item, type, filter_qry, o)
-    final_result = result.sort_by{|fts|
-      fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
-      #fts[0], fts[1] = fts[:id], fts[:score]
-    }.reverse
+    final_result = result.sort_by{|fts|fts[:score]}.reverse
     #puts "[search_by_item] #{item} - #{final_result[0][:id]} : #{final_result[0][:score]} * #{weights.inspect}"
-    final_result
+  end
+  
+  def solr_filter_concepts(prefix = '+', join = ' || ')
+    ['query'].map{|e|"#{prefix}itype_text:#{e}"}.join("#{join}")
   end
   
   # Calculate similarity feature values 
   # - Connect to Solr for feature value calculation
   # - Cache the results
   # @param [Bool] :no_cache : disble result cacheing
-  def calc_sim_features(query_item, type, filter_qry, o={})
+  # @param [Array<int>] :items : items to be included for scoring
+  def calc_sim_scores(query_item, type, o={})
+    #debugger
     #puts "[calc_sim_features] query_item = #{query_item} #{filter_qry}"
     
-    if !o[:no_cache] && cache_data([query_item.id, type, 'result'].join("_"))
+    if !o[:no_cache] && Conf.cache && cache_data([query_item.id, type, 'result'].join("_"))
       return cache_data([query_item.id, type, 'result'].join("_"))
     end
-
+    case type
+    when 'con' : features, weights, filter_qry = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights), solr_filter_concepts()
+    when 'doc' : features, weights, filter_qry = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights), solr_filter_concepts('-', '&&')
+    end
+    filter_qry = o[:working_set].map{|e|"id_text:#{e}"}.join(" || ") if o[:working_set]
+    #debugger
     # Initial Solr Query
     result = []
     solr = RSolr.connect :url=>Conf.solr_server
@@ -97,25 +101,31 @@ class SolrSearcher < Searcher
       error "[search_by_item] Error in Calling Solr", e
       return result
     end
-    
+    error "[search_by_item] Nothing returned from Solr!!!" if solr_result['response']['docs'].size == 0
     # Feature Vector generation
+    query_count = -1
     solr_result['response']['docs'].each do |e|
-      #debugger
+      #
       e["id"] = e["id"].split(" ")[1]
       next if o[:items] && !o[:items].include?(e["id"])
       begin
         item = $items[e["id"].to_i]
-        #leven_dist = (item.did.size + query_item.did.size).to_f / item.did.levenshtein(query_item.did)/4
+        next if item.title == TEXT_DUMMY
+        info "[calc_sim_scores] == #{item.title} =="
         fts = {:id=>item.id, :content=>(e["score"]/2)}
         #fts[:tag]   = item.tag_titles.overlap(query_item.tag_titles) #get_overlap_feature('s', item, query_item)
         fts[:title] = (item.title || "").word_sim(query_item.title || "")
         fts[:time]  = (item.basetime - query_item.basetime ).normalize_time
         case type
         when 'con'
+          both_count, item_count = calc_df(item.title, [query_item.title]), calc_df(item.title)
+          query_count = calc_df(query_item.title) if query_count < 0
+          #  @clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id)
+          info "[calc_sim_scores] both_count, item_count, query_count = #{both_count}, #{item_count}, #{query_count}"
           fts[:string] = item.did.str_sim(query_item.did)
-          fts[:topic] = @clf.read('t', item.id, query_item.id)
-          fts[:cooc]  = Math.overlap(@clf.read('o', item.id, query_item.id), @clf.read_sum('o', item.id), @clf.read_sum('o', query_item.id))
-          fts[:occur] = @clf.read_sum('o', item.id).normalize(Item.count_docs)
+          #fts[:topic] = @clf.read('t', item.id, query_item.id)
+          fts[:cooc]  = Math.overlap(both_count, item_count, query_count)
+          fts[:occur] = item_count.to_f.normalize(Item.count_docs)
         when 'doc'
           if item.remark && query_item.remark
             arr1, arr2 = item.remark.split(",").map{|e|e.to_f}, query_item.remark.split(",").map{|e|e.to_f}
@@ -126,17 +136,18 @@ class SolrSearcher < Searcher
           fts[:type] = (item.itype == query_item.itype)? 0.5 : 0
           fts[:concept] = get_concept_feature(item.id, query_item.id) / 3
         end
-        #puts fts.inspect
-      rescue Interrupt
-        break
+        fts[:score] = features.map_with_index{|e,i|(fts[e]||0.0) * weights[i]}.sum
+        info "[calc_sim_scores] #{fts.inspect}"
+      #rescue Interrupt
+      #  break
       rescue Exception => e
         error "[search_by_item] Error in #{query_item} -> #{item}", e
         next
       end#begin
+      #debugger
       result << fts
     end#each
-    
-    cache_data([query_item.id, type, 'result'].join("_"), result) if !o[:no_cache]
+    cache_data([query_item.id, type, 'result'].join("_"), result) if !o[:no_cache] && Conf.cache
     return result
   end
 end

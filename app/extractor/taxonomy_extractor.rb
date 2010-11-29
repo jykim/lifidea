@@ -11,9 +11,7 @@ class TaxonomyExtractor
   end
   
   def genTFIT(tplus, tminus, allterms, prevterm = nil, relation = nil, l = 0, w = 0)
-    splus = tplus.map{|e|"+\"#{e}\""}.join(" ")
-    sminus = tminus.map{|e|"-\"#{e}\""}.join(" ")#
-    tnext, fnext = *allterms.map{|e| [e, @solr.calc_df("\"#{e}\" #{splus} #{sminus}")]}.sort_by{|e|e[1]}[-1]
+    tnext, fnext = *allterms.map{|e| [e, @solr.calc_df(e, tplus, tminus)]}.sort_by{|e|e[1]}[-1]
     
     if( fnext >= @support)
       puts "#{l} / #{w} / \"#{prevterm}\" / \"#{tnext}\" / [label=\"#{relation}\"] / #{fnext} /" + 

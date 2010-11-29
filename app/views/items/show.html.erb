@@ -1,9 +1,8 @@
 
-<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="100%" height="80%" style="border: none;"></iframe>
-
-<% content_for :bottom do %>
-	
-	<% if @item.document? %>
+<% if @item.document? %>
+	<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="100%" height="80%" style="border: none;"></iframe>
+	<% content_for :bottom do %>
+		<%= render :partial => 'linked_docs' if @link_docs.size > 0 %>
 		<h2>Relevant Documents</h2>
 		<table class="sortable" id="sortabletable">
 		<tr>
@@ -21,23 +20,9 @@
 				<%=raw [:score].concat(Searcher::DOC_FEATURES).map{|f|"<td>#{(e[f]||0).to_f.r3}</td>"} %>
 			<% end %>
 			</tr>
-		<% end %>
-		</table>
+			<% end %>
+		</table>	
 	<% end %>
-
-	<% if @link_docs %>
-		<h2>Linked Documents</h2>
-		<table>
-		<% @link_docs[0..14].each do |item| %>
-		  <tr>
-		    <td width='80'><%= item.basetime.to_date %></td>
-		    <td><%= item.itype %></td>
-		    <td><%= link_to item.title, item_path(item), :title=>item.to_s %></td>
-		    <td><%= link_to 'Edit', edit_item_path(item) %></td>
-		    <td><%= link_to 'Del', del_item_path(item) %></td>
-		  </tr>
-		<% end %>
-		</table>
-	<% end %>
-
+<% else %>
+	<%= render :partial => 'linked_docs' %>
 <% end %>

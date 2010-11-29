@@ -1,4 +1,4 @@
-<div id="tagcloud" class="sidebar">
+<div class="sidebar">
 	<div class="title">Linked Concepts</div>
 	<ul>
 	<% @link_cons.find_all{|e|e.title != TEXT_DUMMY}[0..9].each do |c| %>

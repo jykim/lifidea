@@ -14,7 +14,7 @@ class IMAPCollector < Collector
   def read_from_source(o = {})
     @imap = Net::IMAP.new(@src.uri.gsub("imap://",""), @src.o[:port] , true)
     @imap.login(@src.o[:id], @src.o[:password])
-    @imap.select(@src.o[:folder])
+    @imap.examine(@src.o[:folder])
     result = []
     
     @imap.search(["SINCE",(@src.sync_at||Time.now.at_beginning_of_year).strftime("%d-%b-%y")]).each do |msg_id|

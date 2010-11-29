@@ -4,6 +4,8 @@ class Searcher
   DOC_FEATURES = [:title, :content, :tag, :time, :topic, :path, :type, :concept]
     
   # Initialize cache / index
+  # - cache link feature values 
+  # - cache feature weights
   def initialize(o = {})
     @debug = o[:debug] || false
     $items = {} if !$items
@@ -44,6 +46,11 @@ class Searcher
     
   end
   
+  # Load feature weights from data/learner_output
+  # - feature set should match with the weight file format
+  # @param <String> features : feature set used
+  # @param <String> type : item type (document / concept)
+  # @param <String> rank : weighting scheme used (default : uniform)
   def self.load_weights(features, type, rank = 'uniform')
     result = [0] * features.size
     rank ||= ENV['rank']
@@ -97,8 +104,7 @@ class Searcher
   
   # 
   def log_preference(query_item, type, click_position, o={})
-    $f_li = File.open(Rails.root + "/data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt", 'a')
-    
+    $f_li = File.open(Rails.root.join("data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt"), 'a')
     result = search_by_item(query_item, type)
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i
     #debugger

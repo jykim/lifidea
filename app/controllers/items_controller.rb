@@ -43,7 +43,7 @@ class ItemsController < ApplicationController
   def search
     info params.inspect
     @query = params[:query]
-    $searcher = SolrSearcher.new
+    searcher = SolrSearcher.new
     @facet = {}
     @page_title = if @query == TEXT_DUMMY
       "All Documents"
@@ -52,7 +52,7 @@ class ItemsController < ApplicationController
     end
     begin
       #debugger
-      @search_results = $searcher.process_request('k', @query, params)
+      @search_results = searcher.process_request('k', @query, params)
       error "search_results : #{@search_results.inspect}"      
     rescue Exception => e
       error "Search failed!!", e
@@ -61,18 +61,18 @@ class ItemsController < ApplicationController
     @query_doc = Item.find_or_create(@query, 'query', :uri=>request.url, 
                    :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
 
-    @facet[:source_id] = $searcher.process_request('k', @query, params.merge(:facet=>:source_id)).
+    @facet[:source_id] = searcher.process_request('k', @query, params.merge(:facet=>:source_id)).
                           find_all{|e|e.instance}.map{|e|["#{e.instance.title} (#{e.count})", e.value]}    
 
-    @facet[:itype_str] = $searcher.process_request('k', @query, params.merge(:facet=>:itype_str)).
+    @facet[:itype_str] = searcher.process_request('k', @query, params.merge(:facet=>:itype_str)).
                           map{|e|["#{e.value} (#{e.count})", e.value]}
     
-    @facet[:basedate] = $searcher.process_request('k', @query, params.merge(:facet=>:basedate)).
+    @facet[:basedate] = searcher.process_request('k', @query, params.merge(:facet=>:basedate)).
                           find_all{|e|Time.now - e.value < 86400*7}.map{|e|["#{e.value.to_date} (#{e.count})", e.value]}.reverse
 
     #debugger
     Item.metadata_fields(params[:facet_itype_str]).each do |field, type|
-      @facet[field] = $searcher.process_request('k', @query, params.merge(:facet=>field)).
+      @facet[field] = searcher.process_request('k', @query, params.merge(:facet=>field)).
                         map{|e|["#{e.value} (#{e.count})", e.value]}
     end
     #@docs = Item.find(@rank_list.map{|e|e[0]}).map_hash{|d|[d.id, d]}
@@ -89,8 +89,8 @@ class ItemsController < ApplicationController
       :metadata=>{:position=>params[:position].to_i, :skipped_items=>params[:skipped_items], :url=>request.url})
     Link.find_or_create(src_item, tgt_item, 'c', :add=>1)
     if ['con','doc'].include?(params[:htype]) && params[:skipped_items].split("|").size > 1
-      $searcher = SolrSearcher.new
-      $searcher.log_preference(params[:src_item_id].to_i, params[:htype] , params[:position].to_i)
+      searcher = SolrSearcher.new
+      searcher.log_preference(params[:src_item_id].to_i, params[:htype] , params[:position].to_i)
       #search_remote('c', "#{params[:src_item_id]}|#{params[:skipped_items]}", :jtype=>'log')
     end
     redirect_to :action=>:show, :id=>params[:id]
@@ -99,37 +99,34 @@ class ItemsController < ApplicationController
   # GET /items/1
   # GET /items/1.xml
   def show
+    searcher = SolrSearcher.new
     @item = Item.find(params[:id])
     @page_title = @item.title
     @link_docs, @link_cons = [], []
     $items = {}
-    #if @item.concept?
-      begin
-        @rel_cons = (search_local('c', @item.id) || [])[0..9]
-        #info "Ranklist(con) : #{@rel_cons.inspect}"
-        @rel_docs = (search_local('d', @item.id) || [])[0..9]
-        #info "Ranklist(doc) : #{@rel_docs.inspect}"
-        #debugger
-      rescue Exception => e
-        error "Failed to get Ranklist!", e
-        @rel_cons = []
-        @rel_docs = []
-      end
-      #debugger
-      #puts @rel_cons.inspect
-      @item.link_items.uniq.each do |e|
-        (e.concept?)? (@link_cons << e) : (@link_docs << e)
-      end
-      #result = cache('foo') { $clf }
-      #puts "Result : " + cache('foo').inspect
-    #else
-    #  @rank_list = []
-    #end
     #debugger
+    begin
+      if @item.concept?
+        @rel_cons = (searcher.search_by_item(@item.id, 'con') || [])[0..9]
+      else
+        #info "Ranklist(con) : #{@rel_cons.inspect}"
+        @rel_docs = (searcher.search_by_item(@item.id, 'doc') || [])[0..9]
+      end
+      #info "Ranklist(doc) : #{@rel_docs.inspect}"
+      #debugger
+    rescue Exception => e
+      error "Failed to get Ranklist!", e
+      @rel_cons = []
+      @rel_docs = []
+    end
+    #debugger
+    @item.link_items.uniq.each do |e|
+      (e.concept?)? (@link_cons << e) : (@link_docs << e)
+    end
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @item }
-    end    
+    end
   end
   
   # Show textual content of the document (for back-up)

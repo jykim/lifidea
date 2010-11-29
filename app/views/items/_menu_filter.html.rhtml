@@ -2,7 +2,7 @@
 <div class="sidebar">
   <div class="title">Filter</div>
 	<ul>
-	<% form_tag '', :method => 'GET' do %> 
+	<%= form_tag '', :method => 'GET' do %> 
 		<li><%= select_for_facet(params, 'itype_str') %></li>
 		<li><%= select_for_facet(params, 'source_id') %></li>
 		<li><%= select_for_facet(params, 'basedate') %></li>

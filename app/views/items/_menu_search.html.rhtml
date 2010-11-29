@@ -1,9 +1,9 @@
 <div class="sidebar">
   <div class="title">Search</div>
   <ul>
-		<% form_tag({:controller=>'items',:action => 'search'}, :method => :get) do -%>
+		<%= form_tag({:controller=>'items',:action => 'search'}, :method => :get) do -%>
     <li><%= text_field_tag(:query, @search) %></li>
     <li><%= submit_tag('Search') %></li>
-		<% end -%>
+		<% end %>
   </ul>
 </div>

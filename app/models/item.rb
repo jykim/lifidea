@@ -4,7 +4,7 @@ class Item < ActiveRecord::Base
   include IndexHelper
   #include TagHelper
   include MetadataHelper, RuleHelper, MarkupHelper
-  ITYPE_CONCEPT = ['tag','person','query']
+  ITYPE_CONCEPT = ['tag','person','query','concept']
   ITYPE_DOCUMENT = ['webpage','bookmark_webpage','email','email_memo','paper','blog','tweet','pub']
   #ITYPE_QUERY = ['concept','person']
   
@@ -55,6 +55,7 @@ class Item < ActiveRecord::Base
   # Sunspot/Solr search indexing  
   searchable do
     text :title, :content, :uri, :itype, :metadata, :id
+    #text(:fulltext) { [title, content, uri, metadata].join(" ") }
     text(:dummy) {TEXT_DUMMY}
     string :hidden_flag
     time :basetime
@@ -84,7 +85,7 @@ class Item < ActiveRecord::Base
   end
   
   def document?
-    !['concept','person','query'].include?(itype)
+    !concept?
   end
   
   def link_items

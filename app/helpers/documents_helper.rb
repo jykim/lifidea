@@ -43,23 +43,6 @@ module DocumentsHelper
     end
   end
   
-  def display_url(item)
-    case item.uri
-    when /\.(#{FileCollector::FILE_FORMAT_BINARY})$/
-      "http://docs.google.com/viewer?url=#{url_encode(item.uri.strip)}&embedded=true"
-    when /^http/
-      if item.uri =~ /wikipedia/
-        item.uri + "?printable=true"
-      elsif item.itype == 'blog'
-        url_for :action=>:show_content, :id=>item.id
-      else
-        item.uri
-      end
-    else
-      url_for :action=>:show_content, :id=>item.id
-    end
-  end
-  
   def display_range(param_page)
     page = (param_page || 1).to_i
     ((page-1) * @display_topk)..(page * @display_topk-1)
