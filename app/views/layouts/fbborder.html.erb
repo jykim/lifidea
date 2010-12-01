@@ -1,0 +1,92 @@
+
+<!-- saved from url=(0054)http://fabrizioballiano.net/fbborderlayout/simple.html -->
+<html style="height: 100%; "><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="/javascripts/jquery-1.2.6.pack.js"></script>
+<!-- jQuery UI is needed only if you enable regions resizing -->
+<script type="text/javascript" src="/javascripts/fbborderlayout.js"></script>
+<script type="text/javascript">
+
+$(function () {
+	$("body").FBBorderLayout({
+		spacing: 5,
+		north_resizable: true,
+		north_max_height: 100,
+		east_resizable: true,
+		east_width: 300,
+		east_min_width:200,
+		east_max_width:400,
+		south_resizable: true,
+		south_max_height: 100,
+		west_resizable: true,
+		west_width: 300,
+		west_min_width:200,
+		west_max_width:400
+	});
+});
+
+</script>
+<style type="text/css">
+/* in this sample we've collapsing turned on, thus
+   you've to define the "collapsers" styles or you
+   won't be able to see the collapsing triggers on
+   the page */
+.fbbl_north_collapser,
+.fbbl_east_collapser,
+.fbbl_south_collapser,
+.fbbl_west_collapser {
+	background: #ccc;
+}
+
+/* the next CSS are just to beautify the demo a bit
+   you can safely remove them */
+body {
+	font-family: sans-serif;
+	font-size: 12px;
+}
+
+.fbbl_north,
+.fbbl_south {
+ text-align: center;
+}
+
+.fbbl_north,
+.fbbl_south,
+.fbbl_east,
+.fbbl_west,
+.fbbl_center {
+ padding: 10px;
+ background: #eee;
+ border: 1px solid #ccc;
+}
+</style>
+</head>
+<body style="position: relative; height: 100%; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; overflow-x: hidden; overflow-y: hidden; ">
+
+<div class="fbbl_north ui-resizable" style="position: relative; z-index: 0; width: auto; ">
+	<h2>LiFiDeA <%= controller.action_name %> <%= get_cur_env %></h2>
+	<% if flash[:notice] -%> 
+	<h2><%= flash[:notice] %></h2>
+	<% end %>
+	<div class="ui-resizable-handle ui-resizable-s " style="bottom: 0pt; width: 100%; overflow-x: hidden; overflow-y: hidden; cursor: s-resize; height: 4px; left: 0px; right: 0px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(222, 222, 222); position: absolute; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: rgb(242, 242, 242); font-size: 0.1px; opacity: 0; background-position: initial initial; background-repeat: initial initial; " unselectable="on"></div>
+</div>
+
+<div class="fbbl_west ui-resizable" style="position: absolute; overflow-x: auto; overflow-y: auto; z-index: 0; top: 41px; bottom: 41px; left: 0px; width: 278px; height: auto; ">
+	<%= yield :left %>
+	<div class="ui-resizable-handle ui-resizable-e " style="right: 0pt; height: 100%; overflow-x: hidden; overflow-y: hidden; cursor: e-resize; width: 4px; top: 0px; bottom: 0px; border-right-width: 1px; border-right-style: solid; border-right-color: rgb(222, 222, 222); position: absolute; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: rgb(242, 242, 242); font-size: 0.1px; opacity: 0; background-position: initial initial; background-repeat: initial initial; " unselectable="on"></div>
+</div>
+
+<div class="fbbl_east ui-resizable" style="position: absolute; overflow-x: auto; overflow-y: auto; z-index: 0; top: 41px; right: 0px; bottom: 41px; left: auto; width: 278px; height: auto; ">
+	  <%= raw(render_sidebars) %>
+</div>
+
+<div class="fbbl_south ui-resizable" style="position: absolute; z-index: 0; top: auto; right: 0px; bottom: 0px; left: 0px; width: auto; ">
+south!
+</div>
+
+<div class="fbbl_center" style="position: absolute; z-index: 0; top: 41px; right: 305px; bottom: 41px; left: 305px; overflow-x: auto; overflow-y: auto; ">
+	  <%= yield %>
+</div>
+
+
+
+<div id="ui-datepicker-div" style="display: none;"></div><div class="fbbl_north_collapser" style="position: absolute; cursor: pointer; z-index: 0; font-size: 1px; width: 50px; height: 5px; top: 36px; left: 494px; "></div><div class="fbbl_east_collapser" style="position: absolute; cursor: pointer; z-index: 0; width: 5px; height: 50px; top: 306.5px; right: 300px; "></div><div class="fbbl_south_collapser" style="position: absolute; cursor: pointer; z-index: 0; font-size: 1px; width: 50px; height: 5px; bottom: 36px; left: 494px; "></div><div class="fbbl_west_collapser" style="position: absolute; cursor: pointer; z-index: 0; width: 5px; height: 50px; top: 306.5px; left: 300px; "></div></body></html>
