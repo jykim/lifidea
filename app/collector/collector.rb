@@ -112,7 +112,7 @@ class Collector #< ApplicationController
     else
       src.uri + postfix
     end
-    puts uri
+    #puts uri
     if src.o[:id]
       open_opt = {:ssl_verify => false,  :http_basic_authentication=>[src.o[:id], src.o[:password]]}
     else

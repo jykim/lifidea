@@ -25,7 +25,7 @@ module Math
   end
   
   def self.overlap(xy, x, y, type = :cosine)
-    return 0 if xy == 0
+    return 0.0 if xy == 0 || x == 0 || y == 0
     case type
     when :jaccard : xy.to_f / (x + y - xy )
     when :dice : 2 * xy.to_f / (x + y)

@@ -43,6 +43,7 @@
 				<%= render :partial => 'menu_filter' if @facet %>
 				<%= render :partial => 'linked_cons' if @link_cons %>
 				<%= render :partial => 'menu_browse' if @rel_cons %>
+				<%= render :partial => 'options' if  session[:admin_flag] %>
 				
 			</div>
 		</div>

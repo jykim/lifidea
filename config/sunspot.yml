@@ -8,7 +8,7 @@ test:
   solr:
     hostname: localhost
     port: 3201
-    log_level: WARNING
+    log_level: INFO
 
 production:
   solr:

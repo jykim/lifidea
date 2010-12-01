@@ -1,26 +1,34 @@
 #!/usr/bin/env ruby
+$opt = {}
+ARGV[1..-1].each{|e|r = e.split('=') ; $opt[r[0]] = r[1] || ''}
+{'d'=>'development', 'p'=>'production', 't'=>'test'}.each{|k,v|$opt['env'] = v if $opt.keys.include?(k)}
+ENV['RAILS_ENV'] = $rails_env = $opt['env'] || 'development'
+
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-require 'ddl_include.rb'
+#require 'ddl_include.rb'
+
+def run(cmd)
+  `#{cmd}`
+  puts cmd if $opt['dbg']
+end
 
 $command = ARGV[0]
-$opt = ARGV[1..-1].map_hash{|e|e.split('=')}
-$rails_env = $opt['env'] || ENV['RAILS_ENV'] || 'development'
 memcached_pid = File.join(Rails.root, "tmp/pids/memcached_#$rails_env.pid")
 #debugger
 case $command
 when 'start'
-  `rake tmp:pids:clear`
-  `memcached -d -p #{Conf.memcached_port} -P #{memcached_pid}` if !File.exists?(memcached_pid)
-  `rake sunspot:solr:start RAILS_ENV=#$rails_env`
-  unless $opt['nosvr']
-    `rails server -d -p #{Conf.webserver_port} -e #{$rails_env}`
+  run "rake tmp:pids:clear"
+  run "memcached -d -p #{Conf.memcached_port} -P #{memcached_pid}"
+  run "rake sunspot:solr:start RAILS_ENV=#$rails_env"
+  if $opt['svr']
+    run "rails server -d -p #{Conf.webserver_port} -e #{$rails_env}"
   end
   #{}`script/collector.sh`
 #  `nohup script/runner app/collector/collector_daemon.rb #$rails_env &`
 when 'stop'
   File.unlink(memcached_pid)  if File.exists?(memcached_pid)
-  `lib/daemons/collector_ctl stop  #{$rails_env}`
-  `rake sunspot:solr:stop RAILS_ENV=#$rails_env`
+  #run "lib/daemons/collector_ctl stop  #{$rails_env}"
+  run "rake sunspot:solr:stop RAILS_ENV=#$rails_env"
 #  `lib/daemons/indexer_ctl stop`
 #  `lib/daemons/searcher_ctl stop`
   $command = 'killall'

@@ -1,0 +1,12 @@
+<div class="sidebar">
+  <div class="title">Options</div>
+	<ul>
+	<%= form_tag '', :method => 'GET' do %> 
+		<li>Feedback? <%= check_box_tag :feedback, 'true', params['feedback'] , :onchange => 'this.form.submit()'%></li>
+		<li>Context? <%= check_box_tag :context, 'true', params['context'] , :onchange => 'this.form.submit()'%></li>
+		<% ContextVector.new.get.reverse[0...5].each do |c|%>
+			<li><%="[#{c[:type]}] #{c[:query]}"%></li>
+		<% end %>
+	<% end %>
+	</ul>
+</div>

@@ -19,20 +19,28 @@ class Searcher
       @con_weights = cache_data('con_weights')
       @doc_weights = cache_data('doc_weights')
     end
+    @cv = ContextVector.new
   end
   
   # Prepare index for searching
   def open_index(o={})
+    clear_context()
     @clf = cache_data('clf', Searcher.load_features())
     @con_weights = cache_data('con_weights', Searcher.load_weights(CON_FEATURES, 'con', Conf.weight_con))
     @doc_weights = cache_data('doc_weights', Searcher.load_weights(DOC_FEATURES, 'doc', Conf.weight_doc))
   end
   
-  def process_request(qtype, query, o = {})
+  def process_request(query, qtype, o = {})
     result = case qtype
-    when 'k' : search_by_keyword(query, o)
-    when 'c' : search_by_item(query, 'con', o)
-    when 'd' : search_by_item(query, 'doc', o)
+    when 'kwd' : search_by_keyword(query, o)
+    when /con|doc/
+      if o['feedback']
+        search_by_item_with_feedback(query, qtype, o)
+      elsif o['context']
+        search_by_item_with_context(query, qtype, o)
+      else
+        search_by_item(query, qtype, o.merge(:add_context=>true))
+      end
     end
   end
   
@@ -105,7 +113,8 @@ class Searcher
   # 
   def log_preference(query_item, type, click_position, o={})
     $f_li = File.open(Rails.root.join("data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt"), 'a')
-    result = search_by_item(query_item, type)
+    result = @cv.get()[-1][:result]
+    #search_by_item(query_item, type)
     last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i
     #debugger
     log = result[0..(click_position-1)].reverse.map_with_index{|e,i|

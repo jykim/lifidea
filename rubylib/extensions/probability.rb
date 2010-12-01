@@ -88,6 +88,14 @@ module ProbabilityOperator
   def sum_prob(other)
     self.merge(other){|k,v1,v2|v1+v2}
   end
+  
+  # Multiply each element by x 
+  # @example
+  #  {:a=>1,:b=>2}.times(2)
+  #  => {:a=>2, :b=>4}
+  def times(x)
+    map_hash{|k,v|[k,v*x]}
+  end
 end
 
 module ProbabilityTransformer

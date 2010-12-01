@@ -52,7 +52,7 @@ class ItemsController < ApplicationController
     end
     begin
       #debugger
-      @search_results = searcher.process_request('k', @query, params)
+      @search_results = searcher.process_request(@query, 'kwd', params)
       error "search_results : #{@search_results.inspect}"      
     rescue Exception => e
       error "Search failed!!", e
@@ -61,18 +61,18 @@ class ItemsController < ApplicationController
     @query_doc = Item.find_or_create(@query, 'query', :uri=>request.url, 
                    :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
 
-    @facet[:source_id] = searcher.process_request('k', @query, params.merge(:facet=>:source_id)).
+    @facet[:source_id] = searcher.process_request(@query, 'kwd', params.merge(:facet=>:source_id)).
                           find_all{|e|e.instance}.map{|e|["#{e.instance.title} (#{e.count})", e.value]}    
 
-    @facet[:itype_str] = searcher.process_request('k', @query, params.merge(:facet=>:itype_str)).
+    @facet[:itype_str] = searcher.process_request(@query, 'kwd', params.merge(:facet=>:itype_str)).
                           map{|e|["#{e.value} (#{e.count})", e.value]}
     
-    @facet[:basedate] = searcher.process_request('k', @query, params.merge(:facet=>:basedate)).
+    @facet[:basedate] = searcher.process_request(@query, 'kwd', params.merge(:facet=>:basedate)).
                           find_all{|e|Time.now - e.value < 86400*7}.map{|e|["#{e.value.to_date} (#{e.count})", e.value]}.reverse
 
     #debugger
     Item.metadata_fields(params[:facet_itype_str]).each do |field, type|
-      @facet[field] = searcher.process_request('k', @query, params.merge(:facet=>field)).
+      @facet[field] = searcher.process_request(@query, 'kwd', params.merge(:facet=>field)).
                         map{|e|["#{e.value} (#{e.count})", e.value]}
     end
     #@docs = Item.find(@rank_list.map{|e|e[0]}).map_hash{|d|[d.id, d]}
@@ -107,10 +107,10 @@ class ItemsController < ApplicationController
     #debugger
     begin
       if @item.concept?
-        @rel_cons = (searcher.search_by_item(@item.id, 'con') || [])[0..9]
+        @rel_cons = (searcher.process_request(@item.id, 'con', params) || [])[0..9]
       else
         #info "Ranklist(con) : #{@rel_cons.inspect}"
-        @rel_docs = (searcher.search_by_item(@item.id, 'doc') || [])[0..9]
+        @rel_docs = (searcher.process_request(@item.id, 'doc', params) || [])[0..9]
       end
       #info "Ranklist(doc) : #{@rel_docs.inspect}"
       #debugger

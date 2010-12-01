@@ -1,7 +1,7 @@
-#ENV["RAILS_ENV"] = "test"
+ENV["RAILS_ENV"] = "test"
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
-require 'ddl_include'
+#require 'ddl_include'
 
 $lgr.level = if ARGV[0] == 'verbose' || ENV['verbose']
   Logger::DEBUG
