@@ -2,23 +2,15 @@ require 'ddl_include'
 namespace :evaluate do
   task(:sim_search => :environment) do
     $set_type = ENV['set_type'] || 'test'
-    input = ENV['input'] || get_learner_input_file()+"#{ENV['train_ratio']}.#$set_type"
-    output = ENV['output'] || get_evaluation_file(ENV['eval_type'] || $type)
-    features = get_features_by_type(ENV['type'], ENV['omit'])
-    methods = if ENV['omit']
-       ['uniform','grid','svm']
-    else
-      [features, 'uniform','grid','svm'].flatten
-    end
-    weights = methods.map{|e|Searcher::load_weights(features, $type, e)}
-    weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
-    result_all = Evaluator::evaluate_sim_query_set(input, features, weights)
-    write_csv(output, result_all,  :header=>["query", methods].flatten) 
+    input = ENV['input'] || get_learner_input_file() + get_file_postfix()
+    output = ENV['output'] || get_evaluation_file(ENV['eval_type'], $type)
+    methods = ['uniform','grid','svm']
+    Evaluator.export_sim_evaluation_result($type, methods, input, output)
   end
   
   namespace :batch do
     task(:cval) do
-      unless ENV['skip_export']
+      if ENV['export']
         case $type
         when 'csel': Rake::Task['export:csel_features'].execute
         when /con|doc/ : Rake::Task['export:sim_features'].execute
@@ -30,7 +22,8 @@ namespace :evaluate do
         puts "====== Starting #{i}th fold ======="
         ENV['fold'] = i.to_s
         $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
-        ['grid','ranksvm'].each{|method|#'ranksvm','grid','liblinear'
+        ['grid'].each{|method|#'ranksvm','grid','liblinear'
+          ENV['set_type'] = 'train'
           #next if ENV['method'] && ENV['method'] != method
           $method = method
           Rake::Task['run:learner'].execute

@@ -12,29 +12,46 @@ class Evaluator
     result
   end
   
-  def self.evaluate_sim_query_set(input, features, weights)
+  # Export evaluation result to a file
+  # @return : a 2d array with evaluation results for given methods
+  def self.export_sim_evaluation_result(type, methods, input, output)
+    features = Learner.get_features_by_type(type, ENV['omit'])
+    weights = [features,methods].flatten.map{|e|Searcher.load_weights(features, type, e)}
+    weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
+    result_all = self.evaluate_sim_search_methods(type, input, features, weights)
+    write_csv(output, result_all, :header=>["query", features, methods].flatten)
+    result_all
+  end
+  
+  # Print evaluation result given input and a set of weights
+  # @deprecated 
+  def self.evaluate_sim_search_methods(type, input, features, weight_set)
     result_all = []
     searcher = SolrSearcher.new
-    qrels = Learner.parse_ranksvm_input(input)
-    qrels.each do |ids|
-      result = [] ; query, rel = ids[0].to_i, ids[1].to_i
-      weights.each_with_index do |weight,i|
-        rank_list = searcher.search_by_item(query, $type, :features=>features, :weights=>weight).map{|fts|[fts[:id], fts[:score]]}
+    qrels = read_csv(input).find_all{|e|e[:pref]=='2'}
+    #debugger
+    qrels.each do |row|
+      result = []
+      query, rel = row[:src_id].to_i, row[:tgt_id].to_i
+      weight_set.each_with_index do |weights,i|
+        rank_list = searcher.search_by_item(query, type, :features=>features, :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
         result << self.recip_rank(rank_list, rel)
       end
       result_all << [query, result].flatten #if result[0] > 0 # use only entries where relevant items were found
     end
-    average = (1..(weights.size)).map{|e|result_all.map{|e2|e2[e]}.mean}
-    result_all << ["summary(#$type/#$set_type)", average].flatten
+    average = (1..(weight_set.size)).map{|e|result_all.map{|e2|e2[e]}.mean.r3}
+    result_all << ["summary(#{type}/#$set_type)", average].flatten
   end
   
+  # Evlaluate similarity search with a query set
+  # @param [Array<Hash>] : input_data 
   def self.evaluate_sim_search_with(input_data, type, weights, o={})
     result = {}
     #puts weights.inspect
     searcher = SolrSearcher.new
     #debugger
-    input_data.each do |ids|
-      query, rel = ids[0].to_i, ids[1].to_i
+    input_data.each do |row|
+      query, rel = row[:src_id].to_i, row[:tgt_id].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
       rank_list = searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}

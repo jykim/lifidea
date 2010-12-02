@@ -1,4 +1,4 @@
-require 'rubylib_include'
+require 'test_helper'
 
 class ProbabilityTest < Test::Unit::TestCase
   def setup
@@ -10,9 +10,9 @@ class ProbabilityTest < Test::Unit::TestCase
   end
   
   def test_sampling
-    assert_equal([1], (1..1).to_a.to_pdist.sample(100).to_pdist.keys, "one element sampling")
-    assert_equal([1,2], (1..2).to_a.to_pdist.sample(100).to_pdist.keys, "two elements sampling")
-    assert_in_delta(5.5, @p10.sample(10000).mean, 0.1, "equal dist.")
+    assert_equal([1], (1..1).to_a.to_pdist.sample_pdist(100).to_pdist.keys, "one element sampling")
+    assert_equal([1,2], (1..2).to_a.to_pdist.sample_pdist(100).to_pdist.keys, "two elements sampling")
+    assert_in_delta(5.5, @p10.sample_pdist(10000).mean, 0.1, "equal dist.")
   end
   
   def test_noise
@@ -22,7 +22,7 @@ class ProbabilityTest < Test::Unit::TestCase
 
   def test_merging
     dists = []
-    0.upto(10){|i| dists[i] = @p10.sample(100).to_pdist}
+    0.upto(10){|i| dists[i] = @p10.sample_pdist(100).to_pdist}
     result1 = dists.merge_by_sum()
     result2 = {}
     #p dists

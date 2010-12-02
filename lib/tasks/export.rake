@@ -43,18 +43,6 @@ namespace :export do
     end
   end
   
-  desc "Export Qrels into Text File"
-  task(:qrels => :environment) do
-    filename = ENV['filename'] || "data/items_#$renv.csv"
-    result = []
-    itype = ENV['itype'] || 'all'
-    Item.valid.between($start_at, $end_at).itype(itype).each_with_index do |e,i|
-      puts "#{i}th item processed..." if i % 50 == 0 && i > 0
-      result << [e.id, e.basetime, e.itype, e.title, e.did, e.uri, e.hidden_flag_before_type_cast, e.query_flag_before_type_cast, e.tag_titles.sort.join(",")]
-    end
-    write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'query_flag' ,'tags']
-  end
-  
   desc "Export Items along with Tags into Text File"
   task(:items => :environment) do
     filename = ENV['filename'] || "data/items_#$renv.csv"
@@ -67,7 +55,7 @@ namespace :export do
     write_csv filename, result, :header=>['id', 'basetime', 'itype', 'title', 'did', 'uri', 'hidden_flag' ,'query_flag' ,'tags']
   end
   
-  desc "Export Top-K Concept Features"
+  desc "Export Links for computing Top-K Concept Features"
   task :topk_concept_features => :environment do
     topk = (ENV['topk'] && ENV['topk'].to_i) || 3
     weights = Searcher::load_weights(Searcher::CON_FEATURES, 'con', ENV['method'] || 'grid')
@@ -83,11 +71,11 @@ namespace :export do
     end
   end
   
-  desc "Export Top K relevant items"
-  task :rel_items => :environment do
+  desc "Export Top K ranked lists (for debugging)"
+  task :topk_results => :environment do
     result_total = []
     type = ENV['type'] || 'con'
-    filename = ENV['filename'] || "data/rel_items_#{type}_#$renv.csv"
+    filename = ENV['filename'] || "data/topk_results_#{type}_#$renv.csv"
     topk = (ENV['topk'] && ENV['topk'].to_i) || 10
     queries = ENV['queries'] && ENV['queries'].split(",").map{|e|e.to_i}
     case type
@@ -98,7 +86,7 @@ namespace :export do
       features = Searcher::DOC_FEATURES
       queries = Item.valid.documents.map{|c|c.id}.sample(10).uniq if !ENV['queries']
     end
-    
+    #debugger
     searcher = SolrSearcher.new
     searcher.open_index()
     queries.each do |q|
@@ -120,7 +108,7 @@ namespace :export do
     #$method ||= ENV['method']
     filename = ENV['input'] || get_feature_file($method)
     File.unlink(filename) if File.exists?(filename)
-    Searcher.export_sim_feature(filename)
+    Learner.export_sim_feature(filename, $type, $method)
   end
     
   desc "Export Stat table into CSV"

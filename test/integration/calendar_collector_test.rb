@@ -6,6 +6,10 @@ class CalendarCollectorTest < ActionController::TestCase
     run_collector(:source=>@src.id, :force=>true)
     #assert_equal(30, Item.find_all_by_source_id(@src.id).size)
   end
+  
+  def teardown
+    Item.destroy_all
+  end
 
   def test_filter
     #Source w/ Filter

@@ -35,7 +35,7 @@ class RSSCollector < Collector
           "query"
         else
           if result_count > 0
-            #puts "query : #{query_text}"
+            #putst "query : #{query_text}"
             e[:metadata][:query] = query_text
             result_count -= 1
           end

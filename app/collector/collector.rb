@@ -17,7 +17,7 @@ class Collector #< ApplicationController
   # @param [Integer] o[:times] : no. of repeated collection
   def collect(o = {})
     return 0 if !@src.sync_now? && !o[:force]
-    error "[run_collector] Working on #{@src.title}"
+    info "[run_collector] Working on #{@src.title}"
     open_source()
     if o[:times]
       count = save_docs(read_batch_from_source(o), o)
@@ -66,7 +66,7 @@ class Collector #< ApplicationController
         doc_db.update_attributes(doc.merge(:source_id=>@src.id))
         #debug "[save_docs] filter : #{@src.filter.inspect}"
         if @src.filter && @src.filter.size > 0 && doc_db.validate_by_condition(@src.filter)
-          warn "[collect] Document #{doc_db.did} filtered out!"
+          info "[collect] Document #{doc_db.did} filtered out!"
           doc_db.destroy
         else
           doc[:metadata][:tag_list].split(",").each{|e|doc_db.create_and_link(e, 'tag','t')} unless doc[:metadata][:tag_list].blank?
@@ -77,7 +77,7 @@ class Collector #< ApplicationController
           doc_db.save
         end
       rescue Exception => e
-        error "[save_docs] "+[e.inspect,e.backtrace].join("\n")
+        info "[save_docs] "+[e.inspect,e.backtrace].join("\n")
       end
     end
     #puts "[save_docs] saved_count = #{saved_count}"

@@ -49,6 +49,7 @@ module DocumentsHelper
   end
   
   # Display link URL for clickthrough recording
+  # - query is the target item for game instead of the current item
   def display_link(item, rank_list, htype, position)
     if during_game?
       if session[:game_type] != :s && !page_found? && !query_limit_reached?

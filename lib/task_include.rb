@@ -15,27 +15,33 @@ $today = ENV['today'] || Time.now.ymd
 $cols = ['calendar','webpage','news','file','email'] #Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'csel'
 $user = ENV['user'] || 'all'
-$method = ENV['method'] || 'ranksvm'
+$method = ENV['method'] || 'grid'
 $remark = ENV['remark'] if ENV['remark']
 
-def get_feature_file(method = nil)
-  method ||= ENV['method']
-  "data/feature-#$renv-#$today-#$type-#{method}-#$user-#$remark.csv"
+def get_feature_file(type = nil, method = nil)
+  type ||= $type
+  method ||= $method
+  "data/feature-#$renv-#$today-#{type}-#{method}-#$user-#$remark.csv"
 end
 
-def get_learner_input_file(method = nil)
-  method ||= ENV['method']
-  "data/learner_input/learner_input-#$renv-#$today-#$type-#{method}-#$user-#$remark#$fold.csv"
+def get_learner_input_file(type = nil, method = nil)
+  type ||= $type
+  method ||= $method
+  "data/learner_input/learner_input-#$renv-#$today-#{type}-#{method}-#$user-#$remark#$fold.csv"
 end
 
-def get_learner_output_file(method = nil)
-  method ||= ENV['method']
-  "data/learner_output/learner_output_#$renv-#$today-#$type-#{method}-#$user-#$remark#$fold.csv"
+def get_learner_output_file(type = nil, method = nil)
+  type ||= $type
+  method ||= $method
+  "data/learner_output/learner_output_#$renv-#$today-#{type}-#{method}-#$user-#$remark#$fold.csv"
 end
 
-def get_evaluation_file(eval_type)
+def get_evaluation_file(eval_type, type = nil)
+  type ||= $type
   omit = "o#{ENV['omit']}" if ENV['omit']
-  "data/evaluation_#$renv-#$today-#$type-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}#{omit}.csv"
+  "data/evaluation_#$renv-#$today-#{type}-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}#{omit}.csv"
 end
 
-#LEARNER_INPUT = 
+def get_file_postfix()
+  "#{ENV['train_ratio']}.#{ENV['set_type']}"
+end

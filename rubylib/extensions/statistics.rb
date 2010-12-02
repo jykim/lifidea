@@ -110,7 +110,7 @@ module Statistics
     collect{|e| e.to_f / r}
   end
   
-  def sample(times = 1)
+  def sample_number(times = 1)
     result = []
     #puts rand(),(rand()*size).to_i
     1.upto(times){|i|result << rand}

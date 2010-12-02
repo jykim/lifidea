@@ -6,6 +6,7 @@ require "rubylib_include.rb"
 #require "searcher/pd_lib.rb"
 require 'ddl_extensions'
 require 'ddl_global'
+require 'ddl_logger'
 require 'collector/collector'
 require 'collector/imap_collector'
 require 'collector/file_collector'

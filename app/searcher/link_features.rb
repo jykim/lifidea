@@ -14,7 +14,7 @@ class LinkFeatures
     i = 0.0
     links.each do |l|
       if l[1] >= l[2] && !o[:force]
-        error "Inconsistent Input #{l.inspect}, skipping..." if l[0] != 'e'
+        info "Inconsistent Input #{l.inspect}, skipping..." if l[0] != 'e'
         next
       end
       v[l[0]] = {} if !v[l[0]]

@@ -1,7 +1,27 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+---
+h1:
+  htype: doc
+  basetime: 2009-07-01 07:00:00
+  src_item_id: 1
+  item_id: 2
+  user_id: 1
+  metadata: "--- \n\
+    :skipped_items: 3|4\n"
+    
+h2:
+  htype: doc
+  basetime: 2009-07-01 07:00:00
+  src_item_id: 2
+  item_id: 3
+  user_id: 1
+  metadata: "--- \n\
+    :skipped_items: 4|5\n"
 
-# one:
-#   column: value
-#
-# two:
-#   column: value
+h3:
+  htype: doc
+  basetime: 2009-07-01 07:00:00
+  src_item_id: 4
+  item_id: 6
+  user_id: 1
+  metadata: "--- \n\
+    :skipped_items: 3|5\n"

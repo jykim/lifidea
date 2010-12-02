@@ -93,7 +93,7 @@ class GoldenSectionSearchMethod < SearchMethod
             @saved_results[@yvals[i].join("_")] = yield @xvals , @yvals[i]
           end
           cur_result = "[#{i}][#{j}] lambda[#{cur_y.round_at(3)}] = #{results[i][j][cur_y]}"
-          $lgr.info "#{i} #{j} #{cur_y.round_at(5)} #{results[i][j][cur_y]}"
+          #debug "#{i} #{j} #{cur_y.round_at(5)} #{results[i][j][cur_y]}"
 
           if k < 2 then k += 1 ; next end
           #low < cur & high < cur
@@ -118,11 +118,11 @@ class GoldenSectionSearchMethod < SearchMethod
           end
 
           if low_ys.size == 0
-            puts "[#{i}][#{j}] reached lower end" ; break        
+            break ; #$lgr.debug "[#{i}][#{j}] reached lower end" ; 
           elsif high_ys.size == 0
-            puts "[#{i}][#{j}] reached upper end" ; break
+            break ; #$lgr.debug "[#{i}][#{j}] reached upper end" ; 
           end
-          puts "#{cur_result} -> #{low_ys.last.round_at(3)} - #{cur_y.round_at(3)} -  #{high_ys.last.round_at(3)}"
+          #debug "#{cur_result} -> #{low_ys.last.round_at(3)} - #{cur_y.round_at(3)} -  #{high_ys.last.round_at(3)}"
           k += 1
         end#while
         @yvals[i][j] = results[i][j].max_pair[0]

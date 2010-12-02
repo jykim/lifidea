@@ -88,11 +88,11 @@ class ItemsController < ApplicationController
     History.create(:htype=>params[:htype], :basetime=>Time.now, :src_item_id=>src_item, :item_id=>tgt_item, :user_id=>get_user_id(),
       :metadata=>{:position=>params[:position].to_i, :skipped_items=>params[:skipped_items], :url=>request.url})
     Link.find_or_create(src_item, tgt_item, 'c', :add=>1)
-    if ['con','doc'].include?(params[:htype]) && params[:skipped_items].split("|").size > 1
-      searcher = SolrSearcher.new
-      searcher.log_preference(params[:src_item_id].to_i, params[:htype] , params[:position].to_i)
-      #search_remote('c', "#{params[:src_item_id]}|#{params[:skipped_items]}", :jtype=>'log')
-    end
+    #if ['con','doc'].include?(params[:htype]) && params[:skipped_items].split("|").size > 1
+    #  searcher = SolrSearcher.new
+    #  searcher.log_preference(params[:src_item_id].to_i, params[:htype] , params[:position].to_i)
+    #  #search_remote('c', "#{params[:src_item_id]}|#{params[:skipped_items]}", :jtype=>'log')
+    #end
     redirect_to :action=>:show, :id=>params[:id]
   end
 

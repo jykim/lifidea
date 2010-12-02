@@ -35,6 +35,10 @@ when 'stop'
   require 'daemons/manager'
 when 'status'
   require 'daemons/manager'
+when 'test'
+  $opt['dbg'] = true
+  run "rake test:units"
+  run "rake test:integration"
 when 'log'
   puts "==== OUTPUT ===="
   puts `tail log/#{$rails_env}.log`

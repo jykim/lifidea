@@ -29,20 +29,20 @@ class SolrSearcherTest < ActiveSupport::TestCase
   end
   
   def test_similarity_search()
-    result = @ss.search_by_item(@target.id, 'con')
-    result.each{|e|debug e.inspect}
-    assert(result.size == 0)
+    #result = @ss.search_by_item(@target.id, 'con')
+    #result.each{|e|debug e.inspect}
+    #assert(result.size == 0)
     
     result = @ss.search_by_item(@target.id, 'doc')
     result.each{|e|debug e.inspect}
     assert(result.size > 0)
   end
   
-  # search result should not change with empty context vector   
+  # 
   def test_search_with_context()
     result = @ss.search_by_item(@target.id, 'doc').map{|e|{:id=>e[:id], :score=>e[:score]}}
     @cv = ContextVector.new ; @cv.clear
     result_with_context = @ss.search_by_item_with_context(@target.id, 'doc')
-    assert_equal(result, result_with_context)
+    assert_equal(result, result_with_context, "Search result should not change with empty context vector")
   end
 end
