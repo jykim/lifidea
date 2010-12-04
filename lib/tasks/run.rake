@@ -70,7 +70,7 @@ namespace :run do
     input = ENV['input'] || get_learner_input_file()
     #puts input
     output = ENV['weights'] || get_learner_output_file()
-    Learner.new.learn($type, $method, input + get_file_postfix(), output)
+    Learner.new.learn($type, $method, input + get_file_postfix('train'), output + get_file_postfix('test'))
   end
   
   desc "Run Searcher"

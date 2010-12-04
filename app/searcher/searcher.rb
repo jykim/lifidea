@@ -62,7 +62,7 @@ class Searcher
     when 'con' : features, weights, filter_qry = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights), solr_filter_concepts()
     when 'doc' : features, weights, filter_qry = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights), solr_filter_concepts('-', '&&')
     end
-    debug "#{features.inspect} = #{weights.inspect}"
+    #debug "[search_by_item] #{features.inspect} = #{weights.inspect}"
     result = calc_sim_features(query_item, type, o)
     #debugger
     final_result = result.sort_by{|fts|
@@ -161,6 +161,82 @@ class Searcher
     return result
   end
 
+  # Batch export similarity features for all learning methods
+  # - Use Searcher to get the latest feature value 
+  # @param [String] method : learning method ( grid, ranksvm, etc.)
+  def self.export_sim_feature(type)
+    last_query_no = 0
+    files = ['grid','ranksvm'].map_hash do |method|
+      [method, File.open(get_feature_file(type, method),'w')]
+    end
+    
+    features = Learner.get_features_by_type(type, ENV['omit'])
+    files['grid'].puts ['pref','basetime','src_id','tgt_id','src','target','sum'].concat(features).join(",")
+    searcher = SolrSearcher.new
+    searcher.open_index()
+    
+    History.between($start_at, $end_at).find_all_by_htype(type).each do |h|
+      next if ENV['id'] && h.id != ENV['id'].to_i
+      next if $user != 'all' && $user != 'top5' && h.user && $user != h.user.uid
+      #next if $user == 'top5' && !['ylim','yhkim','rshorey','gbh','uysal','lfriedl','vdang','limemoon'].include?(h.user.uid)
+      debug "Exporting #{h.id} (#{h.src_item_id} by #{h.user.uid})"
+      h.metadata[:skipped_items] = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}["skipped_items"] if !h.metadata[:skipped_items]
+      skipped_items = h.metadata[:skipped_items].split("|").map{|e|e.to_i}
+      begin
+        result = searcher.search_by_item(h.src_item_id, h.htype, :working_set=>skipped_items, :no_cache=>true)
+        # Get result from Searcher
+        raise DataError, "Source Item not found!"  if !result
+        raise DataError, "Record not found!" if result.find_all{|r|r[:id]==skipped_items[0]}.size == 0 #result.size < 2 || 
+        result_arr = result.map{|r|
+          #debugger
+          pref = (r[:id]==skipped_items[0])? 2 : 1
+          if pref == 1 && searcher.clf.read('c', h.src_item_id.to_i, r[:id]) > 0
+            debug "clicked item : #{h.src_item_id}-#{r[:id]} #{pref} / #{searcher.clf.read('c', h.src_item_id.to_i, r[:id])}"
+            next
+          end
+          {:id=>r[:id], :pref=>pref, :features=>features.map{|f|r[f]||0}}
+        }.find_all{|e|e}.sort_by{|e|e[:pref]}.reverse
+        raise Exception, "Incorrect Pair" if result_arr.size < 2 || result_arr[0][:pref] != 2
+        # Export the result 
+        result_arr.each do |r|
+          files['grid'].puts [r[:pref], h.basetime, h.src_item_id, r[:id], Item.find(h.src_item_id).title, Item.find(r[:id]).title, r[:features].sum].concat(r[:features]).to_csv
+          files['ranksvm'].puts "#{r[:pref]} qid:#{last_query_no} #{r[:features].map_with_index{|f,i|"#{i+1}:#{f}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "          
+        end
+      rescue Interrupt
+        break
+      rescue DataError => e
+        info "[export:sim_features] #{h.src_item_id}(#{skipped_items.size}) : #{(skipped_items - result.map{|r|r[:id]}).inspect} not found!" if skipped_items && result
+        next
+      rescue Exception => e
+        info "[export:sim_features] other exceptions.. #{e.inspect}"
+        #debugger
+        next
+      end
+      last_query_no += 1
+      #index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
+    end
+    puts "#{last_query_no} items exported..."
+    files.each{|k,v|v.flush}
+  end
+  
+  # @deprecated
+  def log_preference(query_item, type, click_position, o={})
+    $f_li = File.open(Rails.root.join("data/learner_input/learner_input_#{ENV['RAILS_ENV']}_#{type}_#{Time.now.ymd}.txt"), 'a')
+    result = @cv.get()[-1][:result]
+    #search_by_item(query_item, type)
+    last_query_no = SysConfig.find_by_title("LAST_QUERY_NO").content.to_i
+    #debugger
+    log = result[0..(click_position-1)].reverse.map_with_index{|e,i|
+      [((i==0)? 2 : 1), "qid:#{last_query_no}", e, "# #{query_item} -> #{e[:id]}" ]
+    }
+    if !o[:export_mode]
+      #$clf.increment('c', dnos[0], dnos[1])
+      SysConfig.find_by_title("LAST_QUERY_NO").update_attributes(:content=>(last_query_no+1)) 
+    end
+    $f_li.puts log.map{|e|e.join(" ")}.join("\n") if log.size > 1
+    $f_li.flush
+  end
+
   
   # Load feature weights from data/learner_output
   # - feature set should match with the weight file format
@@ -185,13 +261,14 @@ class Searcher
     rescue Exception => e
       error "[Searcher.load_weights] error in file [#{weight_file}] ", e
     end
-    debug "[Searcher.load_weights] #{features.inspect}(#{rank}) = #{result.inspect}"
+    #debug "[Searcher.load_weights] #{features.inspect}(#{rank}) = #{result.inspect}"
     result
   end
   
+  # 
   def self.read_recent_file_in(path, o = {})
     file = find_in_path(path, o).map{|e|[e,File.new(e).mtime]}.sort_by{|e|e[1]}[-1]
-    puts "[read_recent_file_in] #{o[:filter]} #{file.inspect}"
+    #debug "[read_recent_file_in] #{o[:filter]} #{file.inspect}"
     file[0]
   end
   

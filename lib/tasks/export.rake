@@ -106,9 +106,7 @@ namespace :export do
   desc "Export Learner Input from Click Histories"
   task :sim_features => :environment do
     #$method ||= ENV['method']
-    filename = ENV['input'] || get_feature_file($method)
-    File.unlink(filename) if File.exists?(filename)
-    Learner.export_sim_feature(filename, $type, $method)
+    Searcher.export_sim_feature($type)
   end
     
   desc "Export Stat table into CSV"

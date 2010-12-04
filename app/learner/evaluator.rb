@@ -29,6 +29,7 @@ class Evaluator
     result_all = []
     searcher = SolrSearcher.new
     qrels = read_csv(input).find_all{|e|e[:pref]=='2'}
+    return nil if qrels.size == 0
     #debugger
     qrels.each do |row|
       result = []
@@ -39,7 +40,7 @@ class Evaluator
       end
       result_all << [query, result].flatten #if result[0] > 0 # use only entries where relevant items were found
     end
-    average = (1..(weight_set.size)).map{|e|result_all.map{|e2|e2[e]}.mean.r3}
+    average = (1..(weight_set.size)).map{|e|result_all.map{|e2|e2[e]}.mean.to_f.r3}
     result_all << ["summary(#{type}/#$set_type)", average].flatten
   end
   

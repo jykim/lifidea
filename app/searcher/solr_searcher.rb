@@ -88,7 +88,7 @@ class SolrSearcher < Searcher
       error "[search_by_item] Error in Calling Solr", e
       return []
     end
-    error "[search_by_item] Nothing returned from Solr!!!" if solr_result['response']['docs'].size == 0
+    info "[search_by_item] Nothing returned from Solr!!!" if solr_result['response']['docs'].size == 0
     # Feature Vector generation
     solr_result['response']['docs']
   end

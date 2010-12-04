@@ -21,7 +21,7 @@ $remark = ENV['remark'] if ENV['remark']
 def get_feature_file(type = nil, method = nil)
   type ||= $type
   method ||= $method
-  "data/feature-#$renv-#$today-#{type}-#{method}-#$user-#$remark.csv"
+  "data/feature/feature-#$renv-#$today-#{type}-#{method}-#$user-#$remark.csv"
 end
 
 def get_learner_input_file(type = nil, method = nil)
@@ -39,9 +39,10 @@ end
 def get_evaluation_file(eval_type, type = nil)
   type ||= $type
   omit = "o#{ENV['omit']}" if ENV['omit']
-  "data/evaluation_#$renv-#$today-#{type}-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}#{omit}.csv"
+  "data/evaluation/evaluation_#$renv-#$today-#{type}-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}#{omit}.csv"
 end
 
-def get_file_postfix()
-  "#{ENV['train_ratio']}.#{ENV['set_type']}"
+def get_file_postfix(set_type = nil)
+  set_type ||= ENV['set_type']
+  "#{ENV['train_ratio']}.#{set_type}"
 end

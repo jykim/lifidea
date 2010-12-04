@@ -3,8 +3,9 @@ namespace :evaluate do
   task(:sim_search => :environment) do
     $set_type = ENV['set_type'] || 'test'
     input = ENV['input'] || get_learner_input_file() + get_file_postfix()
-    output = ENV['output'] || get_evaluation_file(ENV['eval_type'], $type)
+    output = ENV['output'] || get_evaluation_file($set_type, $type)
     methods = ['uniform','grid','svm']
+    debug "[evaluate:sim_search] output = #{output}"
     Evaluator.export_sim_evaluation_result($type, methods, input, output)
   end
   
@@ -16,18 +17,21 @@ namespace :evaluate do
         when /con|doc/ : Rake::Task['export:sim_features'].execute
         end
       end
+      ['grid','ranksvm'].each do |method|#'ranksvm','grid','liblinear'
+        $method = method
+        Rake::Task['etc:split_file'].execute
+      end
       ENV['eval_type'] = 'cval'
-      Rake::Task['etc:split_file'].execute
-      1.upto(ENV['folds'].to_i) do |i|
-        puts "====== Starting #{i}th fold ======="
-        ENV['fold'] = i.to_s
-        $fold = "-k#{ENV['folds']}-#{ENV['fold']}"
-        ['grid'].each{|method|#'ranksvm','grid','liblinear'
+      1.upto(ENV['folds'].to_i) do |x|
+        puts "====== Starting #{x}th fold ======="
+        $fold = "-k#{ENV['folds']}-#{x}"
+        ['grid','ranksvm'].each{|method|#'ranksvm','grid','liblinear'
           ENV['set_type'] = 'train'
           #next if ENV['method'] && ENV['method'] != method
           $method = method
           Rake::Task['run:learner'].execute
         } if !ENV['skip_learner']
+        $method = 'grid'
         case $type
         when /con|doc/
           #ENV['set_type'] = 'train'

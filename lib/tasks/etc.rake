@@ -56,7 +56,7 @@ namespace :etc do
   task(:split_file => :environment) do
     total_ratio = ENV['total_ratio'] || 1
     filename = ENV['input'] || get_feature_file()
-    puts "Splitting #{filename}... (#{ENV['method']})"
+    #puts "Splitting #{filename}... (#{ENV['method']})"
     header = nil
     data = case ($method ||= ENV['method'])
     when 'ranksvm' : IO.read(filename).split(/^(?=2)/)
