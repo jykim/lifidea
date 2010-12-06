@@ -24,7 +24,7 @@ class FileCollector < Collector
   # @option o [Bool] :path_as_tag : use file path as tag 
   def read_from_source(o = {})
     data_path = @src.uri.gsub("file://","")
-    puts "Working on #{@src.title} (#{data_path})"
+    #puts "Working on #{@src.title} (#{data_path})"
     result = [] ; file_count = 0
     find_in_path(data_path, :recursion=>true) do |fp, fn|
       filename, mtime = fp.gsub(data_path+'/', ""), File.new(fp).mtime

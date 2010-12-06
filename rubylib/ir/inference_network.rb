@@ -3,6 +3,8 @@ module InferenceNetwork
   PTN_OP = /\#(wsum|combine)/
   PTN_NODE = /(#{LanguageModel::PTN_TERM})\.\((\w+)\)/
   PTN_WNODE = /([\d\.]+?) (#{LanguageModel::PTN_TERM})\.\((\w+)\)/
+  
+  
   def self.eval_indri_query(query)
     #debugger
     result = query.gsub(PTN_OP,',op_\1').

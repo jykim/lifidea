@@ -14,9 +14,10 @@ class Indexer
   def initialize()
     #@ch = Concept.init_concept_hash()
     #Indexer.initialize_dict()
-    @ch = Indexer.init_concept_hash
+    #@ch = Indexer.init_concept_hash
   end
   
+  # @deprecated
   def self.init_concept_hash
     ch = ConceptHash.new
     Item.valid.concepts.each{|c| ch.put_concepts(c.id , c.title) }    

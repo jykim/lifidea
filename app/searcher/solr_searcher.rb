@@ -43,9 +43,9 @@ class SolrSearcher < Searcher
   # 
   def calc_df(query, tplus = [], tminus = [])
     #debugger
-    splus = tplus.map{|e|"+\"#{e}\""}.join(" ")
-    sminus = tminus.map{|e|"-\"#{e}\""}.join(" ")#
-    query = "\"#{query} #{splus} #{sminus}\""
+    splus = tplus.map{|e|"+'#{e}'"}.join(" ")
+    sminus = tminus.map{|e|"-'#{e}'"}.join(" ")#
+    query = "'#{query}' #{splus} #{sminus}"
     result = Sunspot.search(Item) do
       keywords query
       without :itype_str, Item::ITYPE_CONCEPT

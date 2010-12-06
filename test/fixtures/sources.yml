@@ -197,7 +197,7 @@ sources_013:
     :trec: true\n"
   title: TREC Docs
   itype: file
-  active_flag: "0"
+  active_flag: "1"
   id: "13"
   filter: 
   created_at: 
