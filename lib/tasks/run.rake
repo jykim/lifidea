@@ -67,10 +67,10 @@ namespace :run do
   task(:learner => :environment) do
     #puts "run:learner!"
     #debugger
-    input = ENV['input'] || get_learner_input_file()
+    input = ENV['input'] || get_learner_input_file() + get_file_postfix('train')
     #puts input
-    output = ENV['weights'] || get_learner_output_file()
-    Learner.new.learn($type, $method, input + get_file_postfix('train'), output + get_file_postfix('test'))
+    output = ENV['weights'] || get_learner_output_file() + get_file_postfix('test')
+    Learner.new.learn($type, $method, input, output, :subtype=>$subtype)
   end
   
   desc "Run Searcher"
@@ -79,7 +79,6 @@ namespace :run do
     require 'lib/daemons/searcher'
   end
 
-  
   desc "Run Searcher"
   task(:extractor => :environment) do
     te = TaxonomyExtractor.new

@@ -14,33 +14,38 @@ class Evaluator
   
   # Export evaluation result to a file
   # @return : a 2d array with evaluation results for given methods
-  def self.export_sim_evaluation_result(type, methods, input, output)
+  def self.export_sim_evaluation_result(type, methods, input, output, o = {})
     features = Learner.get_features_by_type(type, ENV['omit'])
-    weights = [features,methods].flatten.map{|e|Searcher.load_weights(features, type, e)}
-    weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
-    result_all = self.evaluate_sim_search_methods(type, input, features, weights)
+    result_all = self.evaluate_sim_search_methods(type, methods, input, o)
     write_csv(output, result_all, :header=>["query", features, methods].flatten)
     result_all
   end
   
   # Print evaluation result given input and a set of weights
-  # @deprecated 
-  def self.evaluate_sim_search_methods(type, input, features, weight_set)
+  def self.evaluate_sim_search_methods(type, methods, input, o = {})
     result_all = []
     searcher = SolrSearcher.new
+    features = Learner.get_features_by_type(type, ENV['omit'])
+    runs = [features,methods].flatten
+    #weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
     qrels = read_csv(input).find_all{|e|e[:pref]=='2'}
     return nil if qrels.size == 0
     #debugger
     qrels.each do |row|
       result = []
       query, rel = row[:src_id].to_i, row[:tgt_id].to_i
-      weight_set.each_with_index do |weights,i|
-        rank_list = searcher.search_by_item(query, type, :features=>features, :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
+      runs.map{|e|e.to_s.split('.')}.each_with_index do |run_id,i|
+        weights = Searcher.load_weights(features.map{|e|e.to_s}, type, run_id[0])
+        case run_id[1]
+        when 'feedback'
+          o.merge!(:subtype=>'feedback', :feedback_weights=>Searcher.load_weights([0.0]*7, type, run_id[0], 'feedback'))
+        end 
+        rank_list = searcher.process_request(query, type, o.merge(:features=>features, :weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
         result << self.recip_rank(rank_list, rel)
       end
       result_all << [query, result].flatten #if result[0] > 0 # use only entries where relevant items were found
     end
-    average = (1..(weight_set.size)).map{|e|result_all.map{|e2|e2[e]}.mean.to_f.r3}
+    average = (1..(runs.size)).map{|e|result_all.map{|e2|e2[e]}.mean.to_f.r3}
     result_all << ["summary(#{type}/#$set_type)", average].flatten
   end
   
@@ -55,11 +60,23 @@ class Evaluator
       query, rel = row[:src_id].to_i, row[:tgt_id].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
-      rank_list = searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
+      rank_list = searcher.process_request(query, type, o.merge(:weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
+      
+      #case o[:subtype]
+      #when 'feedback'
+      #  searcher.search_by_item_with_feedback(query, type, o.merge(:weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
+      #else
+      #  searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
+      #end
       #puts rank_list.inspect
       result[query] = self.recip_rank(rank_list, rel)
     end
-    [result.values.mean, weights].flatten
+    return_weights = case o[:subtype]
+    when 'feedback' : o[:feedback_weights]
+    else
+      weights
+    end
+    [result.values.mean, return_weights].flatten
   end
   
   def self.evaluate_keyword_search_with(input_data, weights = nil, o={})

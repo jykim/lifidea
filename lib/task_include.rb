@@ -14,6 +14,7 @@ $end_at = ENV['end_at']   || (Date.tomorrow+1).to_s
 $today = ENV['today'] || Time.now.ymd
 $cols = ['calendar','webpage','news','file','email'] #Item.itype_lists - ['query','concept']
 $type = ENV['type'] || 'csel'
+$subtype = ENV['subtype'] || 'none'
 $user = ENV['user'] || 'all'
 $method = ENV['method'] || 'grid'
 $remark = ENV['remark'] if ENV['remark']
@@ -32,14 +33,16 @@ end
 
 def get_learner_output_file(type = nil, method = nil)
   type ||= $type
+  subtype ||= $subtype
   method ||= $method
-  "data/learner_output/learner_output_#$renv-#$today-#{type}-#{method}-#$user-#$remark#$fold.csv"
+  "data/learner_output/learner_output_#$renv-#$today-#{type}-#{method}-#{subtype}-#$user-#$remark#$fold.csv"
 end
 
 def get_evaluation_file(eval_type, type = nil)
   type ||= $type
+  subtype ||= $subtype
   omit = "o#{ENV['omit']}" if ENV['omit']
-  "data/evaluation/evaluation_#$renv-#$today-#{type}-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}#{omit}.csv"
+  "data/evaluation/evaluation_#$renv-#$today-#{type}-#{subtype}-#{eval_type}-#$user-#$remark-#$fold-#{ENV['train_ratio']}#{omit}.csv"
 end
 
 def get_file_postfix(set_type = nil)

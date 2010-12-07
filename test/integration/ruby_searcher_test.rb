@@ -25,10 +25,10 @@ class RubySearcherTest< ActiveSupport::TestCase
     0.upto(0) do |i|
       #debugger
       queries[i] = '#combine(#wsum(0.6 t1.(a) 0.4 t1.(b)) #wsum(0.3 t2.(a) 0.7 t2.(b)))'#@docs[i].lm.p.sample(2).join(" ")
-      puts "Query : #{queries[i]}"
+      #puts "Query : #{queries[i]}"
       #run_indri(queries[i])
       results[i] = @rs.search_by_keyword("t1 t2", :indri_query=>queries[i])
-      puts results[i].map{|e|e.join("\t")}.join("\n")
+      #puts results[i].map{|e|e.join("\t")}.join("\n")
     end
   end
 end

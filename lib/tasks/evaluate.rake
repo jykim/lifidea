@@ -4,9 +4,9 @@ namespace :evaluate do
     $set_type = ENV['set_type'] || 'test'
     input = ENV['input'] || get_learner_input_file() + get_file_postfix()
     output = ENV['output'] || get_evaluation_file($set_type, $type)
-    methods = ['uniform','grid','svm']
+    methods = ['uniform','grid','grid.feedback','svm']
     debug "[evaluate:sim_search] output = #{output}"
-    Evaluator.export_sim_evaluation_result($type, methods, input, output)
+    Evaluator.export_sim_evaluation_result($type, methods, input, output, :subtype=>$subtype)
   end
   
   namespace :batch do
@@ -25,10 +25,16 @@ namespace :evaluate do
       1.upto(ENV['folds'].to_i) do |x|
         puts "====== Starting #{x}th fold ======="
         $fold = "-k#{ENV['folds']}-#{x}"
-        ['grid','ranksvm'].each{|method|#'ranksvm','grid','liblinear'
+        ['grid','feedback','ranksvm'].each{|method|#'ranksvm','grid','liblinear'
           ENV['set_type'] = 'train'
           #next if ENV['method'] && ENV['method'] != method
-          $method = method
+          if method == 'feedback'
+            $method = 'grid'
+            $subtype = method
+          else
+            $method = method
+            $subtype = 'none'
+          end
           Rake::Task['run:learner'].execute
         } if !ENV['skip_learner']
         $method = 'grid'

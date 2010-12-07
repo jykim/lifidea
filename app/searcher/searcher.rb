@@ -14,7 +14,7 @@ class Searcher
       #debugger
       open_index()
       cache_data("exists", "true")
-      error "[init_controller] searcher initializd..."
+      error "[Searcher#new] searcher initializd..."
     else
       @clf = cache_data('clf')
       @con_weights = cache_data('con_weights')
@@ -33,7 +33,7 @@ class Searcher
     result = case qtype
     when 'kwd' : search_by_keyword(query, o)
     when /con|doc/
-      if o['feedback']
+      if o['feedback'] || o[:subtype] == 'feedback'
         search_by_item_with_feedback(query, qtype, o)
       elsif o['context']
         search_by_item_with_context(query, qtype, o)
@@ -73,7 +73,8 @@ class Searcher
     final_result
   end
   
-  # 
+  # Search items with pseudo-relevance feedback
+  # @param [Array] :feedback_weights
   def search_by_item_with_feedback(item, type, o={})
     o[:feedback_weights] ||= [0.2]*5
     initial_result = search_by_item(item, type, o)
@@ -81,7 +82,7 @@ class Searcher
     initial_result.each_with_index do |row,i|
       break if !o[:feedback_weights][i]
       result = search_by_item(row[:id], type, o).map_hash{|e|[e[:id], e[:score]]}
-      final_result = final_result.sum_prob(result.times(o[:feedback_weights][i]))
+      final_result = final_result.sum_prob(result.times(o[:feedback_weights][i]/7))
     end
     final_result.map{|k,v|{:id=>k, :score=>v}}.sort_by{|e|e[:score]}.reverse
   end
@@ -215,7 +216,7 @@ class Searcher
       last_query_no += 1
       #index.log_preference([h.src_item_id, skipped_items].flatten.join("|"), :export_mode=>true)
     end
-    puts "#{last_query_no} items exported..."
+    info "#{last_query_no} items exported..."
     files.each{|k,v|v.flush}
   end
   
@@ -237,39 +238,32 @@ class Searcher
     $f_li.flush
   end
 
-  
   # Load feature weights from data/learner_output
   # - feature set should match with the weight file format
   # @param <String> features : feature set used
   # @param <String> type : search type (doc / con)
-  # @param <String> rank : weighting scheme used (default : uniform)
-  def self.load_weights(features, type, rank = 'uniform')
+  # @param <String> method : weighting scheme used
+  # @param <String> subtype : variation of ranking method
+  def self.load_weights(features, type, method = 'uniform', subtype = 'none')
     result = [0] * features.size
-    rank ||= ENV['rank']
-    if features.include?(rank)
-      features.each_with_index{|e,i|result[i] = 1 if e == rank}
+    if features.include?(method)
+      features.each_with_index{|e,i|result[i] = 1 if e == method}
       return result
-    elsif rank == 'uniform'
+    elsif method == 'uniform'
       return [1] * features.size 
     end
     
     begin
-      weight_file = self.read_recent_file_in(Rails.root.join("data/learner_output"), :filter=>/#{ENV['RAILS_ENV']}.*#{type}.*#{rank}/)
+      filename_filter = /#{ENV['RAILS_ENV']}.*#{type}.*#{method}.*#{subtype}/
+      weight_file = read_recent_file_in(Rails.root.join("data/learner_output"), :filter=>filename_filter)
       weight_hash = IO.read(weight_file).
         split("\n")[0].split(" ")[1..-1].map_hash{|e|r = e.split(":") ; [r[0].to_i, r[1].to_f]}
-      result = [] ; 1.upto(features.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0)}
+      result = [] ; 1.upto(features.size){|i|result << ((weight_hash[i] && weight_hash[i] > 0) ? weight_hash[i] : 0.0)}
     rescue Exception => e
-      error "[Searcher.load_weights] error in file [#{weight_file}] ", e
+      error "[Searcher.load_weights] error in file [#{weight_file}] filter [#{filename_filter}]", e
     end
-    #debug "[Searcher.load_weights] #{features.inspect}(#{rank}) = #{result.inspect}"
+    puts "[Searcher.load_weights] #{features.inspect}(#{File.basename(weight_file)}) = #{result.map{|e|e.r3}.inspect}"
     result
-  end
-  
-  # 
-  def self.read_recent_file_in(path, o = {})
-    file = find_in_path(path, o).map{|e|[e,File.new(e).mtime]}.sort_by{|e|e[1]}[-1]
-    #debug "[read_recent_file_in] #{o[:filter]} #{file.inspect}"
-    file[0]
   end
   
   # Load link & occurrence table to memory

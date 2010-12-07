@@ -57,3 +57,10 @@ def parse_value(value)
   end
 end
 
+# 
+def read_recent_file_in(path, o = {})
+  file = find_in_path(path, o).map{|e|[e,File.new(e).mtime]}.sort_by{|e|e[1]}[-1]
+  #debug "[read_recent_file_in] #{o[:filter]} #{file.inspect}"
+  file[0]
+end
+

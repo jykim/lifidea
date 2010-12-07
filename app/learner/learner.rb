@@ -7,7 +7,7 @@ class Learner
   end
   
   # Run learner
-  def learn(type, method, input, output)
+  def learn(type, method, input, output, o = {})
     case method
     when 'ranksvm' : learn_by_ranksvm(input, output)
     when 'liblinear' : learn_by_liblinear(input, output, :ll_type=>ENV['ll_type'])
@@ -15,7 +15,7 @@ class Learner
     when 'grid'
       input_data = read_csv(input)#+"#{ENV['train_ratio']}.train")
       learn_by_grid_search(input_data, output, type, 
-        :features=>Learner.get_features_by_type(type, ENV['omit']), :grid_type=>ENV['grid_type'])
+        o.merge(:features=>Learner.get_features_by_type(type, ENV['omit'])))
     else
       puts "[learner] No method selected!"
     end
@@ -63,28 +63,43 @@ class Learner
   
   # @param <Array> : input_data (same as evaluate_sim_search_with)
   # @param <String> output : output file
-  # @return <Array> : 
+  # @return <String> : type
   def learn_by_grid_search(input_data, output, type, o = {})
     no_params = o[:features].size
     xvals = (1..no_params).to_a
     yvals = [] ; yvals << [0.5] * xvals.size
     results = []
-    
+    if o[:subtype] != 'none'
+      feature_weights = Searcher.load_weights(o[:features], type, 'grid', 'none')
+      puts "[learn_by_grid_search] feature_weights : #{feature_weights.inspect}"
+    end
     search_method = GoldenSectionSearchMethod.new(xvals , yvals)
     search_method.search(3) do |xvals , yvals , train , remote|
       results << case type
-      when /con|doc/ : Evaluator.evaluate_sim_search_with(input_data.find_all{|e|e[:pref] == '2'}, type, yvals, o)
+      when /con|doc/
+        case o[:subtype]
+        when 'feedback'
+          Evaluator.evaluate_sim_search_with(input_data.find_all{|e|e[:pref] == '2'}, 
+            type, feature_weights , o.merge(:feedback_weights=>yvals))
+        when 'context'
+        else
+          Evaluator.evaluate_sim_search_with(input_data.find_all{|e|e[:pref] == '2'}, type, yvals, o)
+        end
       when 'csel': Evaluator.evaluate_csel_with(input_data, yvals, o)
       end
+      debug "[learn_by_grid_search|#{type}|#{o[:subtype]}] #{yvals.map{|e|e.r3}.inspect} = #{results[-1][0].r3}"
       results[-1][0]
     end
-    results_str = case (o[:grid_type] || 'single')
-    when 'single'
-      results.sort_by{|e|e[0]}.reverse.map{|l|l.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
-    when 'avg'
-      max_perf = results.sort_by{|l|l[0]}[-1][0]
-      results_str = results.find_all{|l|l[0] == max_perf}.merge_array_by_avg().map_with_index{|e,i|[i,e].join(":")}.join(" ")
-    end
+    #debugger
+    results_str = results.sort_by{|e|e[0]}.reverse.map{|l|l.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
+
+    #= case (o[:grid_type] || 'single')
+    #when 'single'
+    #  results.sort_by{|e|e[0]}.reverse.map{|l|l.map_with_index{|e,i|[i,e].join(":")}.join(" ")}.join("\n")
+    #when 'avg'
+    #  max_perf = results.sort_by{|l|l[0]}[-1][0]
+    #  results_str = results.find_all{|l|l[0] == max_perf}.merge_array_by_avg().map_with_index{|e,i|[i,e].join(":")}.join(" ")
+    #end
     File.open(output, 'w'){|f|f.puts results_str}
     info "[learn_by_grid_search] max(MRR) = #{results.sort_by{|e|e[0]}[-1][0]}"
     results
