@@ -69,9 +69,9 @@ class Learner
     xvals = (1..no_params).to_a
     yvals = [] ; yvals << [0.5] * xvals.size
     results = []
-    if o[:subtype] != 'none'
+    if o[:subtype] && o[:subtype] != 'none'
       feature_weights = Searcher.load_weights(o[:features], type, 'grid', 'none')
-      puts "[learn_by_grid_search] feature_weights : #{feature_weights.inspect}"
+      debug "[learn_by_grid_search] feature_weights : #{feature_weights.inspect}"
     end
     search_method = GoldenSectionSearchMethod.new(xvals , yvals)
     search_method.search(3) do |xvals , yvals , train , remote|

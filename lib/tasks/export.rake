@@ -106,7 +106,7 @@ namespace :export do
   desc "Export Learner Input from Click Histories"
   task :sim_features => :environment do
     #$method ||= ENV['method']
-    Searcher.export_sim_feature($type)
+    Searcher.export_sim_feature($type, $start_at, $end_at)
   end
     
   desc "Export Stat table into CSV"

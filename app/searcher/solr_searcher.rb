@@ -10,8 +10,6 @@ class SolrSearcher < Searcher
   end
   
   # Search given keyword query
-  # - 2) document scoring
-  # - merging 1) and 2) into final score
   def search_by_keyword(query, o={})
     #debugger
     #debug "[search_by_keyword] query = #{query}"
@@ -34,9 +32,12 @@ class SolrSearcher < Searcher
     #debugger
     if o[:facet]
       result.facet(o[:facet]).rows
-    else
-      @cv.add(:type=>'kwd', :query=>query ,:result=>result.hits.map{|e|{:id=>e.instance.id, :score=>e.score}}) if o[:add_context]
+    elsif o[:raw]
       result
+    else
+      result_items = result.hits.map{|e|{:id=>e.instance.id, :score=>e.score}}
+      @cv.add(:type=>'kwd', :query=>query, :created_at=>(o[:created_at] || Time.now), :history_id=>o[:history_id], :result=>result_items) if o[:add_context]
+      result_items
     end
   end
   

@@ -1,4 +1,6 @@
-# Evaluation of Algorithms
+# == Evaluation of Algorithms
+# 
+# 
 class Evaluator
   def initialize(args)
     
@@ -60,6 +62,7 @@ class Evaluator
       query, rel = row[:src_id].to_i, row[:tgt_id].to_i
       #puts "Query : #{query} -> Rel : #{rel}"
       #debugger
+      
       rank_list = searcher.process_request(query, type, o.merge(:weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
       
       #case o[:subtype]

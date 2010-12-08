@@ -11,6 +11,11 @@ namespace :evaluate do
   
   namespace :batch do
     task(:cval) do
+      if ENV['context']
+        @ss = SolrSearcher.new
+        @ss.build_context_vector()
+      end
+      
       if ENV['export']
         case $type
         when 'csel': Rake::Task['export:csel_features'].execute

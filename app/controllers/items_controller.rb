@@ -52,7 +52,7 @@ class ItemsController < ApplicationController
     end
     begin
       #debugger
-      @search_results = searcher.process_request(@query, 'kwd', params)
+      @search_results = searcher.process_request(@query, 'kwd', params.merge(:raw=>true))
       error "search_results : #{@search_results.inspect}"      
     rescue Exception => e
       error "Search failed!!", e

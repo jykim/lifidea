@@ -1,5 +1,7 @@
 require 'test_helper'
 require 'rake'
+ENV['all'] = 'true'
+require 'task_include'
 Ddl::Application.load_tasks
 
 class SolrSearcherTest < ActiveSupport::TestCase
@@ -19,19 +21,17 @@ class SolrSearcherTest < ActiveSupport::TestCase
       "Inclusion of the same word should not decrease count")
     assert_equal(0, @ss.calc_df(@query_word[0], "", @query_word[0]), 
       "Exclusion of the same word should make the count zero")
-    
   end
   
   # Test keyword / similarity search
   def test_keyword_search()
     #debugger
-    assert(@ss.search_by_keyword(TEXT_DUMMY).total > 0)
+    assert(@ss.search_by_keyword(TEXT_DUMMY, :raw=>true).total > 0)
     
-    result = @ss.search_by_keyword(@query_word)
-    result_docs = result.hits.map{|e|e.instance.id}
+    result_docs = @ss.search_by_keyword(@query_word)
     #debugger
     assert(result_docs.size > 0)
-    assert(result_docs.include? @target.id)
+    assert(1, result_docs.find_all{|e|e[:id] == @target.id})
   end
   
   def test_similarity_search()
@@ -49,8 +49,11 @@ class SolrSearcherTest < ActiveSupport::TestCase
   def test_search_with_context()
     result = @ss.search_by_item(@target.id, 'doc').map{|e|{:id=>e[:id], :score=>e[:score]}}
     @cv = ContextVector.new ; @cv.clear
+    
     result_with_context = @ss.search_by_item_with_context(@target.id, 'doc')
     assert_equal(result, result_with_context, 
-      "Search result should not change with empty context vector")
+      "Search result should not change with the empty context vector")
+      
+    @ss.build_context_vector()
   end
 end

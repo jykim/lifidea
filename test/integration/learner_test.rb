@@ -1,11 +1,13 @@
 require 'test_helper'
+ENV['all'] = 'true'
 require 'task_include'
 require 'rake'
 
 class LearnerTest < ActiveSupport::TestCase
   def setup()
     @l = Learner.new
-    Searcher.export_sim_feature('doc')
+    @ss = SolrSearcher.new
+    @ss.export_sim_feature('doc', $start_at, $end_at)
     assert(File.stat(get_feature_file('doc', 'ranksvm')).size > 0, 'exported file should not be empty!')
   end
     
