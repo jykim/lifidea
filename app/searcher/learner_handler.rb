@@ -80,7 +80,7 @@ module LearnerHandler
     History.between(start_at, end_at).find_all_by_htype(type).each do |h|
       next if ENV['id'] && h.id != ENV['id'].to_i
       next if $user != 'all' && $user != 'top5' && h.user && $user != h.user.uid
-      #next if $user == 'top5' && !['ylim','yhkim','rshorey','gbh','uysal','lfriedl','vdang','limemoon'].include?(h.user.uid)
+      next if $user == 'top5' && !['ylim','yhkim','rshorey','gbh','uysal','lfriedl','vdang','limemoon'].include?(h.user.uid)
       debug "Exporting #{h.id} (#{h.src_item_id} by #{h.user.uid})"
       h.metadata[:skipped_items] = h.m[:url].gsub("%7C","|").split("&")[1..-1].map_hash{|e|e.split("=")}["skipped_items"] if !h.metadata[:skipped_items]
       skipped_items = h.metadata[:skipped_items].split("|").map{|e|e.to_i}

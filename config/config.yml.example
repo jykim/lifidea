@@ -10,6 +10,7 @@ common:
   cache: true
   weight_con: uniform
   weight_doc: uniform
+  path_ranksvm: /Volumes/data/dev/pkg/ranksvm/
   
 development:
   webserver_port: 3000
