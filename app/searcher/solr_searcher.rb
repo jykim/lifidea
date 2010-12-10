@@ -16,7 +16,7 @@ class SolrSearcher < Searcher
     result = Sunspot.search(Item) do
       keywords query
       if o[:doc_only]
-        without :itype_str, ['query','concept','tag']
+        without :itype_str, Item::ITYPE_CONCEPT#['query','concept','tag']
       end
       #debugger
       o.find_all{|k,v|k.to_s =~ /^facet\_/}.each do |e|
@@ -58,8 +58,9 @@ class SolrSearcher < Searcher
   end
   
   # Filter itype from solr search results
-  def solr_filter_concepts(prefix = '+', join = ' || ')
-    ['query'].map{|e|"#{prefix}itype_text:#{e}"}.join("#{join}")
+  def solr_filter_concepts(prefix = '', join = ' || ')
+    result = Item::ITYPE_CONCEPT.map{|e|"#{prefix}itype_text:#{e}"}.join("#{join}")
+    "(#{result})"
   end
   
   # Get similarity search result from Solr
@@ -71,7 +72,7 @@ class SolrSearcher < Searcher
     else
       case type
       when 'con' : filter_qry = solr_filter_concepts()
-      when 'doc' : filter_qry = solr_filter_concepts('-', '&&')
+      when 'doc' : filter_qry = solr_filter_concepts('-', ' && ')
       end
     end
     

@@ -65,12 +65,17 @@ namespace :run do
   
   desc "Run Learner to Train Weights"
   task(:learner => :environment) do
-    #puts "run:learner!"
-    #debugger
+    if !ENV['folds'] && $subtype == 'context'
+      @ss = SolrSearcher.new
+      @ss.build_context_vector()
+      @ss.cv.print()
+    end
+
     input = ENV['input'] || get_learner_input_file() + get_file_postfix('train')
     #puts input
     output = ENV['weights'] || get_learner_output_file() + get_file_postfix('test')
-    Learner.new.learn($type, $method, input, output, :subtype=>$subtype)
+    Learner.new.learn($type, $method, input, output, 
+      :subtype=>$subtype, :no_params => (($subtype == 'none')? nil : 3))
   end
   
   desc "Run Searcher"

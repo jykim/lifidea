@@ -6,7 +6,7 @@
 	  <tr>
 	    <td><%= check_box_tag("checked_docs[]", e[:item].id) %><% e[:score].round_at(3) %></td>
 	    <td><%= e[:item].itype %></td>
-	    <td><%= link_to e[:item].title, {:controller=>'items', :action=>'click', :htype=>'qry_doc', :id=>e[:item].id, :src_item_id=>@query_doc.id} %></td>
+	    <td><%= link_to e[:item].title, {:controller=>'items', :action=>'click', :htype=>'kwd', :id=>e[:item].id, :src_item_id=>@query_doc.id} %></td>
 	  </tr>
 	<% end %>
 </table>

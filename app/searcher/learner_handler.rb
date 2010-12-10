@@ -76,7 +76,7 @@ module LearnerHandler
     end
     
     features = Learner.get_features_by_type(type, ENV['omit'])
-    files['grid'].puts ['pref','basetime','src_id','tgt_id','src','target','sum'].concat(features).join(",")    
+    files['grid'].puts ['pref','basetime','src_id','tgt_id','history_id','src','target','sum'].concat(features).join(",")    
     History.between(start_at, end_at).find_all_by_htype(type).each do |h|
       next if ENV['id'] && h.id != ENV['id'].to_i
       next if $user != 'all' && $user != 'top5' && h.user && $user != h.user.uid
@@ -101,7 +101,7 @@ module LearnerHandler
         raise Exception, "Incorrect Pair" if result_arr.size < 2 || result_arr[0][:pref] != 2
         # Export the result 
         result_arr.each do |r|
-          files['grid'].puts [r[:pref], h.basetime, h.src_item_id, r[:id], Item.find(h.src_item_id).title, Item.find(r[:id]).title, r[:features].sum].concat(r[:features]).to_csv
+          files['grid'].puts [r[:pref], h.basetime, h.src_item_id, r[:id], h.id, Item.find(h.src_item_id).title, Item.find(r[:id]).title, r[:features].sum].concat(r[:features]).to_csv
           files['ranksvm'].puts "#{r[:pref]} qid:#{last_query_no} #{r[:features].map_with_index{|f,i|"#{i+1}:#{f}"}.join(' ')} # #{h.src_item_id} -> #{r[:id]} "          
         end
       rescue Interrupt
@@ -123,9 +123,10 @@ module LearnerHandler
   
   # Build Contextual Vector
   def build_context_vector()
+    @cv.clear()
     @prev_game_id, @prev_item_id = -1, -1
     History.all.each do |h|
-      debug "Processing #{h.id} (#{h.src_item_id} by #{h.user.uid})"
+      debug "Processing #{h.id} (#{h.src_item_id}/#{h.htype} by #{h.user})"
       begin
         result = process_request(h.src_item_id, h.htype, :history_id=>h.id, :created_at=>h.created_at, :add_context=>true)
         if h.game_id 
@@ -140,6 +141,7 @@ module LearnerHandler
         next
       end
     end
+    #@cv.print() ; nil
   end
   
   # @deprecated

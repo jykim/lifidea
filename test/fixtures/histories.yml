@@ -28,3 +28,13 @@ h3:
   user_id: 1
   metadata: "--- \n\
     :skipped_items: 3|5\n"
+
+h4:
+  id: 4
+  htype: kwd
+  basetime: 2009-07-01 07:07:00
+  src_item_id: 4
+  item_id: 6
+  user_id: 1
+  metadata: "--- \n\
+    :skipped_items: 3|5\n"

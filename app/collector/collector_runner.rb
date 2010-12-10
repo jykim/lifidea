@@ -34,7 +34,7 @@ def run_collector(o = {})
     end
   end
   counts = counts.find_all{|k,v|v && v > 0}.to_hash
-  info "[run_collector] #{counts.values.sum} collected (#{counts.inspect})"
+  error "[run_collector] #{counts.values.sum} collected (#{counts.inspect})"
   counts.values.sum
 end
 #puts File.basename(__FILE__)

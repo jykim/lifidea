@@ -28,6 +28,7 @@ class Evaluator
     result_all = []
     searcher = SolrSearcher.new
     features = Learner.get_features_by_type(type, ENV['omit'])
+    debug "[evaluate_sim_search_methods] features = #{features.inspect}"
     runs = [features,methods].flatten
     #weights << ENV['weights'].split(",").map{|e|e.to_f} if ENV['weights']
     qrels = read_csv(input).find_all{|e|e[:pref]=='2'}
@@ -38,10 +39,17 @@ class Evaluator
       query, rel = row[:src_id].to_i, row[:tgt_id].to_i
       runs.map{|e|e.to_s.split('.')}.each_with_index do |run_id,i|
         weights = Searcher.load_weights(features.map{|e|e.to_s}, type, run_id[0])
+        #subtype_weights = if run_id[1] && ENV['fixed_weights']
+        #  [0.5, 0.3, 0.1]
+        #else
+        #  Searcher.load_weights([0.0]*3, type, run_id[0], run_id[1])
+        #end
         case run_id[1]
         when 'feedback'
-          o.merge!(:subtype=>'feedback', :feedback_weights=>Searcher.load_weights([0.0]*7, type, run_id[0], 'feedback'))
-        end 
+          o.merge!(:subtype=>'feedback', :feedback_weights=>Searcher.load_weights([0.0]*3, type, run_id[0], run_id[1]))
+        when 'context'
+          o.merge!(:subtype=>'context', :history_id=>row[:history_id], :context_weights=>Searcher.load_weights([0.0]*3, type, run_id[0], run_id[1]))
+        end
         rank_list = searcher.process_request(query, type, o.merge(:features=>features, :weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
         result << self.recip_rank(rank_list, rel)
       end
@@ -59,23 +67,13 @@ class Evaluator
     searcher = SolrSearcher.new
     #debugger
     input_data.each do |row|
-      query, rel = row[:src_id].to_i, row[:tgt_id].to_i
-      #puts "Query : #{query} -> Rel : #{rel}"
-      #debugger
-      
-      rank_list = searcher.process_request(query, type, o.merge(:weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
-      
-      #case o[:subtype]
-      #when 'feedback'
-      #  searcher.search_by_item_with_feedback(query, type, o.merge(:weights=>weights)).map{|fts|[fts[:id], fts[:score]]}
-      #else
-      #  searcher.search_by_item(query, type, :features=>o[:features], :weights=>weights).map{|fts|[fts[:id], fts[:score]]}
-      #end
-      #puts rank_list.inspect
+      query, rel = row[:src_id].to_i, row[:tgt_id].to_i      
+      rank_list = searcher.process_request(query, type, o.merge(:weights=>weights, :history_id=>row[:history_id])).map{|fts|[fts[:id], fts[:score]]}
       result[query] = self.recip_rank(rank_list, rel)
     end
     return_weights = case o[:subtype]
     when 'feedback' : o[:feedback_weights]
+    when 'context'  : o[:context_weights]
     else
       weights
     end

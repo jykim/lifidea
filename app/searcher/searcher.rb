@@ -1,5 +1,7 @@
 class Searcher
+  attr_accessor :cv
   include LearnerHandler
+  DISCOUNT_FACTOR = 7
     
   # Initialize cache / index
   # - cache link feature values 
@@ -33,7 +35,7 @@ class Searcher
     when /con|doc/
       if o['feedback'] || o[:subtype] == 'feedback'
         search_by_item_with_feedback(query, qtype, o)
-      elsif o['context']
+      elsif o['context'] || o[:subtype] == 'context'
         search_by_item_with_context(query, qtype, o)
       else
         search_by_item(query, qtype, o)
@@ -56,8 +58,10 @@ class Searcher
     query_item = Item.find(item.to_i)
     return nil if !query_item
     case type
-    when 'con' : features, weights, filter_qry = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights), solr_filter_concepts()
-    when 'doc' : features, weights, filter_qry = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights), solr_filter_concepts('-', '&&')
+    when 'con' : features, weights = (o[:features] || CON_FEATURES), (o[:weights] || @con_weights)
+    when 'doc' : features, weights = (o[:features] || DOC_FEATURES), (o[:weights] || @doc_weights)
+    else 
+      error "[search_by_item] no type parameter!" ; return nil
     end
     #debug "[search_by_item] Item : #{item} #{features.inspect} = #{weights.inspect}"
     result = calc_sim_features(query_item, type, o)
@@ -79,7 +83,7 @@ class Searcher
     initial_result.each_with_index do |row,i|
       break if !o[:feedback_weights][i]
       result = search_by_item(row[:id], type, o).map_hash{|e|[e[:id], e[:score]]}
-      final_result = final_result.sum_prob(result.times(o[:feedback_weights][i]/7))
+      final_result = final_result.sum_prob(result.times(o[:feedback_weights][i] / DISCOUNT_FACTOR))
     end
     final_result.map{|k,v|{:id=>k, :score=>v}}.sort_by{|e|e[:score]}.reverse
   end
@@ -89,10 +93,13 @@ class Searcher
     o[:context_weights] ||= [0.2]*5
     initial_result = search_by_item(item, type, o)
     final_result = initial_result.map_hash{|e|[e[:id], e[:score]]}
-    @cv.get().reverse.each_with_index do |row,i|
+    debug "[search_by_item_with_context] Target : #{item} (#{o[:history_id]})"
+    #debugger
+    (@cv.get(o[:history_id].to_i) || []).reverse.each_with_index do |row,i|
       break if !o[:context_weights][i]
+      debug "  | context : #{row[:query]}"
       result = row[:result].map_hash{|e|[e[:id], e[:score]]}
-      final_result = final_result.sum_prob(result.times(o[:context_weights][i]))
+      final_result = final_result.sum_prob(result.times(o[:context_weights][i] / DISCOUNT_FACTOR))
     end
     final_result.map{|k,v|{:id=>k, :score=>v}}.sort_by{|e|e[:score]}.reverse
   end
@@ -121,7 +128,7 @@ class Searcher
     rescue Exception => e
       error "[Searcher.load_weights] error in file [#{weight_file}] filter [#{filename_filter}]", e
     end
-    debug "[Searcher.load_weights] #{features.inspect}(#{(weight_file)? File.basename(weight_file) : weight_file}) = #{result.map{|e|e.to_f.r3}.inspect}"
+    error "[Searcher.load_weights] #{features.inspect}(#{(weight_file)? File.basename(weight_file) : weight_file}) = #{result.map{|e|e.to_f.r3}.inspect}"
     result
   end
   

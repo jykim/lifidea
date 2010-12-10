@@ -2,7 +2,7 @@
 $opt = {}
 ARGV[1..-1].each{|e|r = e.split('=') ; $opt[r[0]] = r[1] || ''}
 {'d'=>'development', 'p'=>'production', 't'=>'test'}.each{|k,v|$opt['env'] = v if $opt.keys.include?(k)}
-ENV['RAILS_ENV'] = $rails_env = $opt['env'] || 'development'
+ENV['RAILS_ENV'] = $rails_env = $opt['env'] || ENV['RAILS_ENV'] || 'development'
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 #require 'ddl_include.rb'

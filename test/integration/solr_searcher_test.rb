@@ -9,6 +9,7 @@ class SolrSearcherTest < ActiveSupport::TestCase
     @ss = SolrSearcher.new
     #{}`rake sunspot:solr:reindex RAILS_ENV=test`
     @target = Item.find_by_did('cal0')
+    @target_con = Item.find_by_did('qry1')
     @query_word = @target.title.scan(/\w+/)
     Rake::Task['sunspot:solr:reindex'].execute  
   end
@@ -43,6 +44,13 @@ class SolrSearcherTest < ActiveSupport::TestCase
     result.each{|e|debug e.inspect}
     assert(result.size > 0, 
       "At least one item find for #{@target}(#{@target.id})")
+  end
+  
+  def test_concept_similarity_search()
+    result = @ss.search_by_item(@target_con.id, 'con')
+    result.each{|e|debug e.inspect}
+    assert(result.size > 0, 
+      "At least one item find for #{@target_con}(#{@target_con.id})")    
   end
   
   # 

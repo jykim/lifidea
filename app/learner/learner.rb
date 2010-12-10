@@ -65,7 +65,7 @@ class Learner
   # @param <String> output : output file
   # @return <String> : type
   def learn_by_grid_search(input_data, output, type, o = {})
-    no_params = o[:features].size
+    no_params = o[:no_params] || o[:features].size
     xvals = (1..no_params).to_a
     yvals = [] ; yvals << [0.5] * xvals.size
     results = []
@@ -82,12 +82,14 @@ class Learner
           Evaluator.evaluate_sim_search_with(input_data.find_all{|e|e[:pref] == '2'}, 
             type, feature_weights , o.merge(:feedback_weights=>yvals))
         when 'context'
+          Evaluator.evaluate_sim_search_with(input_data.find_all{|e|e[:pref] == '2'}, 
+            type, feature_weights , o.merge(:context_weights=>yvals))
         else
           Evaluator.evaluate_sim_search_with(input_data.find_all{|e|e[:pref] == '2'}, type, yvals, o)
         end
       when 'csel': Evaluator.evaluate_csel_with(input_data, yvals, o)
       end
-      debug "[learn_by_grid_search|#{type}|#{o[:subtype]}] #{yvals.map{|e|e.r3}.inspect} = #{results[-1][0].r3}"
+      puts "[learn_by_grid_search|#{type}|#{o[:subtype]}] #{yvals.map{|e|e.r3}.inspect} = #{results[-1][0].r3}"
       results[-1][0]
     end
     #debugger

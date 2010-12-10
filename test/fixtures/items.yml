@@ -117,3 +117,30 @@ cal6:
     :grade: A0\n\
     :score: 2.0\n"
   basetime: 2009-07-14 07:00:00
+
+qry1:
+  id: 8
+  did: qry1
+  title: cal6 bla
+  itype: query
+  content: "bla"
+  metadata: "--- {}\n"
+  basetime: 2009-07-14 07:00:00
+
+qry2:
+  id: 9
+  did: qry2
+  title: cal5 bla
+  itype: query
+  content: "bla tag1"
+  metadata: "--- {}\n"
+  basetime: 2009-07-14 07:00:00
+
+qry3:
+  id: 10
+  did: qry3
+  title: cal3 bla bla
+  itype: query
+  content: "bla tag1 A0"
+  metadata: "--- {}\n"
+  basetime: 2009-07-14 07:00:00

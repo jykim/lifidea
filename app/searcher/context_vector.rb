@@ -9,6 +9,11 @@ class ContextVector
     end
   end
   
+  def print(history_id = nil)
+    get(history_id).each{|e|e2 = e.dup ; e2.delete(:result) ;  e2.delete(:query) ; puts e2.map{|k,v|"#{k} : #{v}"}.join("\t")}
+    nil
+  end
+  
   def clear()
     cache_data('context', [] )
     cache_data('session_id', 0)
@@ -23,13 +28,14 @@ class ContextVector
   end
   
   # Get part or all of context vector
-  def get(history_id = nil)
+  def get(history_id = nil, htype = nil)
     context = cache_data('context')
     if history_id
       cur_entry = context.find{|e|e[:history_id] == history_id}
       return nil if !cur_entry
       debug "[ContextVector#get] cur_entry = #{cur_entry[:id]}"
-      context[0..cur_entry[:id]].find_all{|e|e[:session_id] == cur_entry[:session_id]}
+      context[0..cur_entry[:id]].
+        find_all{|e|e[:session_id] == cur_entry[:session_id] && (e[:htype] == 'kwd'|| e[:htype] == htype) }
     else
       context
     end
