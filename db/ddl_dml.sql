@@ -19,3 +19,5 @@ update occurrences set oid=concat(item_id,'_',tag_id,'_',otype);
 insert into sources select * from ddl_production.sources;
 
 update concepts set ctype='pnoun' , modified_flag=1;
+
+

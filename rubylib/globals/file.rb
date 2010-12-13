@@ -13,6 +13,8 @@ def read_csv(filename, o = {})
   end
 end
 
+# Write to CSV
+# @param :summary
 def write_csv(filename, content, o = {})
   mode = o[:mode] || 'w'
   if o[:summary]

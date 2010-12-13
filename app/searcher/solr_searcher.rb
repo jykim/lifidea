@@ -35,7 +35,7 @@ class SolrSearcher < Searcher
     elsif o[:raw]
       result
     else
-      result_items = result.hits.map{|e|{:id=>e.instance.id, :score=>e.score}}
+      result_items = result.hits.map_with_index{|e,i|{:id=>e.instance.id, :rank=>(i+1), :score=>e.score}}
       @cv.add(:type=>'kwd', :query=>query, :created_at=>(o[:created_at] || Time.now), :history_id=>o[:history_id], :result=>result_items) if o[:add_context]
       result_items
     end
