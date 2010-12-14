@@ -16,8 +16,8 @@ def import_click_position()
   hist_pos = {}
   History.all.group_by{|e|[e[:game_id],e[:src_item_id],e[:item_id]].join('_')}.each {|rid, rows|
     positions = rows.map{|r|r[:metadata][:position]}.uniq
-    p rid, positions if positions.size > 1
-    hist_pos[rid] = positions.join('_')
+    #p rid, positions if positions.size > 1
+    hist_pos[rid] = positions#.join('_')
     #hist_pos <<  [rid, positions.join('_')]
   } ; nil
   hist_pos
@@ -26,22 +26,28 @@ end
 
 $cp = import_click_position()#read_csv('hist_pos').map_hash{|e|[e[:rid], e[:positions].split('_')]}
 $ss = SolrSearcher.new
-def get_click_position(itype, rid, ridp)
+def get_click_position(rid, rtype, prev_query)
   position = $cp[rid]
   if position && position.size != 0
     $cp[rid] = position[1..-1]
+    puts "    [get_click_position] position : #{position[0]}"
     return position[0]
   end
-  query = Item.find(ridp.split('_')[2].to_i)
-  if query.itype == 'query_doctrack'
+  query = Item.find(prev_query)
+  if rtype == 's_to_b'
+    #debugger
     result = $ss.search_by_keyword(query.title).find{|e|e[:id] == rid.split('_')[2].to_i}
-    return result[:rank] if result
+    if result
+      puts "    [get_click_position] query: #{query.title} -> item: #{result.inspect}"
+      return result[:rank]
+    end
   end
+  nil
 end
 
 row_count = 0
 time_by_itype = []
-dt = read_csv('dt2_sessions')
+dt = read_csv('data/dt2_sessions')
 dt.group_by{|e|[e[:game_id], e[:k1]].join('_')}.each do |sid, rows|
   rows = rows.sort_by{|e|e[:id].to_i}
   rf, rl = rows[0], rows[-1]
@@ -62,7 +68,7 @@ dt.group_by{|e|[e[:game_id], e[:k1]].join('_')}.each do |sid, rows|
       else
         'browse'
       end
-      cpos = get_click_position([sid, r[:k2]].join('_'))
+      cpos = get_click_position([sid, r[:k2]].join('_'), rtype, rp[:k2])
       puts "  #{rtype}\t#{time_spent}\t#{r[:position]}\t#{cpos}\t#{r[:t2]}::#{r[:i2]}" 
       time_by_itype << [rtype, conv_itype(r[:t2]), time_spent, r[:position].to_i, cpos.to_i]
     end

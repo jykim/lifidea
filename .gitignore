@@ -6,6 +6,7 @@ etc/deprecated/**/*
 solr/data/**/*
 config/config.yml
 config/database.yml
+config/sunspot.yml
 .gitignore~
 data/evaluation_production-20101121-con-cval-all---k2-1-.csv
 data/evaluation_production-20101121-con-cval-all---k2-2-.csv
