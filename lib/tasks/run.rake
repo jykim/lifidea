@@ -18,6 +18,30 @@ namespace :run do
     end
   end
   
+  desc "Run User Model"
+  task(:pum => :environment) do
+    repeat = ENV['repeat'] || 1
+    puts "Repeat #{repeat} times..."
+    info "From #{$start_at} ~ #{$end_at}"
+    1.upto(repeat.to_i) do |i|
+      begin
+        um = UserModel.new
+        items = if ENV['id']
+          [Item.find(ENV['id'].to_i)]
+        else
+          Item.between($start_at, $end_at).find_all_by_query_flag(1)
+        end
+        puts "[run:pum] target items : #{items.map{|e|e.id}.inspect}"
+        1.upto(repeat.to_i) do |i|        
+          um.run(items)
+        end
+        #puts count
+      rescue Exception => e
+        error "[run:pum] error",e
+      end
+    end
+  end
+  
   namespace :metadata do
     desc "Run metadata updator"
     task(:updater => :environment) do

@@ -63,6 +63,10 @@ class Searcher
     else 
       error "[search_by_item] no type parameter!" ; return nil
     end
+    if o[:content_only]
+      return solr_search_by_item(query_item, type, o).
+        map_with_index{|e,i|{:id=>e["id"].split(" ")[1].to_i, :rank=>(i+1), :score=>e['score']}}
+    end
     #debug "[search_by_item] Item : #{item} #{features.inspect} = #{weights.inspect}"
     result = calc_sim_features(query_item, type, o)
     #debugger

@@ -17,8 +17,9 @@ module IndexHelper
     #puts "[get_index] #{id}"
     begin
       @index ||= if textindex
-        features = {:basetime=>basetime, :occur_count=>$clf.read_sum('o',id), :click_count=>$clf.read_sum('c',id)}
-        IR::Document.create_from_yaml(textindex, o.merge(:features=>features))
+        IR::Document.create_from_yaml(textindex)
+        #features = {:basetime=>basetime, :occur_count=>$clf.read_sum('o',id), :click_count=>$clf.read_sum('c',id)}
+        #IR::Document.create_from_yaml(textindex, o.merge(:features=>features))
       else
         IR::Document.new(id, did, index_fields.values.join(" "), o)
       end

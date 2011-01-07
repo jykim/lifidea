@@ -25,7 +25,7 @@ class SolrSearcher < Searcher
       end
       #debugger
       order_by(:basetime, :desc) if o[:order] == "recency" || query == TEXT_DUMMY
-      paginate(:page => o[:page]) if o[:page]
+      paginate(:page => o[:page], :per_page => o[:per_page]) if o[:page]
       facet(o[:facet]) if o[:facet]
       without :hidden_flag, '1'
     end

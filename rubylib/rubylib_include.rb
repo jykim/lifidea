@@ -20,5 +20,6 @@ require 'ir/index.rb'
 require 'ir/document.rb'
 require 'ir/concept_hash.rb'
 require 'ir/params_search.rb'
+require 'ir/user_model.rb'
 
 #include Test::Unit::Assertions
