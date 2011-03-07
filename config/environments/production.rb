@@ -17,7 +17,7 @@ config.log_level = :debug
 # config.logger = SyslogLogger.new
 
 # Use a different cache store in production
-# config.cache_store = :mem_cache_store
+#config.cache_store = :mem_cache_store, 'localhost', '127.0.0.1:11211', {:namespace => 'webcache'}
 
 # Enable serving of images, stylesheets, and javascripts from an asset server
 # config.action_controller.asset_host = "http://assets.example.com"

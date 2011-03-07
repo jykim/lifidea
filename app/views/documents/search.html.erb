@@ -10,12 +10,11 @@
   <tr>
     <td><%= i+1 %></td>
     <td><%= e[:item].itype %></td>
-    <td><%= link_to(e[:item].title, {:action=>'show', :id=>e[:id]}) %></td>
+    <td><%= e[:item].title %></td>
     <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
   </tr>
 <% end %>
 </table>
 <% if during_game? && !page_found? && !query_limit_reached? %>
-<h3> Click each document to browse into related document!</h3>
 <% end %>
 <br />

@@ -5,7 +5,7 @@ class DocumentsController < ApplicationController
   #before_filter :apply_user_level
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :pagehunt_search, :only=>[:index, :search]
-  sidebar :menu, :only=>[:index]
+  #sidebar :menu, :only=>[:index]
   sidebar :pagehunt_status, :only=>[:show, :start_search, :search, :request_document]
   sidebar :pagehunt_relevant_concepts, :only=>:show, :if=>:item_concept?
   #sidebar :linked_concepts, :only=>[:show], :unless=>:item_concept?
@@ -17,16 +17,16 @@ class DocumentsController < ApplicationController
   #sidebar :linked_documents, :only=>:show
   
   def initialize
-    @display_topk =        15   #get_config("DISPLAY_TOPK_RESULT").to_i
+    @display_topk =        25   #get_config("DISPLAY_TOPK_RESULT").to_i
     @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
     @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
     @no_entry_item    =    10
     @display_page_total =   2   #get_config("DISPLAY_PAGE_NO").to_i
-    @time_per_page =       15   #get_config("TIME_PER_PAGE").to_i
+    @time_per_page =       20   #get_config("TIME_PER_PAGE").to_i
     @ratio_game_type = {:s=>1}#{:sb=>0.5, :bd=>0.5}
     @user_level_applied = false
-    $document_list ||= Item.valid.documents.all.group_by{|e|e.itype}.map_hash{|k,v|[k,v.map{|e|e.id}]}
-    $concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
+    #$document_list ||= Item.find(:all,:limit=>500).group_by{|e|e.itype}.map_hash{|k,v|[k,v.map{|e|e.id}]}
+    #$concept_list  ||= Item.valid.concepts.all.map{|e|e.id}
   end
   
   # GET /documents
@@ -38,7 +38,7 @@ class DocumentsController < ApplicationController
     conditions = {}
     conditions.merge!({:itype=>params[:itype]}) if params[:itype] && !params[:itype].include?("all")
     conditions.merge!({:query_flag=>true}) if params[:query_only]
-    @documents = Item.valid.searchables.between(@start_at, @end_at).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
+    @documents = Item.find(:all,:limit=>500).paginate( :conditions=>conditions, :order=>"basetime desc", :page=>params[:page],:per_page=>50)
     
     respond_to do |format|
       format.html # index.html.erb
@@ -51,7 +51,7 @@ class DocumentsController < ApplicationController
     @game = Game.create(:gid=>"#{session[:user_uid]}_#{Time.now.to_s(:db)}", 
       :user_id=>session[:user_id], :level=>session[:user_level], :start_at=>Time.now)
     init_game(@game.id)
-    @query_docs_total = Item.documents.find_all_by_query_flag(true).map{|d|d.id}
+    @query_docs_total = Item.documents.find_all_by_query_flag(true)[0..200].map{|d|d.id}
     @query_cons_total = Item.concepts.find_all_by_query_flag(true).map{|d|d.id}
     @query_items_found = Query.find_all_by_user_id(session[:user_id]).map{|e|e.item_id}.uniq
     session[:query_cons] = @query_cons_total -  @query_items_found
@@ -143,7 +143,7 @@ class DocumentsController < ApplicationController
     if page_found? || query_limit_reached?
       session[:seen_doc_count] += 1
       if page_found?
-        session[:score] += (@display_topk.to_f / @relevant_position / 1.5 ).to_i
+        session[:score] += (@display_topk.to_f / @relevant_position / 2.5 ).to_i
         #session[:score] += (@display_topk.to_f / @relevant_position / 3 ).to_i + ((@queries_per_page - session[:query_count] + 1) / 2).to_i
       end
     end
@@ -180,8 +180,8 @@ class DocumentsController < ApplicationController
           @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con'
           @rel_cons = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
         else
-          @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
-          @rel_docs = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
+          #@search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
+          #@rel_docs = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
         end
         #info "Ranklist(doc) : #{@rel_docs.inspect}"
         #debugger
@@ -190,7 +190,7 @@ class DocumentsController < ApplicationController
         @rel_docs = @rel_cons = []
       end
       if during_game?
-        process_search_result(@rel_docs.map{|e|e[:id]}, params[:id])
+        #process_search_result(@rel_docs.map{|e|e[:id]}, params[:id])
       end
     end
     

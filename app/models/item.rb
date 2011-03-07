@@ -53,6 +53,10 @@ class Item < ActiveRecord::Base
     end
     #more_like_this :title, :content, :uri, :itype
   end
+
+  def title
+    (read_attribute(:title).blank?)? 'Untitled' : read_attribute(:title)
+  end
   
   def concept?
     ITYPE_CONCEPT.include?(itype)

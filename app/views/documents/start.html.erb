@@ -1,45 +1,20 @@
-<h2>News</h2>
-<font color=red>(5/19) 2nd round of DocTrack competition has started. (Try <a href='http://screencast.com/t/NjU3YzZhYTI'>our new screencast</a>!) </font><br><br>
-
-(5/18) Congrats to winners for the first round! <br> ylim (best score) uysal (most at top 10) yhkim (frequent player) gbh sjh (raffle)<br><br>
-
-(5/14) Try <a href='http://tinyurl.com/doctrack-howto'>DocTrack screencast</a> to find out how to play. (Make sure you have your speaker turned on.)
+<h1>Start a New Game</h1>
 
 <h2>Goal</h2>
-Your goal is to find the item (document) you're shown using the search and browsing capability of the system. Since finding the item you've just seen is too easy, we show <%= @display_page_total %> items in a row and tell you which item to find in the end. <br><br>
+Your goal is to find the documents you're shown using the search engine provided. Since finding the document you've just seen is too easy, we show <%= @display_page_total %> documents in a row and tell you which document to find in the end. <br><br>
 
-There are two different scenarios of finding in this game, which is decided by the system at random for each target item. 
+Your score is determined by where in the Top <%= @display_topk_result %> rank list you can locate the target document. For instance, if the target document was found at the first rank, you can get 10 points.<br><br>
 
-<ul>
-	<li>Finding a document by search + browsing</li> You're asked to find the target <u>document</u> using search or browsing into related item.
-	<font color=red><li>Finding a document by browsing</li> You're asked to find the target <u>document</u> by browsing into relevant document starting from one of entry points.</font>
-</ul>
-
-For each search / browsing activity, you'll see a rank list of relevant items. Your score is determined by where in the rank list you can locate the target item. For instance, if the target item was found at the first rank, you can get 10 points.<br><br>
-
-<font color=red>In 2nd round, you can search and browse to concepts. Since concepts are linked to many documents, it's a good way to find the target documents. For instance, you can directly search for the concept linked into the target document or find one concept and browse into related concept which contains the target document.  </font>
 
 <h2>Rules</h2>
-- You'll be finding <%= @pages_per_game %> items per game, each of which will be provided with <%= @display_page_total-1 %> other items. <br>
+- You'll be finding <%= @pages_per_game %> documents per game, each of which will be provided with <%= @display_page_total-1 %> other documents. <br>
 
-- You'll be given <%= @queries_per_page%> trial. Each <u>keyword</u> you type in or click to the relevant item is counted as one trial.<br>
+- You'll be given <%= @time_per_page %> seconds to skim each document after it's loaded.<br>
 
-- You'll be given <%= @time_per_page %> seconds to skim each item after it's loaded.<br><br>
+- Please do not copy and paste document text. (pasting to search box is disabled) <br>
 
-- After scoring more than 50, you get a higher level and enjoy more challenging game. <br>
+- The search engine used for this game indexes everything (type, title, uri, metadata and content) shown in the document page.
 
-- Before your first query or click for each item, you can skip to the next item without penalty.<br>
+- The search engine handles only simple keyword queries without fancy features. (e.g. phrase, spell correction, etc.)
 
-- Please do not use copy and paste text. (pasting to search box is disabled) <br>
-
-<h2>List of Participants</h2>
-<table width=100% border=1>
-	<tr><td>Level 2 (advanced)</td><td><%= display_user_list(2) %></td></tr>
-	<tr><td>Level 1 (intermediate)</td><td><%= display_user_list(1) %></td></td></tr>
-	<tr><td>Level 0 (beginner)</td><td><%= display_user_list(0) %></td></td></tr>
-</table>
-
-<div align=right>Users above level 0 are eligible for a raffle! (your level: <%= user_level %>)</div>
-
-
-<h3><%= link_to("Click here", :action=>:request_document)%> if you want to start now!</h3>
+	<h3><%= link_to("Click here", :action=>:request_document)%> if you want to start now!</h3>

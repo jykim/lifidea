@@ -13,7 +13,7 @@
 <%= "<b>Did: </b>" + @item.did if session[:admin_flag] && @item.did %>
 
 <p>
-  <b>Title:</b>
+  <b>Subject:</b>
   <%=h @item.title %> <%=h @item.query_flag ? "(query)" : "" %>
 </p>
 <% if @item.uri =~ /^http:/ %>
@@ -49,21 +49,11 @@
 			<td><%= "<font color='#ff0000'>target item!</font>" if item.id == session[:target_document].to_i %></td>
 			</tr>
 		<% end %>
-	<% else %>
-		<% @rel_docs.each_with_index do |e,i| %>
-		  <tr>
-		    <td><%= i+1 %></td>
-		    <td><%= e[:item].itype %></td>
-		    <td><%= display_link(e[:item], @rel_docs.map{|e2|e2[:id]}, 'doc', i) %></td>
-		    <td><%= "<font color='#ff0000'>target document!</font>" if e[:id] == session[:target_document].to_i %></td>
-		  </tr>
-		<% end %>
 	<% end %>
 	</table>
 <% end %>
 <p>
   <b>Content:</b> <br>
-	(click <%= link_to "here", {:action=>:show_content, :id=>@item.id}, :target=>'iframe_doc' %> to see the content if it's invisible)
 		<iframe name='iframe_doc' src="<%= display_url(@item) %>" width="700" height="780" style="border: none;"></iframe>
 </p>
 
