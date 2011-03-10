@@ -5,7 +5,7 @@
 	<h3>You have found <%= session[:seen_doc_count] %> documents so far. </h3>
 <% end %>
 <h3>If you're impatient, <%= link_to("click here", :action=>:show, :random=>true)%>.</h3>
-<%= redirect_to_after(url_for(:action=>:show, :random=>true), 2) %>
+<%= raw redirect_to_after(url_for(:action=>:show, :random=>true), 2) %>
 <table>
   <tr>
   </tr>

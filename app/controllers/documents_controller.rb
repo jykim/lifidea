@@ -1,7 +1,9 @@
 require 'ddl_include'
+
 class DocumentsController < ApplicationController
-  include AdminHelper, DocumentsHelper
+  include AdminHelper, DocumentsHelper, ApplicationHelper
   before_filter :authorize, :except => [:login, :index, :show, :search, :click]
+  before_filter :game_setup
   #before_filter :apply_user_level
   DL_TYPES = ['content','person','event','pubtime','caltime'].map{|e|e.to_sym}
   sidebar :pagehunt_search, :only=>[:index, :search]
@@ -16,7 +18,7 @@ class DocumentsController < ApplicationController
   #sidebar :linked_concepts, :only=>:show
   #sidebar :linked_documents, :only=>:show
   
-  def initialize
+  def game_setup
     @display_topk =        15   #get_config("DISPLAY_TOPK_RESULT").to_i
     @pages_per_game =      10   #get_config("PAGES_PER_GAME").to_i
     @queries_per_page =    10   #get_config("QUERIES_PER_PAGE").to_i
@@ -32,6 +34,7 @@ class DocumentsController < ApplicationController
   # GET /documents
   # GET /documents.xml
   def index
+    #info "What's wrong?"
     finish_game()
     @start_at = params[:start_at] || Time.now.years_ago(1).to_date.to_s
     @end_at = params[:end_at] || Date.tomorrow.to_s
@@ -109,8 +112,9 @@ class DocumentsController < ApplicationController
     @query = params[:query].gsub(/[\'\"]/, "")
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
-    @rank_list = search_local('k', @query)[display_range(params[:page])]#search_remote('k', @query)
-    if !@rank_list
+    
+    @search_results = SolrSearcher.new.search_by_keyword( @query, :raw=>true)#[display_range(params[:page])]#search_remote('k', @query)
+    if !@search_results
       flash[:notice] = "Invalid query!"
       if !during_game?
         redirect_to :action=>:search 
@@ -122,9 +126,9 @@ class DocumentsController < ApplicationController
       return
     end
     #debugger
-    #@docs = Item.find_by_dids(@rank_list.map{|e|e[0]}).map_hash{|d|[d.did, d]}
+    @rank_list = @search_results.hits.map{|e|{:item=>e.instance, :id=>e.instance.id, :score=>e.score}}
     @query_doc = Item.find_or_create(@query, 'query', :did=>@query_did, 
-      :uri=>request.url, :content=>@rank_list.map{|e|e[:item].title}.join("\n"))
+      :uri=>request.url, :content=>@rank_list.map{|e|e[:item].title}.join("\n")) 
     if during_game?
       process_search_result(@rank_list.map{|e|e[:id]}, @query_doc.id, @query)
     end
@@ -157,12 +161,13 @@ class DocumentsController < ApplicationController
         redirect_to :action=>:start_search
         return
       end
+      #debugger
       if session[:game_type] == :b
         #$concept_list.sample[0]
-        params[:id] = session[:query_cons].sample[0]
+        params[:id] = session[:query_cons].sample#[0]
         session[:query_cons] -= [params[:id]]
       else
-        params[:id] = session[:query_docs].sample[0]
+        params[:id] = session[:query_docs].sample#[0]
         session[:query_docs] -= [params[:id]]
       end
       session[:display_page_cur] += 1
@@ -176,11 +181,11 @@ class DocumentsController < ApplicationController
       $items = {}
       begin
         if @item.itype == 'concept'
-          @rel_docs = (search_local('k', "\"#{@item.title}\"", :doc_only=>true) || [])[display_range(params[:page])]
-          @search_type, @feature_type, @htype = 'c', Searcher::CON_FEATURES, 'con'
+          @rel_docs = (search_local('kwd', "\"#{@item.title}\"", :doc_only=>true) || [])[display_range(params[:page])]
+          @search_type, @feature_type, @htype = 'con', Searcher::CON_FEATURES, 'con'
           @rel_cons = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
         else
-          @search_type, @feature_type, @htype = 'd', Searcher::DOC_FEATURES, 'doc'        
+          @search_type, @feature_type, @htype = 'doc', Searcher::DOC_FEATURES, 'doc'        
           @rel_docs = (search_local(@search_type, params[:id]) || [])[display_range(params[:page])]
         end
         #info "Ranklist(doc) : #{@rel_docs.inspect}"

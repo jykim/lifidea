@@ -22,9 +22,4 @@ module ItemsHelper
   def options_with_all(field_name, param, options)
     options_for_select([["<#{field_name.titleize}>", -1]].concat(options),param ? param.map{|e|e} : [-1])
   end
-  
-  def search_local(qtype, query, o={})
-    $searcher = SolrSearcher.new
-    @rank_list = $searcher.process_request(qtype, query, o)
-  end
 end

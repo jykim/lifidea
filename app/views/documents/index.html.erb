@@ -13,7 +13,7 @@ This is a collection of documents of many types (calendar, file, email, webpage 
     <td><%= document.itype %></td>
     <td><%= link_to document.title, :controller=>:documents, :action=>:show, :id=>document.id, :title=>document.to_s %></td>
 <% if session[:admin_flag] %>
-    <td><%= document.query_flag ? "(#{Query.valid_queries(document.id).size})" : "" %></td>
+    <td><%= document.query_flag ? "(#{Query.find_all_by_item_id(document.id).size})" : "" %></td>
     <td><%= link_to 'Edit', edit_document_path(document) %></td>
     <td><%= link_to 'Del', document, :confirm => 'Are you sure?', :method => :delete %></td>
 <% end %>

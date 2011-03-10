@@ -38,4 +38,9 @@ module ApplicationHelper
       url_for :action=>:show_content, :id=>item.id, :layout=>nil
     end
   end
+  
+  def search_local(qtype, query, o={})
+    $searcher = SolrSearcher.new
+    @rank_list = $searcher.process_request(qtype, query, o)
+  end
 end

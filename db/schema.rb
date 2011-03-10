@@ -1,34 +1,34 @@
-# This file is auto-generated from the current state of the database. Instead of editing this file, 
-# please use the migrations feature of Active Record to incrementally modify your database, and
-# then regenerate this schema definition.
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your database schema. If you need
-# to create the application database on another system, you should be using db:schema:load, not running
-# all the migrations from scratch. The latter is a flawed and unsustainable approach (the more migrations
+# Note that this schema.rb definition is the authoritative source for your
+# database schema. If you need to create the application database on another
+# system, you should be using db:schema:load, not running all the migrations
+# from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091024024026) do
+ActiveRecord::Schema.define(:version => 20091205172650) do
 
-  create_table "concepts", :force => true do |t|
-    t.string   "cid"
-    t.string   "uri"
-    t.string   "ctype"
+  create_table "data_documents", :force => true do |t|
+    t.string   "did"
+    t.string   "uri",            :limit => 512
+    t.string   "dtype"
     t.string   "title"
-    t.string   "remark"
-    t.string   "judgment"
+    t.integer  "source_id"
+    t.text     "content"
     t.text     "metadata"
+    t.text     "concept_titles"
     t.text     "textindex"
-    t.boolean  "hidden_flag",   :default => false
-    t.boolean  "modified_flag", :default => false
+    t.datetime "basetime"
+    t.boolean  "hidden_flag",                   :default => false
+    t.boolean  "modified_flag",                 :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "synonym_id"
-    t.boolean  "private_flag"
+    t.datetime "indexed_at"
   end
-
-  add_index "concepts", ["cid"], :name => "index_concepts_on_cid", :unique => true
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -54,8 +54,9 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
     t.datetime "finish_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "feedback"
+    t.boolean  "hidden_flag"
     t.integer  "level"
-    t.boolean  "hidden_flag", :default => false
   end
 
   create_table "histories", :force => true do |t|
@@ -72,38 +73,57 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
 
   add_index "histories", ["basetime"], :name => "index_histories_on_basetime"
 
-  create_table "items", :force => true do |t|
+  create_table "item_queries", :id => false, :force => true do |t|
+    t.integer  "id",                            :default => 0,     :null => false
     t.string   "did"
-    t.string   "uri",           :limit => 512
+    t.string   "uri",            :limit => 512
     t.string   "itype"
     t.string   "title"
     t.integer  "source_id"
     t.text     "content"
     t.text     "metadata"
-    t.text     "textindex",     :limit => 16777215
+    t.text     "tag_titles_bak"
+    t.text     "textindex"
     t.datetime "basetime"
-    t.boolean  "hidden_flag",                       :default => false
-    t.boolean  "modified_flag",                     :default => false
+    t.boolean  "hidden_flag",                   :default => false
+    t.boolean  "modified_flag",                 :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "indexed_at"
     t.boolean  "private_flag"
+    t.text     "remark"
     t.boolean  "query_flag"
     t.integer  "user_id"
+  end
+
+  create_table "items", :force => true do |t|
+    t.string   "did"
+    t.string   "uri",            :limit => 512
+    t.string   "itype"
+    t.string   "title"
+    t.integer  "source_id"
+    t.text     "content"
+    t.text     "metadata"
+    t.text     "tag_titles_bak"
+    t.text     "textindex"
+    t.datetime "basetime"
+    t.boolean  "hidden_flag",                   :default => false
+    t.boolean  "modified_flag",                 :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "indexed_at"
+    t.boolean  "private_flag"
     t.text     "remark"
-    t.string   "tags_saved"
-    t.string   "query_group",   :limit => 20
+    t.boolean  "query_flag"
+    t.integer  "user_id"
   end
 
   add_index "items", ["did"], :name => "index_documents_on_did", :unique => true
-  add_index "items", ["query_flag"], :name => "index_documents_on_qflag"
-  add_index "items", ["hidden_flag"], :name => "index_documents_on_hflag"
-  add_index "items", ["itype"], :name => "index_documents_on_itype"
 
   create_table "links", :force => true do |t|
     t.string   "lid"
-    t.string   "in_id"
-    t.string   "out_id"
+    t.integer  "out_id"
+    t.integer  "in_id"
     t.string   "remark"
     t.string   "judgment"
     t.float    "weight"
@@ -137,7 +157,9 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-  
+
+  add_index "occurrences", ["oid"], :name => "index_occurrences_on_oid", :unique => true
+
   create_table "queries", :force => true do |t|
     t.string   "query_text"
     t.integer  "user_id"
@@ -159,7 +181,7 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
     t.string   "value"
     t.text     "condition"
     t.text     "option"
-    t.boolean  "active_flag", :default => false
+    t.boolean  "inactive_flag", :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -184,7 +206,7 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
     t.text     "option"
     t.text     "filter"
     t.datetime "sync_at"
-    t.boolean  "active_flag",   :default => true
+    t.boolean  "active_flag",   :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -211,6 +233,16 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
     t.datetime "updated_at"
   end
 
+  create_table "taggings", :force => true do |t|
+    t.integer  "tag_id"
+    t.integer  "taggable_id"
+    t.string   "taggable_type"
+    t.datetime "created_at"
+  end
+
+  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
+  add_index "taggings", ["taggable_id", "taggable_type"], :name => "index_taggings_on_taggable_id_and_taggable_type"
+
   create_table "tags", :force => true do |t|
     t.string   "tid"
     t.string   "uri"
@@ -231,6 +263,10 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
 
   add_index "tags", ["tid"], :name => "index_concepts_on_cid", :unique => true
 
+  create_table "tags_old", :force => true do |t|
+    t.string "name"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "uid"
     t.string   "utype"
@@ -241,7 +277,6 @@ ActiveRecord::Schema.define(:version => 20091024024026) do
     t.text     "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "admin_flag"
     t.integer  "level"
   end
 

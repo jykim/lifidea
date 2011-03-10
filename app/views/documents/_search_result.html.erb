@@ -1,13 +1,13 @@
 <% if during_game? %>
 <h3>
 	<% if game_finished? %>
-		<%= "Game Finished! #{link_to 'Click here', :action=>:request_document, :finish=>true} to see the score." %>
+		<%= raw "Game Finished! #{link_to 'Click here', :action=>:request_document, :finish=>true} to see the score." %>
 	<% elsif page_found? %>
-		<%= "Item Found! #{link_to 'Click here', :action=>:request_document} to see the next item." %>
+		<%= raw "Item Found! #{link_to 'Click here', :action=>:request_document} to see the next item." %>
 	<% elsif query_limit_reached? %>
-		<%= "Query limit reached! #{link_to 'Click here', :action=>:request_document} to see the next item." %>
+		<%= raw "Query limit reached! #{link_to 'Click here', :action=>:request_document} to see the next item." %>
 	<% else %>
-		<%= "Item Not Found! You have #{@queries_per_page - session[:query_count]} trials left." %>
+		<%= raw "Item Not Found! You have #{@queries_per_page - session[:query_count]} trials left." %>
 		<br>
 		<% if session[:game_type] != :bc && session[:game_type] != :bd %>
 			<% form_tag({:controller=>'documents',:action => 'search'}, :method => :get) do -%>
@@ -16,9 +16,9 @@
 			<% end -%>
 		<% end %>
 		<% if controller.action_name == 'show' %>
-		<br>You can <%= link_to "skip", :action=>:request_document, :skip=>true%>  to the next item or <a href="javascript: history.go(-1)">move back</a> to the previous page.
+		<br>You can <%= raw link_to "skip", :action=>:request_document, :skip=>true%>  to the next item or <a href="javascript: history.go(-1)">move back</a> to the previous page.
 		<% else %>
-		<br>You can <%= link_to "click here", :action=>:request_document, :skip=>true%> to skip  to the next item.
+		<br>You can <%= raw link_to "click here", :action=>:request_document, :skip=>true%> to skip  to the next item.
 		<% end %>
 	<% end %>
 </h3>
