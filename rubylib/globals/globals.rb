@@ -1,4 +1,3 @@
-require 'globals/file'
 
 def str2time(str)
   if str.class == Time then return str end

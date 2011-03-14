@@ -42,6 +42,10 @@ def write_csv(filename, content, o = {})
   File.open(filename, mode){|f|f.puts content.map{|e|e.to_csv}.join("")}
 end
 
+def print_csv(csvdata)
+  csvdata.each{|row|p row}
+  nil
+end
 
 def file_write(file_name , var , o = {})
   path = o[:path] || PATH_DATA

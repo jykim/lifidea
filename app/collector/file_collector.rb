@@ -24,14 +24,14 @@ class FileCollector < Collector
   # @option o [Bool] :path_as_tag : use file path as tag 
   def read_from_source(o = {})
     data_path = @src.uri.gsub("file://","")
-    #puts "Working on #{@src.title} (#{data_path})"
+    puts "Working on #{@src.title} (#{data_path})"
     result = [] ; file_count = 0
     find_in_path(data_path, :recursion=>true) do |fp, fn|
       filename, mtime = fp.gsub(data_path+'/', ""), File.new(fp).mtime
       #puts filename
       #debugger
       next if (@docs_read[fp] && @docs_read[fp] >= mtime) || (File.dirname(fp) == /\./) ||
-        (!@src.o[:trec] && !(File.extname(fp) =~ /\.(#{@src.o[:file_format] || INDEX_FILE_FORMAT})/i))
+        (@src.o[:standard] && !(File.extname(fp) =~ /\.(#{@src.o[:file_format] || INDEX_FILE_FORMAT})/i))
       break if file_count >= FILES_IN_BATCH ; file_count += 1
       debug "[FileCollector#read_from_source] Working on #{fp}" # #{@docs_read[fp]} >= #{mtime}
       if @src.o[:trec]
@@ -43,6 +43,18 @@ class FileCollector < Collector
         title = content.find_tag("Subject")[0].strip
         metadata = {:from=>content.find_tag("From")[0].strip, 
           :to=>content.find_tag("To")[0].strip, :date=>content.find_tag("Date")[0].strip}
+      elsif @src.o[:twitter]
+        content = IO.read(fp)#.find_tag("json")[0]
+        did = content.find_tag("DOCNO")[0].strip
+        title = content.find_tag("text")[0].strip
+        metadata = {:from=>content.find_tag("name")[0].strip, :date=>content.find_tag("created_at")[0].strip}        
+        content = title
+      elsif @src.o[:facebook]
+        content = IO.read(fp)#.find_tag("json")[0]
+        did = content.find_tag("DOCNO")[0].strip
+        title = content.find_tag("message")[0] || content.find_tag("caption")[0]
+        metadata = {:from=>content.find_tag("from")[0].find_tag("name")[0].strip, :date=>content.find_tag("created_time")[0].strip}        
+        content = [content.find_tag("message"),content.find_tag("caption")].flatten.join("<br>")
       elsif fp =~ /\.(FILE_FORMAT_TEXT)$/i
         debug "Content read for #{fp}"
         content = IO.read(fp)
