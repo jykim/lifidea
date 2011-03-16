@@ -111,7 +111,6 @@ GEM
       linecache (>= 0.3)
     sax-machine (0.0.15)
       nokogiri (> 0.0.0)
-    smtp_tls (1.0.3)
     sunspot (1.2.rc4)
       escape (= 0.0.4)
       pr_geohash (~> 1.0)
@@ -144,7 +143,6 @@ DEPENDENCIES
   ri_cal
   rspec
   ruby-debug
-  smtp_tls
   sunspot
   sunspot_rails (= 1.2.rc4)
   thoughtbot-shoulda

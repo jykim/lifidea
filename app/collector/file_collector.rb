@@ -29,11 +29,10 @@ class FileCollector < Collector
     find_in_path(data_path, :recursion=>true) do |fp, fn|
       filename, mtime = fp.gsub(data_path+'/', ""), File.new(fp).mtime
       #puts filename
-      #debugger
       next if (@docs_read[fp] && @docs_read[fp] >= mtime) || (File.dirname(fp) == /\./) ||
         (@src.o[:standard] && !(File.extname(fp) =~ /\.(#{@src.o[:file_format] || INDEX_FILE_FORMAT})/i))
       break if file_count >= FILES_IN_BATCH ; file_count += 1
-      debug "[FileCollector#read_from_source] Working on #{fp}" # #{@docs_read[fp]} >= #{mtime}
+      info "[FileCollector#read_from_source] Working on #{fp}" # #{@docs_read[fp]} >= #{mtime}
       if @src.o[:trec]
         content = IO.read(fp)
         did = content.find_tag("DOCNO")[0]
@@ -53,7 +52,8 @@ class FileCollector < Collector
         content = IO.read(fp)#.find_tag("json")[0]
         did = content.find_tag("DOCNO")[0].strip
         title = content.find_tag("message")[0] || content.find_tag("caption")[0]
-        metadata = {:from=>content.find_tag("from")[0].find_tag("name")[0].strip, :date=>content.find_tag("created_time")[0].strip}        
+        from = content.find_tag("from")[0] ? content.find_tag("from")[0].clear_tags : ""
+        metadata = {:from=>from, :date=>content.find_tag("created_time")[0]}        
         content = [content.find_tag("message"),content.find_tag("caption")].flatten.join("<br>")
       elsif fp =~ /\.(FILE_FORMAT_TEXT)$/i
         debug "Content read for #{fp}"
@@ -61,6 +61,7 @@ class FileCollector < Collector
       else
         content = nil
       end
+      #debugger
       tag_list = File.dirname(filename).gsub("/", ",") if @src.o[:path_as_tag]      
       did  ||= filename ; title ||= filename
       result << {:itype=>@src.itype, :title=>title,:did=>did, :uri=>fp, :basetime=>mtime, :content=>content,

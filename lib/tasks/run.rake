@@ -14,7 +14,7 @@ namespace :run do
       rescue Exception => e
         error "[run:collector] error",e
       end
-      break if count == 0
+      #break if count == 0
     end
   end
   

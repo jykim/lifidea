@@ -39,11 +39,11 @@
 				  <%= yield %>
 			</div>
 			<div class="col2">
-				<%= render :partial => 'menu_search' %>
+				<%= render :partial => 'menu_search' if params['controller'] == 'items' %>
 				<%= render :partial => 'menu_filter' if @facet %>
 				<%= render :partial => 'linked_cons' if @link_cons %>
 				<%= render :partial => 'menu_browse' if @rel_cons %>
-				<%= render :partial => 'options' if  session[:admin_flag] %>
+				<%= render :partial => 'options' if  session[:admin_flag] && params['controller'] == 'items' %>
 				
 			</div>
 		</div>

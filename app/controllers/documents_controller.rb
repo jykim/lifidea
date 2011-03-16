@@ -59,6 +59,7 @@ class DocumentsController < ApplicationController
     @query_items_found = Query.find_all_by_user_id(session[:user_id]).map{|e|e.item_id}.uniq
     session[:query_cons] = @query_cons_total -  @query_items_found
     session[:query_docs] = @query_docs_total -  @query_items_found
+    #debugger
   end
   
   # FInalize current game
@@ -170,6 +171,7 @@ class DocumentsController < ApplicationController
         params[:id] = session[:query_docs].sample#[0]
         session[:query_docs] -= [params[:id]]
       end
+      #puts params.inspect, session.inspect
       session[:display_page_cur] += 1
       session[:display_docs] << params[:id].to_i
       #History.create(:htype=>"show", :basetime=>Time.now, :src_item_id=>session[:game_id], :item_id=>params[:id], :user_id=>get_user_id(),

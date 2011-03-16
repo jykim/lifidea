@@ -18,7 +18,7 @@ gem 'feedzirra'
 gem 'tmail'
 gem 'ruby-debug'
 gem 'fastercsv'
-gem 'smtp_tls'
+#gem 'smtp_tls'
 gem 'ri_cal'#'icalendar'
 gem 'icalendar'#'icalendar'
 

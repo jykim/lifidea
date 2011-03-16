@@ -77,7 +77,7 @@ class Collector #< ApplicationController
           doc_db.save
         end
       rescue Exception => e
-        info "[save_docs] "+[e.inspect,e.backtrace].join("\n")
+        error "[save_docs] "+[e.inspect,e.backtrace].join("\n")
       end
     end
     #puts "[save_docs] saved_count = #{saved_count}"
