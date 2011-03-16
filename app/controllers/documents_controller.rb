@@ -114,7 +114,7 @@ class DocumentsController < ApplicationController
     info "Query : #{@query}"
     @query_did = [get_user_id(),@query].join(" ").to_id
     
-    @search_results = SolrSearcher.new.search_by_keyword( @query, :raw=>true)#[display_range(params[:page])]#search_remote('k', @query)
+    @search_results = SolrSearcher.new.search_by_keyword( @query, :doc_only=>true, :raw=>true)#[display_range(params[:page])]#search_remote('k', @query)
     if !@search_results
       flash[:notice] = "Invalid query!"
       if !during_game?
