@@ -48,7 +48,7 @@ class FileCollector < Collector
         did = content.find_tag("DOCNO")[0].strip
         title = content.find_tag("text")[0].strip
         metadata = {:from=>content.find_tag("name")[0].strip, :date=>content.find_tag("created_at")[0].strip}        
-        content = title
+        content = content.find_tag("text").join("<br>")
       elsif @src.o[:facebook]
         content = IO.read(fp)#.find_tag("json")[0]
         did = content.find_tag("DOCNO")[0].strip
