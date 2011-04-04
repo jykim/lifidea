@@ -10,7 +10,7 @@ $KCODE = "u"
 require 'extensions/extensions.rb'
 #require 'extensions/open-uri.rb'
 require 'extensions/exceptions.rb'
-require 'extensions/table.rb'
+load 'extensions/table.rb'
 require 'globals/file'
 require 'globals/globals.rb'
 require 'globals/ddl.rb'

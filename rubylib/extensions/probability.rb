@@ -96,6 +96,10 @@ module ProbabilityOperator
   def times(x)
     map_hash{|k,v|[k,v*x]}
   end
+  
+  def print
+    sort_by{|k,v|v}.reverse.map{|e|[e[0],e[1].r3].join(":")}.join(" ")
+  end
 end
 
 module ProbabilityTransformer

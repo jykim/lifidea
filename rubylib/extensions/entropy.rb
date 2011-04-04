@@ -13,6 +13,8 @@ module Entropy
     -map{|k,v| v * log2(pd[k])}.sum
   end
   
+  #Kullback–Leibler divergence
+  #
   def kld(pd)
     ch(pd) - h()
   end

@@ -8,14 +8,18 @@ module Table
     
     titles = [titles] if titles.class == String
     data = data.map{|e|[e]} if data[0].class != Array
-    raise ArgumentError, "Invalid summary argument" if !titles.respond_to?(o[:summary])
-    raise ArgumentError, "Inconsistent size!" if [titles.size].concat(data.map{|e|e.size}).uniq.size > 1
+    #raise ArgumentError, "Invalid summary argument" if !titles.respond_to?(o[:summary])
+    raise ArgumentError, "Every row should have the same size!" if [titles.size].concat(data.map{|e|e.size}).uniq.size > 1
     raise ArgumentError, "Incorrect data size! (#{data.size}+2=#{size})" if data.size + 2 != size
     self[0].concat(titles)
     1.upto(size-2) do |i|
       self[i].concat(data[i-1])
     end
-    self[-1].concat titles.map_with_index{|e,i|data.map{|e2|e2[i]}.send(o[:summary])}
+    if o[:summary] == :none
+      self[-1].concat ["summary"]
+    else
+      self[-1].concat titles.map_with_index{|e,i|data.map{|e2|e2[i]}.send(o[:summary])}
+    end
   end
   
   def export_tbl(filename,o={})
