@@ -10,11 +10,11 @@ module Entropy
   #Cross Entropy
   # - Bits when encoding self with suboptimal distribution p
   def ch(pd)
-    -map{|k,v| v * log2(pd[k])}.sum
+    -map{|k,v| !(pd[k]) ? 0 : (v * log2(pd[k])) }.sum
   end
   
   #Kullback–Leibler divergence
-  #
+  # {:a=>0.5,:b=>0.5}.kld(:a=>0.4,:b=>0.6)
   def kld(pd)
     ch(pd) - h()
   end
