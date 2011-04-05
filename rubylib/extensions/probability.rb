@@ -81,7 +81,7 @@ module ProbabilityOperator
     #merge(other){|k,v1,v2|v1+v2}.map_hash{|k,v|[k,v/2]}
     map_hash{|k,v|[k,v*(1-lambda)]}.merge(other.map_hash{|k,v|[k,v*lambda]}){|k,v1,v2|v1+v2}
   end
-  
+
   # @example
   #  {:a=>1,:b=>2}.sum(:b=>5,:c=>1).inspect
   #  => {:b=>7, :c=>1, :a=>1}
