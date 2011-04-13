@@ -1,6 +1,8 @@
 $stopwords = {
   "a"=>nil, 
 	"about"=>nil, 
+	"fw"=>nil, 
+	"re"=>nil, 
 	"above"=>nil, 
 	"according"=>nil, 
 	"across"=>nil, 

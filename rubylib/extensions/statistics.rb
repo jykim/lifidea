@@ -110,6 +110,10 @@ module Statistics
     collect{|e| e.to_f / r}
   end
   
+  #def to_p()
+  #  map{|e|e.to_f / sum }
+  #end
+  
   def sample_number(times = 1)
     result = []
     #puts rand(),(rand()*size).to_i
@@ -129,16 +133,5 @@ module Statistics
 
   def shuffle!
     self.replace shuffle
-  end
-  
-  # Normalize value into probability
-  # self : [[k1,v1],...], [v1,v2,...]
-  def to_p()
-    if self[0].class == Array
-      v_sum = map{|e|e[1]}.sum
-      map{|e|[e[0] , e[1]/v_sum.to_f]}
-    else
-      collect{|e| e.to_f / sum}
-    end
   end
 end

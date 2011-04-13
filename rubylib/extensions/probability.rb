@@ -70,6 +70,12 @@ module ProbabilityOperator
     return results
   end
   
+  def sample_pdist_except(items, times = 1)
+    self_n = self.dup
+    items.each{|e|self_n.delete(e)}
+    self_n.to_p.sample_pdist(times)
+  end
+  
   alias dice sample_pdist
   
   # linear interpolation of two distributions

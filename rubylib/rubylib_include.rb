@@ -7,7 +7,7 @@ require 'matrix'
 $KCODE = "u"
 
 #require 'test/unit'
-require 'extensions/extensions.rb'
+load 'extensions/extensions.rb'
 #require 'extensions/open-uri.rb'
 require 'extensions/exceptions.rb'
 load 'extensions/table.rb'

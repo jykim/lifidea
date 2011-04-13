@@ -20,7 +20,7 @@ class String
   end
   
   def clear_tags()
-    gsub(/\<\/?\w+?\>/, "")
+    gsub("&lt;","<").gsub("&gt;",">").gsub(/\<\/?\w+?\>/, "")
   end
   
   def round(at = 5)
