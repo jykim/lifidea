@@ -87,6 +87,11 @@ module ProbabilityOperator
     #merge(other){|k,v1,v2|v1+v2}.map_hash{|k,v|[k,v/2]}
     map_hash{|k,v|[k,v*(1-lambda)]}.merge(other.map_hash{|k,v|[k,v*lambda]}){|k,v1,v2|v1+v2}
   end
+  
+  def unsmooth(lambda  = 0.5)
+    top1_dist = [self.max_pair].to_p.to_h
+    smooth(lambda, top1_dist)
+  end
 
   # @example
   #  {:a=>1,:b=>2}.sum(:b=>5,:c=>1).inspect
