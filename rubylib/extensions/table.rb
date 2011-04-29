@@ -7,19 +7,26 @@ module Table
     o[:summary] ||= :mean
     
     titles = [titles] if titles.class == String
-    data = data.map{|e|[e]} if data[0].class != Array
+    data = data.map{|e|[o[:round_at] ? e.round_at(o[:round_at]) : e]} if data[0].class != Array
     #raise ArgumentError, "Invalid summary argument" if !titles.respond_to?(o[:summary])
     raise ArgumentError, "Every row should have the same size!" if [titles.size].concat(data.map{|e|e.size}).uniq.size > 1
     raise ArgumentError, "Incorrect data size! (#{data.size}+2=#{size})" if data.size + 2 != size
     self[0].concat(titles)
     1.upto(size-2) do |i|
-      self[i].concat(data[i-1])
+      self[i].concat(data[i-1] )
     end
     if o[:summary] == :none
       self[-1].concat ["summary"]
     else
       self[-1].concat titles.map_with_index{|e,i|data.map{|e2|e2[i]}.send(o[:summary])}
     end
+  end
+  
+  # Create a column by taking difference (col1 - col2)
+  def add_diff_col(cid1, cid2, o = {})
+    col1 = self.map{|row|row[cid1]}
+    col2 = self.map{|row|row[cid2]}
+    add_cols((o[:title] || "#{col1[0]}-#{col2[0]}"), col1[1..-2].map_with_index{|e,i| e - col2[i+1]} )
   end
   
   def export_tbl(filename,o={})
