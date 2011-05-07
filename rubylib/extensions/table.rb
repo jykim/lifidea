@@ -19,7 +19,7 @@ module Table
       self[-1].concat ["summary"]
     else
       self[-1].concat titles.map_with_index{|e,i|
-        data.map{|e2|e2[i]}.send(o[:summary]).round_at(3)}
+        data.map{|e2|e2[i]}.send(o[:summary]).round_at(4)}
     end
   end
   
@@ -27,7 +27,7 @@ module Table
   def add_diff_col(cid1, cid2, o = {})
     col1 = self.map{|row|row[cid1]}
     col2 = self.map{|row|row[cid2]}
-    add_cols((o[:title] || "#{col1[0]}-#{col2[0]}"), col1[1..-2].map_with_index{|e,i| e - col2[i+1]} )
+    add_cols((o[:title] || "#{col1[0]}-#{col2[0]}"), col1[1..-2].map_with_index{|e,i| (e - col2[i+1]).round_at(3)} )
   end
   
   def export_tbl(filename,o={})
