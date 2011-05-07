@@ -18,7 +18,8 @@ module Table
     if o[:summary] == :none
       self[-1].concat ["summary"]
     else
-      self[-1].concat titles.map_with_index{|e,i|data.map{|e2|e2[i]}.send(o[:summary])}
+      self[-1].concat titles.map_with_index{|e,i|
+        data.map{|e2|e2[i]}.send(o[:summary]).round_at(3)}
     end
   end
   
