@@ -31,7 +31,7 @@ module Table
   end
   
   def export_tbl(filename,o={})
-    File.open(filename, 'w'){|f|f.puts self.map{|e|e.join(",")}.join("\n")}
+    File.open(filename, 'w'){|f|f.puts self.map{|e|e.join("\t")}.join("\n")}
   end
   
   def transpose
