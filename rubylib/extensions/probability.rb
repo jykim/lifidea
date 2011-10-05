@@ -17,6 +17,11 @@ module ValueArray
     end
   end
   
+  # sef = [[v1, v2], [v1, v2]]
+  def to_cdist()
+    group_by{|e|e[0]}.map_hash{|k,v|[k, v.map{|e|e[1]}.to_dist]}
+  end
+  
   def to_pdist(o={})
     to_dist(o).to_p
   end

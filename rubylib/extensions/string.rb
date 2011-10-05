@@ -19,8 +19,8 @@ class String
     self.gsub("\n\r","\n").gsub("\r","\n")
   end
   
-  def clear_tags()
-    gsub("&lt;","<").gsub("&gt;",">").gsub(/\<\/?\w+?\>/, "")
+  def clear_tags(replace_with = "")
+    gsub("&lt;","<").gsub("&gt;",">").gsub(/\<\/?\w+?\>/, replace_with)
   end
   
   def round(at = 5)
