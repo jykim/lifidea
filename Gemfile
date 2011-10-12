@@ -5,7 +5,7 @@ source :rubygems
 gem 'rails', '3.0.1'
 gem "hpricot"
 gem 'daemons'
-gem 'mysql'
+#gem 'mysql'
 gem 'mongrel'
 
 #gem "inherited_resources", "1.0.0"
